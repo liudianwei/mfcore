@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+		<TargetFrameworks>netcoreapp3.1;net5</TargetFrameworks>
+    <RootNamespace>MF.Consul</RootNamespace>
+    <AssemblyName>MF.Consul</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Consul" Version="1.6.1.1" />
+  </ItemGroup>
+</Project>

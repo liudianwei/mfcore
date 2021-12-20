@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MF.ApiJob": {
+      "commandName": "Project",
+      "remoteDebugEnabled": false
+    }
+  }
+}

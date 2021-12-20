@@ -1,0 +1,128 @@
+﻿using System;
+
+using SqlSugar;
+
+namespace MF.Job.Core.Business.Info
+{
+    /// <summary>
+    /// Job信息
+    /// </summary>
+    [SugarTable("job_task")]
+    public class JobTask
+    {
+        /// <summary>
+        /// JobID
+        /// </summary>
+        public string BackgroundJobId { get; set; }
+
+        /// <summary>
+        /// Job类型
+        /// </summary>
+        public string JobType { get; set; }
+
+        /// <summary>
+        /// Job名称
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string Description { get; set; }
+
+        /// <summary>
+        /// 程序集名称(所属程序集)
+        /// </summary>
+        public string Target { get; set; }
+
+        /// <summary>
+        /// 类名(完整命名空间的类名)
+        /// </summary>
+        public string TargetDetail { get; set; }
+
+        /// <summary>
+        /// api使用
+        /// </summary>
+        public string Token { get; set; }
+
+        /// <summary>
+        /// api请求方法
+        /// </summary>
+        public string Method { get; set; }
+
+        /// <summary>
+        /// 参数
+        /// </summary>
+        public string JobArgs { get; set; }
+
+        /// <summary>
+        /// Cron表达式
+        /// </summary>
+        public string CronExpression { get; set; }
+
+        /// <summary>
+        /// Cron表达式描述
+        /// </summary>
+        public string CronExpressionDescription { get; set; }
+
+        /// <summary>
+        /// 最后运行时间
+        /// </summary>
+        public DateTime? LastRunTime { get; set; }
+
+        /// <summary>
+        /// 下次运行时间
+        /// </summary>
+        public DateTime? NextRunTime { get; set; }
+
+        /// <summary>
+        /// 运行次数
+        /// </summary>
+        public int RunCount { get; set; }
+
+        /// <summary>
+        /// 状态  0-停止  1-运行  2-删除  3-正在启动中...  5-停止中...
+        /// </summary>
+        public int State { get; set; }
+
+        /// <summary>
+        /// 排序
+        /// </summary>
+        public int DisplayOrder { get; set; }
+
+        /// <summary>
+        /// 创建人ID
+        /// </summary>
+        public string CreatedByUserId { get; set; }
+
+        /// <summary>
+        /// 创建人姓名
+        /// </summary>
+        public string CreatedByUserName { get; set; }
+
+        /// <summary>
+        /// 创建日期时间
+        /// </summary>
+        public DateTime CreatedDateTime { get; set; }
+
+        /// <summary>
+        /// 最后更新人ID
+        /// </summary>
+        public string LastUpdatedByUserId { get; set; }
+
+        /// <summary>
+        /// 最后更新人姓名
+        /// </summary>
+        public string LastUpdatedByUserName { get; set; }
+
+        ///// <summary>
+        ///// 最后更新时间
+        ///// </summary>
+        public DateTime LastUpdatedDateTime { get; set; }
+
+        /// <summary>
+        /// 异常信息
+        /// </summary>
+        public string ErrorMsg { get; set; } = "";
+    }
+}
