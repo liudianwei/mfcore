@@ -10,4 +10,8 @@
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.2" />
     </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\MF.Job\MF.Job.csproj" />
+    </ItemGroup>
 </Project>

@@ -63,6 +63,10 @@ cd MF.Message
 dotnet pack --output ./../../core-nupkgs
 
 cd ..
+cd MF.Misdata
+dotnet pack --output ./../../core-nupkgs
+
+cd ..
 cd MF.NetCoreApp
 dotnet pack --output ./../../core-nupkgs
 

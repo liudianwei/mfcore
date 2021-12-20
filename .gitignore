@@ -2,6 +2,7 @@
 .vscode
 bin
 obj
+core-nupkgs
 TestResults
 Backup*/
 UpgradeLog*.XML

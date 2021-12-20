@@ -18,6 +18,11 @@ namespace MF.Core.Extensions
             return arrDesc[0]?.Description;
         }
 
+        public static string GetValueStr(this Enum obj)
+        {
+            return obj.ToInt32().ToString();
+        }
+
         public static T ToEnum<T>(this string obj)
         {
             return (T)Enum.Parse(typeof(T), obj);

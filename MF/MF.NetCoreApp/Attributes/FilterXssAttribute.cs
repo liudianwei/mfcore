@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-using Microsoft.Extensions.Logging;
-using System.Reflection;
 
 namespace MF.NetCoreApp.Attributes
 {
