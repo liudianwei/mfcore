@@ -2,10 +2,11 @@
 
   <PropertyGroup>
 	  <TargetFrameworks>netcoreapp3.1;net5</TargetFrameworks>
+	  <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SqlSugarCore" Version="5.0.4.3-preview05" />
+    <PackageReference Include="SqlSugarCore" Version="5.0.4.7" />
   </ItemGroup>
 
 </Project>
