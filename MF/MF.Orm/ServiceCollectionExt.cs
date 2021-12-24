@@ -305,6 +305,8 @@ namespace MF.Extensions.DependencyInjection
             //    "MF.Modules.UserCenter.Shared.dll"
             //};
 
+            var dllsStr = "";
+            string[] dllns = null;
             List<string> dllnames = new List<string>()
             {
                 "MF.Orm.dll"
@@ -312,16 +314,40 @@ namespace MF.Extensions.DependencyInjection
 
             try
             {
+                dllsStr = configuration["Orm:Dlls"];
+                if (dllsStr == "")
+                {
+                    Console.WriteLine("配置Orm:Dlls没有找到或内容空，请填写包含数据库实体的dll名称");
+                    return;
+                }
+                dllns = dllsStr.Split(",");
+                if (dllns.Length == 0)
+                {
+                    Console.WriteLine("配置Orm:Dlls没有找到或内容空，请填写包含数据库实体的dll名称");
+                    return;
+                }
+
+                dllnames = dllns.ToList();
+            }
+            catch (Exception ee) 
+            {
+                Console.WriteLine(ee.Message);
+                Console.WriteLine(ee.StackTrace);
+                return;
+            }
+
+            try
+            {
                 var path = Environment.CurrentDirectory;
-                Console.WriteLine("当前环境 " + env.EnvironmentName);
+                log.LogError("当前环境 " + env.EnvironmentName);
                 if (env.EnvironmentName == "Development")
                 {
-                    path = Path.Combine(path, "bin", "netcoreapp3.1");
+                    path = Path.Combine(path, "bin", configuration["Orm:DllDir"]);
                 }
-                Console.WriteLine("dll路径: " + path);
+                log.LogError("dll路径: " + path);
                 foreach (var dllpath in dllnames)
                 {
-                    var ass = Assembly.LoadFrom(Path.Combine(path, dllpath));
+                    var ass = Assembly.LoadFrom(Path.Combine(path, dllpath+".dll"));
                     var types = ass.GetTypes().ToList();
                     types = types.Where(i => i.GetCustomAttribute<SugarTable>() != null).ToList();
 
@@ -332,13 +358,15 @@ namespace MF.Extensions.DependencyInjection
                         {
                             entitys.Add(tablename, type);
                         }
+                        else
+                        {
+                            log.LogError($"表实体：{tablename} 重复");
+                        }
                     }
                 }
             }
             catch (Exception ee)
             {
-                Console.WriteLine("加载表实体模型dll异常");
-                Console.WriteLine(ee.Message);
                 log.LogError("加载表实体模型dll异常");
                 log.LogError(ee.Message);
                 return;
@@ -346,6 +374,14 @@ namespace MF.Extensions.DependencyInjection
 
             //获取当前数据库所有表名称
             //db.EntityMaintenance.GetEntityInfo();
+
+            //var lss = entitys.Keys.ToList();
+            //lss.Sort();
+
+            //foreach (var tnn in lss)
+            //{
+            //    Console.WriteLine(tnn);
+            //}
 
             try
             {
@@ -416,7 +452,15 @@ namespace MF.Extensions.DependencyInjection
 
                 Console.WriteLine(sqlName + " Init Record...");
                 log.LogInformation(sqlName + " Init Record...");
-                db.Ado.ExecuteCommand(sql);
+                try
+                {
+                    db.Ado.ExecuteCommand(sql);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("ExecuteCommand：" + ex.StackTrace);
+                    log.LogError("ExecuteCommand：" + ex.StackTrace);
+                }
             }
             else
             {

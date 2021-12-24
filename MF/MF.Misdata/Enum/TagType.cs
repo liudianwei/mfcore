@@ -8,116 +8,116 @@ namespace Common.Model
         /// <summary>
         ///
         /// </summary>
-        @short = 2,
+        @short,
 
         /// <summary>
         ///
         /// </summary>
-        shortArray = 2,
+        shortArray,
 
         /// <summary>
         ///
         /// </summary>
-        @int = 3,
+        @int,
 
         /// <summary>
         ///
         /// </summary>
-        intArray = 3,
+        intArray,
 
         /// <summary>
         ///
         /// </summary>
-        @float = 4,
+        @float,
 
         /// <summary>
         ///
         /// </summary>
-        floatArray = 4,
+        floatArray,
 
         /// <summary>
         ///
         /// </summary>
-        datetime = 7,
+        datetime,
 
         /// <summary>
         ///
         /// </summary>
-        datetimeArray = 7,
+        datetimeArray,
 
         /// <summary>
         ///
         /// </summary>
-        @string = 8,
+        @string,
 
         /// <summary>
         ///
         /// </summary>
-        @bool = 11,
+        @bool,
 
         /// <summary>
         ///
         /// </summary>
-        boolArray = 11,
+        boolArray,
 
         /// <summary>
         /// /
         /// </summary>
-        @sbyte = 16,
+        @sbyte,
 
         /// <summary>
         /// /
         /// </summary>
-        sbyteArray = 16,
+        sbyteArray,
 
         /// <summary>
         /// /
         /// </summary>
-        @byte = 17,
+        @byte,
 
         /// <summary>
         ///
         /// </summary>
-        byteArray = 17,
+        byteArray,
 
         /// <summary>
         ///
         /// </summary>
-        @ushort = 18,
+        @ushort,
 
         /// <summary>
         ///
         /// </summary>
-        ushortArray = 18,
+        ushortArray,
 
         /// <summary>
         /// /
         /// </summary>
-        @uint = 19,
+        @uint,
 
         /// <summary>
         /// /
         /// </summary>
-        uintArray = 19,
+        uintArray,
 
         /// <summary>
         ///
         /// </summary>
-        time = 2,
+        time,
 
         /// <summary>
         ///
         /// </summary>
-        timeArray = 2,
+        timeArray,
 
         /// <summary>
         ///
         /// </summary>
-        tod = 19,
+        tod,
 
         /// <summary>
         ///
         /// </summary>
-        todArray = 19
+        todArray
     }
 }

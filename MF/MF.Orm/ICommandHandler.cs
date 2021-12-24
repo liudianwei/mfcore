@@ -53,15 +53,15 @@ namespace MF.Orm
         {
             if (state.IsNull())
             {
-                return Failed(BaseError.BATCH_STATE_NULL);
+                return Failed(BaseSystemError.BATCH_STATE_NULL);
             }
             if (ids.Count == 0)
             {
-                return Failed(BaseError.BATCH_STATE_DATA_NULL);
+                return Failed(BaseSystemError.BATCH_STATE_DATA_NULL);
             }
             List<T> list = new List<T>();
             var stateL = Trepository.Queryable().Where(i => ids.Contains(i.Id)).ToList();
-            if (stateL.Count != ids.Count) return Failed(BaseError.OBJECT_DOES_NOT_EXIST);
+            if (stateL.Count != ids.Count) return Failed(BaseSystemError.OBJECT_DOES_NOT_EXIST);
 
             foreach (var item in stateL)
             {
