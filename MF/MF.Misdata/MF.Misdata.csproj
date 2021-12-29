@@ -7,12 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MF.Orm" Version="1.0.3" />
     <PackageReference Include="MQTTnet" Version="3.1.1" />
     <PackageReference Include="StackExchange.Redis" Version="2.2.88" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\MF.Orm\MF.Orm.csproj" />
   </ItemGroup>
 
 </Project>

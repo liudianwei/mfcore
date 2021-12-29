@@ -60,6 +60,7 @@ namespace Common.Communication
         /// <param name="token"></param>
         /// <param name="tokenkey"></param>
         /// <returns></returns>
+        [Obsolete]
         public static OperateResultValue Delete(string resource,
                                                 Parameter p,
                                                 string mediatype = "application/json",

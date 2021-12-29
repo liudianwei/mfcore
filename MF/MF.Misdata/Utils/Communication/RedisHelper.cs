@@ -17,7 +17,7 @@ namespace Common.Communication
         /// <summary>
         /// Redis 客户端
         /// </summary>
-        public static RedisClient redisClient;
+        public static RedisClient redisClient { get; set; }
 
         /// <summary>
         /// Redis 地址
