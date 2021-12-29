@@ -17,7 +17,7 @@ namespace Common.Communication
     public class MQTTHelper
     {
         /// <summary>
-        /// Mqtt «È?ºİ
+        /// Mqtt å®¢æˆ·ç«¯
         /// </summary>
         public static MqttClient mqttClient { get; set; }
 
@@ -52,20 +52,18 @@ namespace Common.Communication
         private static readonly bool CleanSession = ConfigHelper.GetAppseting("MQTT:CleanSession") == "1";
 
         /// <summary>
-        /// mqtt?¥¬³q¹D
+        /// mqttå‘å¸ƒé€šé“
         /// </summary>
         private static readonly string SentTopic = ConfigHelper.GetAppseting("MQTT:SentTopic");
 
         /// <summary>
-        /// mqtt??³q¹D
+        /// mqttè®¢é˜…é€šé“
         /// </summary>
         private static readonly string RecvTopic = ConfigHelper.GetAppseting("MQTT:RecvTopic");
 
         /// <summary>
-        /// ªì©l¤Æ«È?ºİ
+        /// åˆå§‹åŒ–å®¢æˆ·ç«¯
         /// </summary>
-                SystemLog.Fatal($"### MQTT CREATE FAILED ###{ex.Message}", ex);
-                SystemLog.Fatal($"### MQTT PUBLISH FAILED ###{ex.Message}", ex);
         /// <returns></returns>
         public static bool InitMqttClient()
         {
@@ -79,7 +77,6 @@ namespace Common.Communication
             catch (Exception ex)
             {
                 SystemLog.Fatal("InitMqttClient", ex);
-                SystemLog.Fatal($"### MQTT RECONNECTING FAILED ###{ex.Message}", ex);
             }
 
             return flag;
