@@ -80,6 +80,7 @@ namespace MF.Extensions.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddSqlSugarClient<T>(this IServiceCollection services, Action<ConnectionConfig> configAction, ServiceLifetime lifetime = ServiceLifetime.Scoped) where T : SqlSugarClient
         {
+            services.GetMachineCodeString();
             switch (lifetime)
             {
                 case ServiceLifetime.Singleton:
@@ -371,7 +372,7 @@ namespace MF.Extensions.DependencyInjection
                 log.LogError(ee.Message);
                 return;
             }
-
+            Console.WriteLine($"{entitys.Count} 张表");
             //获取当前数据库所有表名称
             //db.EntityMaintenance.GetEntityInfo();
 
@@ -452,15 +453,16 @@ namespace MF.Extensions.DependencyInjection
 
                 Console.WriteLine(sqlName + " Init Record...");
                 log.LogInformation(sqlName + " Init Record...");
-                try
-                {
-                    db.Ado.ExecuteCommand(sql);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("ExecuteCommand：" + ex.StackTrace);
-                    log.LogError("ExecuteCommand：" + ex.StackTrace);
-                }
+                db.Ado.ExecuteCommand(sql);
+                //try
+                //{
+                //    db.Ado.ExecuteCommand(sql);
+                //}
+                //catch (Exception ex)
+                //{
+                //    Console.WriteLine("ExecuteCommand：" + ex.StackTrace);
+                //    log.LogError("ExecuteCommand：" + ex.StackTrace);
+                //}
             }
             else
             {

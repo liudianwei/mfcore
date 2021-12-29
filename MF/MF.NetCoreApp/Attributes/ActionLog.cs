@@ -69,25 +69,25 @@ namespace MF.NetCoreApp.Attributes
             //}
 
             //授权
-            //bool ignore = false;
-            //foreach (var item in context.Filters)
-            //{
-            //    if (item.GetType() == typeof(IgnoreValid))
-            //    {
-            //        ignore = true;
-            //    }
-            //}
+            bool ignore = false;
+            foreach (var item in context.Filters)
+            {
+                if (item.GetType() == typeof(IgnoreValid))
+                {
+                    ignore = true;
+                }
+            }
 
             //授权
-            //if (!ignore)
-            //{
-            //    if (!new Esnecil().Check())
-            //    {
-            //        context.Result = new ObjectResult("") { StatusCode = 303 };
-            //        base.OnActionExecuting(context);
-            //        return;
-            //    }
-            //}
+            if (!ignore)
+            {
+                if (!new Esnecil().Check())
+                {
+                    context.Result = new ObjectResult("") { StatusCode = 303 };
+                    base.OnActionExecuting(context);
+                    return;
+                }
+            }
 
             //查询缓存中是否存在TOKEN 没有就返回错误
 

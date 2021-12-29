@@ -4,7 +4,7 @@ using MF.FluentValidation;
 using MF.Utils.Json;
 
 using Microsoft.AspNetCore.Http;
-
+using NLog;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -117,7 +117,7 @@ namespace MF.NetCoreApp.Middleware
                 Message = ex.Message,
                 Status = "error"
             };
-
+            logger.Error(ex.Message);
             httpResponse.HttpContext.Request.Headers.TryGetValue("Accept-Language", out var lang);
             string langstr = null;
             if (lang != "")
@@ -132,6 +132,7 @@ namespace MF.NetCoreApp.Middleware
             await httpResponse.WriteAsync(res.JilToJsonCamelCase());
         }
 
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
         private Task HandleExceptionAsync(HttpResponse httpResponse, int statusCode, string msg)
         {
             var res = new HttpResult
@@ -140,6 +141,7 @@ namespace MF.NetCoreApp.Middleware
                 Message = msg,
                 Status = "error"
             };
+            logger.Info(msg);
             httpResponse.ContentType = ContentType;
             return httpResponse.WriteAsync(res.JilToJsonCamelCase());
         }

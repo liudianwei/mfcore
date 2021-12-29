@@ -352,6 +352,9 @@ namespace MF.NetCoreApp
                     exportCount = list.Count;
                 }
 
+                //修改状态为开始下载状态 导出正在导出
+                MRestClient.Post(domain, $"rest/productcenter/v1/exportlog/modify-export-status-1", JsonConvert.SerializeObject(new { id = cmd.TaskId, exportCount, startTime }), $"Bearer {token}");
+
                 //开始导出操作
                 var items = ExportExcelLocal<T>(resp, BaseStateConstants.excelOutPath, new Action<int>((process) =>
                 {

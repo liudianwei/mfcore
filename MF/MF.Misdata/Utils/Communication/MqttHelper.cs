@@ -94,6 +94,7 @@ namespace Common.Communication
             catch (Exception ex)
             {
                 Console.WriteLine($"### MQTT CREATE FAILED ###{ex.Message}");
+                SystemLog.Fatal($"### MQTT CREATE FAILED ###{ex.Message}", ex);
             }
         }
 
@@ -126,6 +127,7 @@ namespace Common.Communication
             catch (Exception ex)
             {
                 Console.WriteLine($"### MQTT PUBLISH FAILED ###{ex.Message}");
+                SystemLog.Fatal($"### MQTT PUBLISH FAILED ###{ex.Message}", ex);
             }
         }
 
@@ -146,6 +148,7 @@ namespace Common.Communication
             catch (Exception ex)
             {
                 Console.WriteLine($"### MQTT RECONNECTING FAILED ###{ex.Message}");
+                SystemLog.Fatal($"### MQTT RECONNECTING FAILED ###{ex.Message}", ex);
             }
         }
 

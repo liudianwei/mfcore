@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DeviceId;
+using System;
 using System.Linq;
 using System.Management;
 using System.Security.Cryptography;
@@ -9,24 +9,34 @@ namespace MF.Utils
 {
     public class MachineCode
     {
-        private static MachineCode machineCode;
         private static string machineCodeString = "";
 
         public static string GetMachineCodeString()
-        {
+        { 
             if (machineCodeString != "")
             {
                 return machineCodeString;
             }
+            machineCodeString = new DeviceIdBuilder()
+            .AddMachineName()
+            .AddOsVersion()
+            .OnWindows(windows => windows
+                .AddProcessorId()
+                .AddMotherboardSerialNumber()
+                .AddSystemDriveSerialNumber())
+            .OnLinux(linux => linux
+                .AddMotherboardSerialNumber()
+                .AddSystemDriveSerialNumber())
+            .ToString();
 
-            if (machineCode == null)
-            {
-                machineCode = new MachineCode();
-            }
-            machineCodeString = "MACROINF." + machineCode.GetCpuInfo()
-                + "." + machineCode.GetHDid();
-            //+ "." + machineCode.GetMoAddress();
-            machineCodeString = ToReverse(To_md5(machineCodeString)).ToUpper();
+            //if (machineCode == null)
+            //{
+            //    machineCode = new MachineCode();
+            //}
+            //machineCodeString = "MACROINF." + machineCode.GetCpuInfo()
+            //    + "." + machineCode.GetHDid();
+            ////+ "." + machineCode.GetMoAddress();
+            //machineCodeString = ToReverse(To_md5(machineCodeString)).ToUpper();
             return machineCodeString;
         }
 

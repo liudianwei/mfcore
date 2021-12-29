@@ -1,3 +1,5 @@
+using MF.NetCoreApp;
+using MF.Utils;
 using Microsoft.Extensions.Configuration;
 
 using System;
@@ -30,7 +32,23 @@ namespace Common.Utils
             }
             catch (Exception e)
             {
-                SystemLog.Fatal("Config初始化失败", e);
+                Console.WriteLine("Config初始化失败!");
+                SystemLog.Fatal("Config初始化失败!", e);
+                throw e;
+            }
+            try
+            {
+                var strMachineCode = MachineCode.GetMachineCodeString();
+                Console.WriteLine($"机器码:{strMachineCode}");
+                var item = new Esnecil().CheckMisdataCr(strMachineCode);
+                if (!item.Item1)
+                {
+                    Console.WriteLine($"授权失败,请联系管理员进行授权!throw message===>{item.Item2}");
+                    throw new Exception($"授权失败,请联系管理员进行授权!throw message===>{item.Item2}；机器码为===>{strMachineCode}");
+                }
+            }
+            catch (Exception e)
+            {
                 throw e;
             }
         }
