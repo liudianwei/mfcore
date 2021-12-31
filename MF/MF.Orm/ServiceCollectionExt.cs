@@ -394,6 +394,7 @@ namespace MF.Extensions.DependencyInjection
                 Console.WriteLine(ee.Message);
                 //TODO 退出服务程序
             }
+            var til = db.DbMaintenance.GetTableInfoList();
 
             var tables = db.DbMaintenance.GetTableInfoList().OrderBy(i => i.Name).Distinct().ToList();
             if (tables.Count != 0)
@@ -446,23 +447,21 @@ namespace MF.Extensions.DependencyInjection
 
         private static void ExecuteSql(SqlSugarClient db, string sqlName, ILogger log)
         {
-            var sqlpath = Path.Combine(Environment.CurrentDirectory, sqlName + ".sql");
+            //var sqlpath = Path.Combine(Environment.CurrentDirectory, sqlName + ".sql");
+            var sqlpath = Path.Combine(Environment.CurrentDirectory, "mysql.sql");
             if (File.Exists(sqlpath))
             {
                 var sql = File.ReadAllText(sqlpath);
-
+                if (sqlName == "sqlserver")
+                {
+                    sql = sql.Replace("`", "");
+                    sql = sql.Replace("SET NAMES utf8mb4;", "");
+                    sql = sql.Replace("SET FOREIGN_KEY_CHECKS = 0;", "");
+                    sql = sql.Replace("SET FOREIGN_KEY_CHECKS = 1;", "");
+                }
                 Console.WriteLine(sqlName + " Init Record...");
                 log.LogInformation(sqlName + " Init Record...");
                 db.Ado.ExecuteCommand(sql);
-                //try
-                //{
-                //    db.Ado.ExecuteCommand(sql);
-                //}
-                //catch (Exception ex)
-                //{
-                //    Console.WriteLine("ExecuteCommand：" + ex.StackTrace);
-                //    log.LogError("ExecuteCommand：" + ex.StackTrace);
-                //}
             }
             else
             {

@@ -23,7 +23,7 @@ namespace MF.Orm
         /// Default:NULL
         /// Nullable:True
         /// </summary>
-        [SugarColumn(ColumnName = "inner_version", IsEnableUpdateVersionValidation = true, ColumnDataType = ("bigint"), Length = 20, ColumnDescription = "内部版本 乐观锁 标识字段,同一时间不能同时操作", DefaultValue = "0")]
+        [SugarColumn(ColumnName = "inner_version", IsEnableUpdateVersionValidation = true, ColumnDataType = ("bigint"), ColumnDescription = "内部版本 乐观锁 标识字段,同一时间不能同时操作", DefaultValue = "0")]
         public virtual int InnerVersion { get; set; }
 
         /// <summary>
