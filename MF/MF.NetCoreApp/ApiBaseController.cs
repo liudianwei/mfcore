@@ -263,7 +263,10 @@ namespace MF.NetCoreApp
                     }
                 }
             }
-
+            if (false == Directory.Exists(outpath))
+            {
+                Directory.CreateDirectory(outpath);
+            }
             var OutFullPath = $"{outpath}{Guid.NewGuid()}.xlsx";
             using (var fs = System.IO.File.OpenWrite(OutFullPath))
             {
