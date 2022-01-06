@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Common.Utils.MacroInfoLogger
+namespace HslCommunication.LogNet
 {
     /// <summary>
     /// 一个通用的日志接口
@@ -19,9 +19,16 @@ namespace Common.Utils.MacroInfoLogger
     public interface ILogNet : IDisposable
     {
         /// <summary>
-        /// 文件存储模式，1:单文件，2:根据大小，3:根据时间
+		/// 日志存储模式，1:单文件，2:按大小存储，3:按时间存储<br />
+		/// Log storage mode, 1: single file, 2: storage by size, 3: storage by time
+		/// </summary>
+		LogSaveMode LogSaveMode { get; }
+
+        /// <summary>
+        /// 获取或设置当前的日志信息在存储的时候是否在控制台进行输出，默认不输出。<br />
+        /// Gets or sets whether the current log information is output on the console when it is stored. It is not output by default.
         /// </summary>
-        int LogSaveMode { get; }
+        bool ConsoleOutput { get; set; }
 
         /// <summary>
         /// 存储之前引发的事件，允许额外的操作
@@ -132,13 +139,13 @@ namespace Common.Utils.MacroInfoLogger
         /// <summary>
         /// 写入一行换行符
         /// </summary>
-        void WriteNewLine();
+        void WriteNewLine(string filename);
 
         /// <summary>
         /// 写入一条解释性的信息
         /// </summary>
         /// <param name="description"></param>
-        void WriteDescrition(string description);
+        void WriteDescrition(string description, string filename);
 
         /// <summary>
         /// 设置日志的存储等级，高于该等级的才会被存储

@@ -1,5 +1,4 @@
-using Common.Utils.MacroInfoLogger;
-
+using HslCommunication.LogNet;
 using System;
 
 namespace Common.Utils
@@ -13,7 +12,7 @@ namespace Common.Utils
         /// 初始化系统日志
         /// </summary>
         /// <returns></returns>
-        private static readonly ILogNet _logger = new LogNetDateTime(ConfigHelper.GetAppseting("Logger:DirPath"), ConfigHelper.GetAppseting("Logger:SystemName"), GenerateMode.ByEveryDay);
+        private static readonly ILogNet _logger = new LogNetDateTime(ConfigHelper.GetAppseting("Logger:DirPath") + ConfigHelper.GetAppseting("Logger:SystemName"), GenerateMode.ByEveryDay);
 
         private SystemLog()
         {

@@ -1,10 +1,11 @@
-﻿using System;
+﻿using HslCommunication.LogNet;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
 
-namespace Common.Utils.MacroInfoLogger
+namespace HslCommunication.LogNet
 {
     /// <summary>
     /// 日志存储类的基类，提供一些基础的服务
@@ -33,53 +34,40 @@ namespace Common.Utils.MacroInfoLogger
             filtrateLock = new SimpleHybirdLock();
         }
 
-        private const string u0002 = "\u0002";
-
         #endregion Constructor
 
         #region Private Member
 
-        private HslMessageDegree m_messageDegree = HslMessageDegree.DEBUG;                    // 默认的存储规则
-        private Queue<HslMessageItem> m_WaitForSave;                                          // 待存储数据的缓存
-        private SimpleHybirdLock m_simpleHybirdLock;                                          // 缓存列表的锁
-        private int m_SaveStatus = 0;                                                         // 存储状态
-        private readonly List<string> filtrateKeyword;                                        // 需要过滤的存储对象
-        private readonly SimpleHybirdLock filtrateLock;                                       // 过滤列表的锁
+        /// <summary>
+		/// 文件存储的锁
+		/// </summary>
+		protected SimpleHybirdLock m_fileSaveLock;                                             // 文件的锁
+
+        private HslMessageDegree m_messageDegree = HslMessageDegree.DEBUG;                     // 默认的存储规则
+        private Queue<HslMessageItem> m_WaitForSave;                                           // 待存储数据的缓存
+        private SimpleHybirdLock m_simpleHybirdLock;                                           // 缓存列表的锁
+        private int m_SaveStatus = 0;                                                          // 存储状态
+        private List<string> filtrateKeyword;                                                  // 需要过滤的存储对象
+        private SimpleHybirdLock filtrateLock;                                                 // 过滤列表的锁
 
         #endregion Private Member
 
-        #region Protect Member
-
-        /// <summary>
-        /// 文件存储的锁
-        /// </summary>
-        protected SimpleHybirdLock m_fileSaveLock;                                             // 文件的锁
-
-        #endregion Protect Member
-
         #region Event Handle
 
-        /// <summary>
-        /// 在存储到文件的时候将会触发的事件
-        /// </summary>
-        public event EventHandler<HslEventArgs> BeforeSaveToFile = null;
+        /// <inheritdoc cref="ILogNet.BeforeSaveToFile"/>
+		public event EventHandler<HslEventArgs> BeforeSaveToFile = null;
 
-        private void OnBeforeSaveToFile(HslEventArgs args)
-        {
-            BeforeSaveToFile?.Invoke(this, args);
-        }
+        private void OnBeforeSaveToFile(HslEventArgs args) => BeforeSaveToFile?.Invoke(this, args);
 
         #endregion Event Handle
 
         #region Public Member
 
-        /// <summary>
-        /// 日志存储模式，1:单文件，2:按大小存储，3:按时间存储
-        /// </summary>
-        public int LogSaveMode { get; protected set; }
+        /// <inheritdoc cref="ILogNet.LogSaveMode"/>
+        public LogSaveMode LogSaveMode { get; protected set; }
 
         /// <inheritdoc cref="ILogNet.ConsoleOutput"/>
-		public bool ConsoleOutput { get; set; } = true;
+        public bool ConsoleOutput { get; set; }
 
         #endregion Public Member
 
@@ -228,23 +216,32 @@ namespace Common.Utils.MacroInfoLogger
         /// <summary>
         /// 写入一条换行符
         /// </summary>
-        public void WriteNewLine()
+        public void WriteNewLine(string filename)
         {
-            ThreadPool.QueueUserWorkItem(new WaitCallback(ThreadPoolSaveText), $"{u0002}{Environment.NewLine}");
+            RecordMessage(HslMessageDegree.None, string.Empty, "\u0002" + Environment.NewLine, filename);
+        }
+
+        /// <summary>
+        /// 设置日志的存储等级，高于该等级的才会被存储
+        /// </summary>
+        /// <param name="degree">消息等级</param>
+        public void SetMessageDegree(HslMessageDegree degree)
+        {
+            m_messageDegree = degree;
         }
 
         /// <summary>
         /// 写入一条解释性的消息，不需要带有回车键
         /// </summary>
         /// <param name="description">解释性的文本</param>
-        public void WriteDescrition(string description)
+        public void WriteDescrition(string description, string filename)
         {
             if (string.IsNullOrEmpty(description)) return;
 
             // 和上面的文本之间追加一行空行
-            StringBuilder stringBuilder = new StringBuilder(u0002);
+            StringBuilder stringBuilder = new StringBuilder("\u0002");
             stringBuilder.Append(Environment.NewLine);
-            stringBuilder.Append($"{u0002}/");
+            stringBuilder.Append("\u0002/");
 
             int count = 118 - CalculateStringOccupyLength(description);
             if (count >= 8)
@@ -284,17 +281,7 @@ namespace Common.Utils.MacroInfoLogger
 
             stringBuilder.Append('/');
             stringBuilder.Append(Environment.NewLine);
-
-            ThreadPool.QueueUserWorkItem(new WaitCallback(ThreadPoolSaveText), stringBuilder.ToString());
-        }
-
-        /// <summary>
-        /// 设置日志的存储等级，高于该等级的才会被存储
-        /// </summary>
-        /// <param name="degree">消息等级</param>
-        public void SetMessageDegree(HslMessageDegree degree)
-        {
-            m_messageDegree = degree;
+            RecordMessage(HslMessageDegree.None, string.Empty, stringBuilder.ToString(), filename);
         }
 
         #endregion Log Method
@@ -378,7 +365,7 @@ namespace Common.Utils.MacroInfoLogger
             m_fileSaveLock.Enter();
 
             // 获取要存储的文件名称
-            string LogSaveFileName = GetFileSaveName() + "\\" + current.filename;
+            string LogSaveFileName = GetFileSaveName() + "\\" + current.FileName;
 
             if (!string.IsNullOrEmpty(LogSaveFileName))
             {
@@ -395,15 +382,15 @@ namespace Common.Utils.MacroInfoLogger
                     while (current != null)
                     {
                         if (ConsoleOutput) ConsoleWriteLog(current);
-                        if (current.filename.Trim() == "")
+                        if (current.FileName.Trim() == "")
                         {
-                            current.filename = "common";
+                            current.FileName = "common";
                         }
-                        LogSaveFileName = $"{LogSaveFileName}\\{current.filename}_{current.Degree}.log";
-                        if (!swmsp.ContainsKey($"{current.filename}_{current.Degree}"))
+                        LogSaveFileName = $"{LogSaveFileName}\\{current.FileName}_{current.Degree}.log";
+                        if (!swmsp.ContainsKey($"{current.FileName}_{current.Degree}"))
                         {
                             sw = new StreamWriter(LogSaveFileName, true, Encoding.UTF8);
-                            swmsp.Add($"{current.filename}_{current.Degree}", sw);
+                            swmsp.Add($"{current.FileName}_{current.Degree}", sw);
                         }
                         // 触发事件
                         OnBeforeSaveToFile(new HslEventArgs() { HslMessage = current });
@@ -459,8 +446,8 @@ namespace Common.Utils.MacroInfoLogger
 
             // 释放锁
             m_fileSaveLock.Leave();
-
             Interlocked.Exchange(ref m_SaveStatus, 0);
+            OnWriteCompleted();
 
             // 再次检测锁是否释放完成
             if (m_WaitForSave.Count > 0)
@@ -471,18 +458,25 @@ namespace Common.Utils.MacroInfoLogger
 
         private static string HslMessageFormate(HslMessageItem hslMessage)
         {
-            StringBuilder stringBuilder = new StringBuilder(u0002);
-            stringBuilder.Append($"[{LogNetManagment.GetDegreeDescription(hslMessage.Degree)}] ");
-
-            stringBuilder.Append(hslMessage.Time.ToString("yyyy-MM-dd HH:mm:ss.fff"));
-            stringBuilder.Append($" thread:[{hslMessage.ThreadId:D2}] ");
-
-            if (!string.IsNullOrEmpty(hslMessage.KeyWord))
+            StringBuilder stringBuilder = new StringBuilder();
+            if (hslMessage.Degree != HslMessageDegree.None)
             {
-                stringBuilder.Append(hslMessage.KeyWord);
-                stringBuilder.Append(" : ");
-            }
+                stringBuilder.Append("\u0002");
+                stringBuilder.Append("[");
+                stringBuilder.Append(LogNetManagment.GetDegreeDescription(hslMessage.Degree));
+                stringBuilder.Append("] ");
 
+                stringBuilder.Append(hslMessage.Time.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                stringBuilder.Append(" thread:[");
+                stringBuilder.Append(hslMessage.ThreadId.ToString("D3"));
+                stringBuilder.Append("] ");
+
+                if (!string.IsNullOrEmpty(hslMessage.KeyWord))
+                {
+                    stringBuilder.Append(hslMessage.KeyWord);
+                    stringBuilder.Append(" : ");
+                }
+            }
             stringBuilder.Append(hslMessage.Text);
 
             return stringBuilder.ToString();
@@ -539,6 +533,13 @@ namespace Common.Utils.MacroInfoLogger
         }
 
         /// <summary>
+		/// 当写入文件完成的时候触发，这时候已经释放了文件的句柄了。<br />
+		/// Triggered when writing to the file is complete, and the file handle has been released.
+		/// </summary>
+		protected virtual void OnWriteCompleted()
+        { }
+
+        /// <summary>
         /// 返回检查的路径名称，将会包含反斜杠
         /// </summary>
         /// <param name="filePath">路径信息</param>
@@ -577,7 +578,7 @@ namespace Common.Utils.MacroInfoLogger
                 Text = text,
                 ThreadId = Thread.CurrentThread.ManagedThreadId,
                 Time = DateTime.Now,
-                filename = filename
+                FileName = filename
             };
         }
 

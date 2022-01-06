@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Common.Utils.MacroInfoLogger
+namespace HslCommunication.LogNet
 {
     /*************************************************************************************
      *
@@ -86,7 +86,7 @@ namespace Common.Utils.MacroInfoLogger
                     //builder.Append("错误源：");
                     //builder.Append(ex.Source);
                     //builder.Append(Environment.NewLine);
-                    builder.Append("错误堆栈："); 
+                    builder.Append("错误堆栈：");
                     builder.Append(Environment.NewLine);
                     builder.Append(ex.StackTrace);
                     builder.Append(Environment.NewLine);

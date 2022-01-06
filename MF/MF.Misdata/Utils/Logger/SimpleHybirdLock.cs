@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace Common.Utils.MacroInfoLogger
+namespace HslCommunication.LogNet
 {
     /// <summary>
     /// 一个简单的混合线程同步锁，采用了基元用户加基元内核同步构造实现
