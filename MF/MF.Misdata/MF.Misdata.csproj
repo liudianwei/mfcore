@@ -3,7 +3,7 @@
   <PropertyGroup>
 	  <TargetFrameworks>net5</TargetFrameworks>
     <Platforms>AnyCPU;ARM64</Platforms>
-    <Version>1.0.3-rc9</Version>
+    <Version>1.0.4-rc1</Version>
     <PackageReleaseNotes>优化mqttclient，并进行异常测试:(1)断服务器(2)超时</PackageReleaseNotes>
   </PropertyGroup>
 

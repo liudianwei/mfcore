@@ -43,8 +43,10 @@ namespace Common.Utils
                 var item = new Esnecil().CheckMisdataCr(strMachineCode);
                 if (!item.Item1)
                 {
-                    Console.WriteLine($"授权失败,请联系管理员进行授权!throw message===>{item.Item2}");
-                    throw new Exception($"授权失败,请联系管理员进行授权!throw message===>{item.Item2}；机器码为===>{strMachineCode}");
+                    var msg = $"授权失败,请联系管理员进行授权!Warning Message ===>{item.Item2}；机器码为===>{strMachineCode}";
+                    Console.WriteLine(msg);
+                    SystemLog.Fatal(msg);
+                    throw new Exception(msg);
                 }
             }
             catch (Exception e)
