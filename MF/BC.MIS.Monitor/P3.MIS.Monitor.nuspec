@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>MIS.Monitor</id>
+    <version>1.0.1</version>
+    <title>MIS.Monitor</title>
+    <authors>corbin chen</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <!-- <icon>icon.png</icon> -->
+    <projectUrl>http://192.168.0.111:9009/v3/index.json</projectUrl>
+    <description>net framework版本</description>
+    <releaseNotes>v1.0.0  基础版
+	v1.0.1 发布版</releaseNotes>
+    <copyright>Copyright ©2022 Macroinf Corporation</copyright>
+    <tags>MIS.Monitor</tags>
+  </metadata>
+</package>

@@ -1,0 +1,13 @@
+﻿v9.3.0  基础版
+v9.3.1  Redis AbortOnConnectFail=false
+v9.3.2  新增未监控变量，Api调用实时读取，写入数据
+v9.3.3  优化数据类型转换
+v9.3.4  升级最新StackExchange.Redis库,修改批量读取Redis缓存，提高性能；变量change时，日志里面只打印配置文件里面配置的变量
+v9.3.5  ReadPLC_Sync_DataList_MesRead只读取质量数据组
+v9.3.6  初始化两个Redis读写分离
+v9.3.7  初始化RedisSlave时的bug
+v9.3.8  修正识别Tag数据类型DateTime=>datetime
+v9.3.9  新增BaseScadaApp.InitAllTag获取所有Tag
+v9.4.0  初始化Tag，记录加载错误日志,取消读写分离
+v9.4.1  支持array数组类型的数据类型（例如.intArray.boolArray）
+v9.4.2  redis发布数据使用队列,优化redis初始化

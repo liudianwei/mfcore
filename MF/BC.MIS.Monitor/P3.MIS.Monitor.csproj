@@ -1,0 +1,281 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D8B5AF3A-4DC2-4CF0-ACCC-153CB959F01A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Monitor</RootNamespace>
+    <AssemblyName>Monitor</AssemblyName>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <PublishUrl>http://localhost/Monitor/</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Web</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Monitor.XML</DocumentationFile>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Release\Monitor.XML</DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MIS.Monitor\ListViewNF.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MesBoolSignal.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="MesBoolSignal.Designer.cs">
+      <DependentUpon>MesBoolSignal.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MIS.Monitor\AlarmListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MIS.Monitor\CircleMultStatusRotation.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MIS.Monitor\PlcLinkStatus.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MIS.Monitor\PlcLinkStatusWork.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MIS.Monitor\StandardCircle.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MIS.Monitor\StandardCircleCartColor.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MIS.Monitor\StandardRectangle.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MIS.Monitor\UserControlButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MIS.Monitor\ButtonEngineNumber.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MIS.Monitor\UserControlLable.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MIS.Monitor\ButtonLable.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MIS.Monitor\StandardCircleHeatBeat.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MIS.Monitor\CircleMultStatus.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MIS.Monitor\ButtonEngineNumberHor.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MIS.Monitor\ButtonEngineNumberColor.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MIS.Monitor\ButtonEngineNumberHorColor.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MIS.Monitor\UserControlLableOpName.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MIS.Monitor\StandardCircleCartColorOpNamePress.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="PlcConnect.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PlcConnect.Designer.cs">
+      <DependentUpon>PlcConnect.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PlcWorkStationSignal.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PlcWorkStationSignal.Designer.cs">
+      <DependentUpon>PlcWorkStationSignal.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="SignalInit.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="MesBoolSignal.resx">
+      <DependentUpon>MesBoolSignal.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MIS.Monitor\AlarmListView.resx">
+      <DependentUpon>AlarmListView.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MIS.Monitor\ButtonEngineNumber.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ButtonEngineNumber.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MIS.Monitor\ButtonLable.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ButtonLable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MIS.Monitor\PlcLinkStatus.resx">
+      <DependentUpon>PlcLinkStatus.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MIS.Monitor\PlcLinkStatusWork.resx">
+      <DependentUpon>PlcLinkStatusWork.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MIS.Monitor\StandardCircle.resx">
+      <DependentUpon>StandardCircle.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MIS.Monitor\StandardRectangle.resx">
+      <DependentUpon>StandardRectangle.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MIS.Monitor\UserControlLable.resx">
+      <DependentUpon>UserControlLable.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MIS.Monitor\StandardCircleHeatBeat.resx">
+      <DependentUpon>StandardCircleHeatBeat.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MIS.Monitor\ButtonEngineNumberHor.resx">
+      <DependentUpon>ButtonEngineNumberHor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MIS.Monitor\ButtonEngineNumberColor.resx">
+      <DependentUpon>ButtonEngineNumberColor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MIS.Monitor\ButtonEngineNumberHorColor.resx">
+      <DependentUpon>ButtonEngineNumberHorColor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MIS.Monitor\UserControlLableOpName.resx">
+      <DependentUpon>UserControlLableOpName.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PlcConnect.resx">
+      <DependentUpon>PlcConnect.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PlcWorkStationSignal.resx">
+      <DependentUpon>PlcWorkStationSignal.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Image1.gif" />
+    <None Include="Resources\BreakPLC.png" />
+    <None Include="Resources\green.png" />
+    <None Include="Resources\init.png" />
+    <None Include="Resources\none.png" />
+    <None Include="Resources\PlcConnect0.png" />
+    <None Include="Resources\PlcConnect1.png" />
+    <None Include="Resources\PlcConnect2.png" />
+    <None Include="Resources\PlcConnect3.png" />
+    <None Include="Resources\PlcConnect4.png" />
+    <None Include="Resources\PlcConnectBig.png" />
+    <None Include="Resources\PlcConnectSmall.png" />
+    <None Include="Resources\red.png" />
+    <None Include="Resources\yellow.png" />
+    <None Include="Resources\BreakPLC1.png" />
+    <None Include="Resources\green1.png" />
+    <None Include="Resources\init1.png" />
+    <None Include="Resources\none1.png" />
+    <None Include="Resources\PlcConnect01.png" />
+    <None Include="Resources\PlcConnect11.png" />
+    <None Include="Resources\PlcConnect21.png" />
+    <None Include="Resources\PlcConnect31.png" />
+    <None Include="Resources\PlcConnect41.png" />
+    <None Include="Resources\PlcConnectBig1.png" />
+    <None Include="Resources\PlcConnectSmall1.png" />
+    <None Include="Resources\red1.png" />
+    <None Include="Resources\yellow1.png" />
+    <Content Include="Resources\旋转.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BC.BasicData\BasicData.csproj">
+      <Project>{32d1f0c6-8d6b-465f-bc20-f639c7907375}</Project>
+      <Name>BasicData</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -67,7 +67,7 @@ namespace HslCommunication.LogNet
         public LogSaveMode LogSaveMode { get; protected set; }
 
         /// <inheritdoc cref="ILogNet.ConsoleOutput"/>
-        public bool ConsoleOutput { get; set; }
+        public bool ConsoleOutput { get; set; } = true;
 
         #endregion Public Member
 

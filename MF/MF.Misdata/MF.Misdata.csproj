@@ -3,9 +3,9 @@
   <PropertyGroup>
 	  <TargetFrameworks>net5</TargetFrameworks>
     <Platforms>AnyCPU;ARM64</Platforms>
-    <Version>1.0.4-rc1</Version>
-    <PackageReleaseNotes>优化日志组件
-</PackageReleaseNotes>
+    <Version>1.0.4-rc2</Version>
+    <PackageReleaseNotes>1、机器码记录到日志
+2、优化日志组件</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
