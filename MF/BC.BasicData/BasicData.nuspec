@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>BasicData</id>
-    <version>1.0.2-rc3</version>
+    <version>1.0.3-rc7</version>
     <title>BasicData</title>
     <authors>corbin chen</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -10,14 +10,18 @@
     <!-- <icon>icon.png</icon> -->
     <projectUrl>http://192.168.0.111:9009/v3/index.json</projectUrl>
     <description>net framework版本</description>
-    <releaseNotes>v1.0.0  基础版
-	v1.0.1 发布版
-	v1.0.2-rc3 CustomeEvetnArgs补充字段
-	</releaseNotes>
+    <releaseNotes>
+      v1.0.0 基础版
+      v1.0.1 发布版
+      v1.0.2-rc3 CustomeEvetnArgs补充字段
+      v1.0.2-rc11 提高日志性能
+      v1.0.3-rc5 发布版
+      v1.0.3-rc7 优化日志性能
+    </releaseNotes>
     <copyright>Copyright ©2022 Macroinf Corporation</copyright>
     <tags>BasicData</tags>
   </metadata>
   <files>
-    <file src="BasicData.csproj"></file>
+    <file src="README.txt" />
   </files>
 </package>
