@@ -1,6 +1,4 @@
-﻿using Common.Utils;
-
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 using RestSharp;
 
@@ -16,13 +14,15 @@ namespace Common.Communication
         /// <summary>
         /// Post
         /// </summary>
+        /// <param name="uri"></param>
         /// <param name="resource"></param>
         /// <param name="data"></param>
         /// <param name="mediatype"></param>
         /// <param name="token"></param>
         /// <param name="tokenkey"></param>
         /// <returns></returns>
-        public static OperateResultValue Post(string resource,
+        public static OperateResultValue Post(string uri,
+                                              string resource,
                                               OperateWriteValue data = null,
                                               string mediatype = "application/json",
                                               string token = "",
@@ -31,7 +31,7 @@ namespace Common.Communication
             OperateResultValue ResultValue = new OperateResultValue() { ErrorCode = -1, IsSuccess = false, Value = "" };
             try
             {
-                var client = new RestClient(ConfigHelper.GetAppseting("HttpServer:Url"));
+                var client = new RestClient(uri);
                 if (tokenkey != "" && token != "")
                 {
                     client.AddDefaultHeader(tokenkey, token);
@@ -54,6 +54,7 @@ namespace Common.Communication
         /// <summary>
         /// Delete
         /// </summary>
+        /// <param name="uri"></param>
         /// <param name="resource"></param>
         /// <param name="p"></param>
         /// <param name="mediatype"></param>
@@ -61,7 +62,8 @@ namespace Common.Communication
         /// <param name="tokenkey"></param>
         /// <returns></returns>
         [Obsolete]
-        public static OperateResultValue Delete(string resource,
+        public static OperateResultValue Delete(string uri,
+                                                string resource,
                                                 Parameter p,
                                                 string mediatype = "application/json",
                                                 string token = "",
@@ -70,7 +72,7 @@ namespace Common.Communication
             OperateResultValue ResultValue = new OperateResultValue() { ErrorCode = -1, IsSuccess = false, Value = "" };
             try
             {
-                var client = new RestClient(ConfigHelper.GetAppseting("HttpServer:Url"));
+                var client = new RestClient(uri);
                 if (tokenkey != "" && token != "")
                 {
                     client.AddDefaultHeader(tokenkey, token);
@@ -91,13 +93,15 @@ namespace Common.Communication
         /// <summary>
         /// Get
         /// </summary>
+        /// <param name="uri"></param>
         /// <param name="resource"></param>
         /// <param name="timeout"></param>
         /// <param name="mediatype"></param>
         /// <param name="token"></param>
         /// <param name="tokenkey"></param>
         /// <returns></returns>
-        public static OperateResultValue Get(string resource,
+        public static OperateResultValue Get(string uri,
+                                             string resource,
                                              int timeout = 5000,
                                              string mediatype = "text/html; charset=utf-8",
                                              string token = "",
@@ -106,7 +110,7 @@ namespace Common.Communication
             OperateResultValue ResultValue = new OperateResultValue() { ErrorCode = -1, IsSuccess = false, Value = "" };
             try
             {
-                var client = new RestClient(ConfigHelper.GetAppseting("HttpServer:Url"));
+                var client = new RestClient(uri);
                 if (tokenkey != "" && token != "")
                 {
                     client.AddDefaultHeader(tokenkey, token);

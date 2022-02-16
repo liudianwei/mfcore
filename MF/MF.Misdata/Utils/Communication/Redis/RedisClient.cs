@@ -54,6 +54,11 @@ namespace Common.Communication
         private static string _password = "";
 
         /// <summary>
+        /// redis服务端是否连接成功
+        /// </summary>
+        public bool IsConnected => redisMulti_SP.IsConnected;
+
+        /// <summary>
         /// Redis客户端
         /// </summary>
         public RedisClient(string ip = "127.0.0.1", int port = 18222, string password = "")
@@ -77,10 +82,10 @@ namespace Common.Communication
                 ConfigurationOptions config = new ConfigurationOptions()
                 {
                     Password = _password,
-                    EndPoints = { { _ip, _port } }
+                    EndPoints = { { _ip, _port } },
+                    AllowAdmin = true,
+                    AbortOnConnectFail = false
                 };
-                config.AllowAdmin = true;
-                config.AbortOnConnectFail = false;
                 //读取与写入
                 redisMulti_RW = ConnectionMultiplexer.Connect(config);
                 redisDb_RW = redisMulti_RW.GetDatabase();
@@ -163,8 +168,9 @@ namespace Common.Communication
         /// 清除Redis中所有数据
         /// </summary>
         /// <param name="errorMsg"></param>
+        /// <param name="db"></param>
         /// <returns></returns>
-        public bool DeleteAllMesKey(out string errorMsg)
+        public bool DeleteAllMesKey(out string errorMsg, int db = 0)
         {
             bool flag = false;
             errorMsg = string.Empty;
@@ -175,7 +181,7 @@ namespace Common.Communication
             }
             try
             {
-                redisMulti_RW.GetServer(_ip, _port).FlushDatabase(0);
+                redisMulti_RW.GetServer(_ip, _port).FlushDatabase(db);
                 flag = true;
             }
             catch (Exception ex)
@@ -276,8 +282,10 @@ namespace Common.Communication
         /// </summary>
         /// <param name="MesVal"></param>
         /// <param name="errorMsg"></param>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
         /// <returns></returns>
-        public bool ReadConfig(out string MesVal, out string errorMsg)
+        public bool ReadConfig(out string MesVal, out string errorMsg, int db = 1, string key = "Settings.xml")
         {
             bool flag = false;
             MesVal = "";
@@ -289,7 +297,7 @@ namespace Common.Communication
             }
             try
             {
-                MesVal = redisMulti_RW.GetDatabase(1).StringGet("Settings.xml");
+                MesVal = redisMulti_RW.GetDatabase(db).StringGet(key);
                 flag = true;
             }
             catch (Exception ex)
@@ -305,8 +313,10 @@ namespace Common.Communication
         /// </summary>
         /// <param name="MesVal"></param>
         /// <param name="errorMsg"></param>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
         /// <returns></returns>
-        public bool ReadAllowWork(out string MesVal, out string errorMsg)
+        public bool ReadAllowWork(out string MesVal, out string errorMsg, int db = 1, string key = "MES_ALLOWWORK")
         {
             bool flag = false;
             MesVal = "";
@@ -318,7 +328,7 @@ namespace Common.Communication
             }
             try
             {
-                MesVal = redisMulti_RW.GetDatabase(1).StringGet("MES_ALLOWWORK");
+                MesVal = redisMulti_RW.GetDatabase(db).StringGet(key);
                 flag = true;
             }
             catch (Exception ex)

@@ -3,9 +3,19 @@ using System.Threading;
 
 namespace HslCommunication.LogNet
 {
+    #region 简单的混合锁
+
     /// <summary>
-    /// 一个简单的混合线程同步锁，采用了基元用户加基元内核同步构造实现
+    /// 一个简单的混合线程同步锁，采用了基元用户加基元内核同步构造实现<br />
+    /// A simple hybrid thread editing lock, implemented by the base user plus the element kernel synchronization.
     /// </summary>
+    /// <remarks>
+    /// 当前的锁适用于，竞争频率比较低，锁部分的代码运行时间比较久的情况，当前的简单混合锁可以达到最大性能。
+    /// </remarks>
+    /// <example>
+    /// 以下演示常用的锁的使用方式，还包含了如何优雅的处理异常锁
+    /// <code lang="cs" source="HslCommunication_Net45.Test\Documentation\Samples\Core\ThreadLock.cs" region="SimpleHybirdLockExample1" title="SimpleHybirdLock示例" />
+    /// </example>
     public sealed class SimpleHybirdLock : IDisposable
     {
         #region IDisposable Support
@@ -18,27 +28,20 @@ namespace HslCommunication.LogNet
             {
                 if (disposing)
                 {
-                    // 释放托管状态(托管对象)。
+                    //  释放托管状态(托管对象)。
                 }
 
-                // 释放未托管的资源(未托管的对象)并在以下内容中替代终结器。
-                // 将大型字段设置为 null。
-                m_waiterLock.Close();
+#if NET35 || NET20
+				m_waiterLock.Close();
+#else
+                m_waiterLock.Value.Close();
+#endif
 
                 disposedValue = true;
             }
         }
 
-        //  仅当以上 Dispose(bool disposing) 拥有用于释放未托管资源的代码时才替代终结器。
-        // ~SimpleHybirdLock() {
-        //   // 请勿更改此代码。将清理代码放入以上 Dispose(bool disposing) 中。
-        //   Dispose(false);
-        // }
-
-        // 添加此代码以正确实现可处置模式。
-        /// <summary>
-        /// 释放资源
-        /// </summary>
+        /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
             // 请勿更改此代码。将清理代码放入以上 Dispose(bool disposing) 中。
@@ -53,19 +56,34 @@ namespace HslCommunication.LogNet
         /// </summary>
         private int m_waiters = 0;
 
+#if NET35 || NET20
+		/// <summary>
+		/// 基元内核模式构造同步锁
+		/// </summary>
+		private AutoResetEvent m_waiterLock = new AutoResetEvent(false);
+#else
+
         /// <summary>
         /// 基元内核模式构造同步锁
         /// </summary>
-        private readonly AutoResetEvent m_waiterLock = new AutoResetEvent(false);
+        private readonly Lazy<AutoResetEvent> m_waiterLock = new Lazy<AutoResetEvent>(() => new AutoResetEvent(false));
+
+#endif
 
         /// <summary>
         /// 获取锁
         /// </summary>
         public void Enter()
         {
-            if (Interlocked.Increment(ref m_waiters) == 1) return;//用户锁可以使用的时候，直接返回，第一次调用时发生
-            //当发生锁竞争时，使用内核同步构造锁
-            m_waiterLock.WaitOne();
+            Interlocked.Increment(ref simpleHybirdLockCount);
+            if (Interlocked.Increment(ref m_waiters) == 1) return;      // 用户锁可以使用的时候，直接返回，第一次调用时发生
+                                                                        // 当发生锁竞争时，使用内核同步构造锁
+            Interlocked.Increment(ref simpleHybirdLockWaitCount);
+#if NET35 || NET20
+			m_waiterLock.WaitOne();
+#else
+            m_waiterLock.Value.WaitOne();
+#endif
         }
 
         /// <summary>
@@ -73,13 +91,40 @@ namespace HslCommunication.LogNet
         /// </summary>
         public void Leave()
         {
-            if (Interlocked.Decrement(ref m_waiters) == 0) return;//没有可用的锁的时候
-            m_waiterLock.Set();
+            Interlocked.Decrement(ref simpleHybirdLockCount);
+            if (Interlocked.Decrement(ref m_waiters) == 0) return;     // 没有可用的锁的时候
+
+            Interlocked.Decrement(ref simpleHybirdLockWaitCount);
+#if NET35 || NET20
+			m_waiterLock.Set( );
+#else
+            m_waiterLock.Value.Set();
+#endif
         }
 
         /// <summary>
         /// 获取当前锁是否在等待当中
         /// </summary>
         public bool IsWaitting => m_waiters != 0;
+
+        #region Static Value
+
+        private static long simpleHybirdLockCount = 0;      // 当前总的锁的进入次数
+        private static long simpleHybirdLockWaitCount = 0;  // 当前锁的等待的次数，此时已经开始竞争了
+
+        /// <summary>
+        /// 获取当前总的所有进入锁的信息<br />
+        /// Get the current total information of all access locks
+        /// </summary>
+        public static long SimpleHybirdLockCount => simpleHybirdLockCount;
+
+        /// <summary>
+        /// 当前正在等待的锁的统计信息，此时已经发生了竞争了
+        /// </summary>
+        public static long SimpleHybirdLockWaitCount => simpleHybirdLockWaitCount;
+
+        #endregion Static Value
     }
+
+    #endregion 简单的混合锁
 }

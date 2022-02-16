@@ -1,7 +1,8 @@
-using MF.NetCoreApp;
-using MF.Utils;
+using Common.DBUtils;
 using Microsoft.Extensions.Configuration;
-
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using SqlSugar;
 using System;
 using System.IO;
 
@@ -15,7 +16,7 @@ namespace Common.Utils
         /// <summary>
         ///
         /// </summary>
-        private static IConfigurationRoot config = null;
+        private static IConfiguration config = null;
 
         /// <summary>
         ///  初始化
@@ -25,32 +26,42 @@ namespace Common.Utils
         {
             try
             {
-                config = new ConfigurationBuilder()
-                    .SetBasePath($"{Directory.GetCurrentDirectory()}/Config")
-                    .AddJsonFile("appsettings.json", true, true)
-                    .Build();
+                IServiceCollection services = new ServiceCollection();
+                services.AddSingleton<ILoggerFactory, LoggerFactory>();
+                services.AddSingleton<IConfiguration>(serviceProvider =>
+                {
+                    IConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
+                    configurationBuilder.AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), "config", "appsettings.json"));
+                    return configurationBuilder.Build();
+                });
+                IConfiguration configuration = services.BuildServiceProvider().GetService<IConfiguration>();
+                config = configuration;
+                var sqlSugarConfig = SugarAccess.GetConnectionParam();
+                //services.AddSqlSugarClient<SqlSugarClient>(config =>
+                //{
+                //    config.DbType = sqlSugarConfig.Item1;
+                //    config.ConnectionString = sqlSugarConfig.Item2;
+                //    config.IsAutoCloseConnection = true;
+                //    config.InitKeyType = InitKeyType.Attribute;
+                //});
+                services.AddSqlSugarScope<SqlSugarScope>(config =>
+                {
+                    config.DbType = sqlSugarConfig.Item1;
+                    config.ConnectionString = sqlSugarConfig.Item2;
+                    config.IsAutoCloseConnection = true;
+                    config.InitKeyType = InitKeyType.Attribute;
+                });
+                IServiceProvider serviceProvider = services.BuildServiceProvider();
+                ServiceResolve.SetServiceResolve(serviceProvider);
+                //config = new ConfigurationBuilder()
+                //    .SetBasePath($"{Directory.GetCurrentDirectory()}/Config")
+                //    .AddJsonFile("appsettings.json", true, true)
+                //    .Build();
             }
             catch (Exception e)
             {
                 Console.WriteLine("Config初始化失败!");
                 SystemLog.Fatal("Config初始化失败!", e);
-                throw e;
-            }
-            try
-            {
-                var strMachineCode = MachineCode.GetMachineCodeString();
-                Console.WriteLine($"机器码:{strMachineCode}");
-                var item = new Esnecil().CheckMisdataCr(strMachineCode);
-                if (!item.Item1)
-                {
-                    var msg = $"授权失败,请联系管理员进行授权!Warning Message ===>{item.Item2}；机器码为===>{strMachineCode}";
-                    Console.WriteLine(msg);
-                    SystemLog.Fatal(msg);
-                    throw new Exception(msg);
-                }
-            }
-            catch (Exception e)
-            {
                 throw e;
             }
         }

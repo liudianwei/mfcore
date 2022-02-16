@@ -1,7 +1,9 @@
 ﻿using HslCommunication.LogNet;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 
@@ -29,9 +31,12 @@ namespace HslCommunication.LogNet
         {
             m_fileSaveLock = new SimpleHybirdLock();
             m_simpleHybirdLock = new SimpleHybirdLock();
-            m_WaitForSave = new Queue<HslMessageItem>();
+            m_WaitForSave = new ConcurrentQueue<HslMessageItem>();
             filtrateKeyword = new List<string>();
             filtrateLock = new SimpleHybirdLock();
+            startSaveFileThread = new Thread(() => { ThreadSaveFile(); });
+            startSaveFileThread.IsBackground = true;
+            startSaveFileThread.Start();
         }
 
         #endregion Constructor
@@ -39,12 +44,22 @@ namespace HslCommunication.LogNet
         #region Private Member
 
         /// <summary>
+        ///
+        /// </summary>
+        private Thread startSaveFileThread = null;
+
+        /// <summary>
+        ///
+        /// </summary>
+        public AutoResetEvent autoReset = new AutoResetEvent(false);
+
+        /// <summary>
 		/// 文件存储的锁
 		/// </summary>
 		protected SimpleHybirdLock m_fileSaveLock;                                             // 文件的锁
 
         private HslMessageDegree m_messageDegree = HslMessageDegree.DEBUG;                     // 默认的存储规则
-        private Queue<HslMessageItem> m_WaitForSave;                                           // 待存储数据的缓存
+        private ConcurrentQueue<HslMessageItem> m_WaitForSave;                                           // 待存储数据的缓存
         private SimpleHybirdLock m_simpleHybirdLock;                                           // 缓存列表的锁
         private int m_SaveStatus = 0;                                                          // 存储状态
         private List<string> filtrateKeyword;                                                  // 需要过滤的存储对象
@@ -67,7 +82,7 @@ namespace HslCommunication.LogNet
         public LogSaveMode LogSaveMode { get; protected set; }
 
         /// <inheritdoc cref="ILogNet.ConsoleOutput"/>
-        public bool ConsoleOutput { get; set; } = true;
+        public bool ConsoleOutput { get; set; } = false;
 
         #endregion Public Member
 
@@ -319,13 +334,15 @@ namespace HslCommunication.LogNet
 
         private void AddItemToCache(HslMessageItem item)
         {
-            m_simpleHybirdLock.Enter();
+            //m_simpleHybirdLock.Enter();
 
             m_WaitForSave.Enqueue(item);
 
-            m_simpleHybirdLock.Leave();
+            //m_simpleHybirdLock.Leave();
 
-            StartSaveFile();
+            //StartSaveFile();
+
+            autoReset.Set();
         }
 
         private void StartSaveFile()
@@ -340,7 +357,11 @@ namespace HslCommunication.LogNet
         private HslMessageItem GetAndRemoveLogItem()
         {
             m_simpleHybirdLock.Enter();
-            HslMessageItem result = m_WaitForSave.Count > 0 ? m_WaitForSave.Dequeue() : null;
+            HslMessageItem result = null;
+            if (m_WaitForSave.Count > 0)
+            {
+                m_WaitForSave.TryDequeue(out result);
+            }
             m_simpleHybirdLock.Leave();
             return result;
         }
@@ -386,10 +407,10 @@ namespace HslCommunication.LogNet
                         {
                             current.FileName = "common";
                         }
-                        LogSaveFileName = $"{LogSaveFileName}\\{current.FileName}_{current.Degree}.log";
+                        var LogSaveFilePath = $"{LogSaveFileName}\\{current.FileName}_{current.Degree}.log";
                         if (!swmsp.ContainsKey($"{current.FileName}_{current.Degree}"))
                         {
-                            sw = new StreamWriter(LogSaveFileName, true, Encoding.UTF8);
+                            sw = new StreamWriter(LogSaveFilePath, true, Encoding.UTF8);
                             swmsp.Add($"{current.FileName}_{current.Degree}", sw);
                         }
                         // 触发事件
@@ -415,14 +436,14 @@ namespace HslCommunication.LogNet
                         current = GetAndRemoveLogItem();
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
                     //AddItemToCache(current);
-                    //AddItemToCache(new HslMessageItem()
-                    //{
-                    //    Degree = HslMessageDegree.FATAL,
-                    //    Text = LogNetManagment.GetSaveStringFromException("LogNetSelf", ex),
-                    //});
+                    AddItemToCache(new HslMessageItem()
+                    {
+                        Degree = HslMessageDegree.FATAL,
+                        Text = LogNetManagment.GetSaveStringFromException("LogNetSelf", ex),
+                    });
                 }
                 finally
                 {
@@ -453,6 +474,100 @@ namespace HslCommunication.LogNet
             if (m_WaitForSave.Count > 0)
             {
                 StartSaveFile();
+            }
+        }
+
+        //读写锁，当资源处于写入模式时，其他线程写入需要等待本次写入结束之后才能继续写入
+        private static ReaderWriterLockSlim LogWriteLock = new ReaderWriterLockSlim();
+
+        private void ThreadSaveFile()
+        {
+            while (true)
+            {
+                autoReset.WaitOne();
+                Dictionary<string, StreamWriter> swmsp = new Dictionary<string, StreamWriter>();
+                while (m_WaitForSave.Any())
+                {
+                    if (m_WaitForSave.TryDequeue(out HslMessageItem current))
+                    {
+                        if (current != null)
+                        {
+                            if (ConsoleOutput) ConsoleWriteLog(current);
+
+                            // 获取要存储的文件名称
+                            string LogSaveFileName = GetFileSaveName() + "\\" + current.FileName;
+
+                            if (!string.IsNullOrEmpty(LogSaveFileName))
+                            {
+                                try
+                                {
+                                    //设置读写锁为写入模式独占资源，其他写入请求需要等待本次写入结束之后才能继续写入
+                                    //注意：长时间持有读线程锁或写线程锁会使其他线程发生饥饿 (starve)。 为了得到最好的性能，需要考虑重新构造应用程序以将写访问的持续时间减少到最小。
+                                    //从性能方面考虑，请求进入写入模式应该紧跟文件操作之前，在此处进入写入模式仅是为了降低代码复杂度
+                                    //因进入与退出写入模式应在同一个try finally语句块内，所以在请求进入写入模式之前不能触发异常，否则释放次数大于请求次数将会触发异常
+                                    LogWriteLock.EnterWriteLock();
+
+                                    var dir = LogSaveFileName;
+                                    if (!Directory.Exists(LogSaveFileName))
+                                    {
+                                        Directory.CreateDirectory(LogSaveFileName);
+                                    }
+
+                                    if (current.FileName.Trim() == "")
+                                    {
+                                        current.FileName = "common";
+                                    }
+                                    var LogSaveFilePath = $"{LogSaveFileName}\\{current.FileName}_{current.Degree}.log";
+                                    if (!swmsp.TryGetValue(LogSaveFilePath, out StreamWriter sw))
+                                    {
+                                        sw = new StreamWriter(LogSaveFilePath, true, Encoding.UTF8);
+                                        swmsp.Add(LogSaveFilePath, sw);
+                                    }
+
+                                    // 检查是否需要真的进行存储
+                                    bool isSave = true;
+                                    //filtrateLock.Enter();
+                                    isSave = !filtrateKeyword.Contains(current.KeyWord);
+                                    //filtrateLock.Leave();
+
+                                    // 检查是否被设置为强制不存储
+                                    if (current.Cancel) isSave = false;
+
+                                    // 如果需要存储的就过滤掉
+                                    if (isSave)
+                                    {
+                                        sw.Write(HslMessageFormate(current));
+                                        sw.Write(Environment.NewLine);
+                                        sw.Flush();
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    //AddItemToCache(current);
+                                    AddItemToCache(new HslMessageItem()
+                                    {
+                                        Degree = HslMessageDegree.FATAL,
+                                        Text = LogNetManagment.GetSaveStringFromException("LogNetSelf", ex),
+                                    });
+                                }
+                                finally
+                                {
+                                    //退出写入模式，释放资源占用
+                                    //注意：一次请求对应一次释放
+                                    //若释放次数大于请求次数将会触发异常[写入锁定未经保持即被释放]
+                                    //若请求处理完成后未释放将会触发异常[此模式不下允许以递归方式获取写入锁定]
+                                    LogWriteLock.ExitWriteLock();
+                                }
+                            }
+                        }
+                    }
+                }
+                foreach (var sw in swmsp.Values)
+                {
+                    sw.Close();
+                    sw?.Dispose();
+                }
+                autoReset.Reset();
             }
         }
 

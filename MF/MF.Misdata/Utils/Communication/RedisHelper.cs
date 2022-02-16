@@ -163,7 +163,7 @@ namespace Common.Communication
 
                         else
                         {
-                            var result = RestHelper.Get($"/{tag.OpCode}/DeviceRead?TagId={tag.TagID}");
+                            var result = RestHelper.Get(ConfigHelper.GetAppseting("HttpServer:Url"), $"/{tag.OpCode}/DeviceRead?TagId={tag.TagID}");
                             if (result.IsSuccess)
                             {
                                 tag.TagValue = result.Value;
@@ -245,7 +245,7 @@ namespace Common.Communication
                 var FromPLC = needReadFromRedis.Where(i => !i.IsMonitor).ToList();
                 FromPLC.ForEach(tag =>
                 {
-                    var result = RestHelper.Get($"/{tag.OpCode}/DeviceRead?TagId={tag.TagID}");
+                    var result = RestHelper.Get(ConfigHelper.GetAppseting("HttpServer:Url"), $"/{tag.OpCode}/DeviceRead?TagId={tag.TagID}");
                     if (result.IsSuccess)
                     {
                         tag.TagValue = result.Value;
@@ -319,7 +319,7 @@ namespace Common.Communication
                 foreach (var tag in FromPLC)
                 {
                     var tagv = tag;
-                    var result = RestHelper.Get($"/{tag.OpCode}/DeviceRead?TagId={tag.TagID}");
+                    var result = RestHelper.Get(ConfigHelper.GetAppseting("HttpServer:Url"), $"/{tag.OpCode}/DeviceRead?TagId={tag.TagID}");
                     if (result.IsSuccess)
                     {
                         tagv.TagValue = result.Value;
@@ -399,7 +399,7 @@ namespace Common.Communication
 
                         else
                         {
-                            var result = RestHelper.Post($"/{tag.OpCode}/DeviceWrite", new OperateWriteValue() { TagId = tag.TagID.ToString(), Value = tag.TagValue.ToString() });
+                            var result = RestHelper.Post(ConfigHelper.GetAppseting("HttpServer:Url"), $"/{tag.OpCode}/DeviceWrite", new OperateWriteValue() { TagId = tag.TagID.ToString(), Value = tag.TagValue.ToString() });
                             if (result.IsSuccess)
                             {
                                 SystemLog.Debug($"WriteApi:{tag.OpName}|{tag.TagID}|{ tag.TagDescription }|{tag.TagValue}", tag.OpName);

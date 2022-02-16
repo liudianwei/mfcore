@@ -1,5 +1,6 @@
 using HslCommunication.LogNet;
 using System;
+using System.Collections.Generic;
 
 namespace Common.Utils
 {
@@ -9,13 +10,54 @@ namespace Common.Utils
     public class BusinessLog
     {
         /// <summary>
-        ///初始化业务日志
+        /// 日志路径
         /// </summary>
-        /// <returns></returns>
-        private static readonly ILogNet _logger = new LogNetDateTime(ConfigHelper.GetAppseting("Logger:DirPath") + ConfigHelper.GetAppseting("Logger:BusinessName"), GenerateMode.ByEveryDay);
+        protected static string Path = ConfigHelper.GetAppseting("Logger:DirPath") + ConfigHelper.GetAppseting("Logger:BusinessName");
 
-        private BusinessLog()
+        /// <summary>
+        /// 按工位区分日志集合
+        /// </summary>
+        public static Dictionary<string, ILogNet> LogNets = new Dictionary<string, ILogNet>();
+
+        /// <summary>
+        /// 初始化日志对象
+        /// </summary>
+        /// <param name="filenames"></param>
+        /// <param name="degree">默认DBBUG最低等级,打印比它高等级的所有日志,等级由高到低None,FATAL,ERROR,WARN,INFO,DEBUG</param>
+        /// <param name="consoleOutput">默认不输出</param>
+        public static void Init(List<string> filenames, HslMessageDegree degree = HslMessageDegree.DEBUG, bool consoleOutput = false)
         {
+            foreach (var item in filenames)
+            {
+                var _logger = new LogNetDateTime(Path, GenerateMode.ByEveryDay);
+                _logger.SetMessageDegree(degree);
+                _logger.ConsoleOutput = consoleOutput;
+                if (!LogNets.ContainsKey(item))
+                {
+                    LogNets.Add(item, _logger);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 获取当前工位所属日志对象
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        public static ILogNet GetLogNet(string filename = "common", HslMessageDegree degree = HslMessageDegree.DEBUG, bool consoleOutput = false)
+        {
+            if (LogNets.TryGetValue(filename, out var _logger))
+            {
+                return _logger;
+            }
+            else
+            {
+                _logger = new LogNetDateTime(Path, GenerateMode.ByEveryDay);
+                _logger.SetMessageDegree(degree);
+                _logger.ConsoleOutput = consoleOutput;
+                LogNets.Add(filename, _logger);
+                return _logger;
+            }
         }
 
         /// <summary>
@@ -26,7 +68,7 @@ namespace Common.Utils
         /// <param name="filename"></param>
         public static void Warn(string Warnmsg, Exception e, string filename = "common")
         {
-            _logger.WriteWarn(Warnmsg, e.ToString(), filename);
+            GetLogNet(filename)?.WriteWarn(Warnmsg, e.ToString(), filename);
         }
 
         /// <summary>
@@ -36,7 +78,7 @@ namespace Common.Utils
         /// <param name="filename"></param>
         public static void Warn(string Warnmsg, string filename = "common")
         {
-            _logger.WriteWarn(Warnmsg, filename);
+            GetLogNet(filename)?.WriteWarn(Warnmsg, filename);
         }
 
         /// <summary>
@@ -46,7 +88,7 @@ namespace Common.Utils
         /// <param name="filename"></param>
         public static void Info(string Infomsg, string filename = "common")
         {
-            _logger.WriteInfo(Infomsg, filename);
+            GetLogNet(filename)?.WriteInfo(Infomsg, filename);
         }
 
         /// <summary>
@@ -57,7 +99,7 @@ namespace Common.Utils
         /// <param name="filename"></param>
         public static void Info(string Infomsg, Exception e, string filename = "common")
         {
-            _logger.WriteInfo(Infomsg, e.ToString(), filename);
+            GetLogNet(filename)?.WriteInfo(Infomsg, e.ToString(), filename);
         }
 
         /// <summary>
@@ -68,7 +110,7 @@ namespace Common.Utils
         /// <param name="filename"></param>
         public static void Debug(string Debugmsg, Exception e, string filename = "common")
         {
-            _logger.WriteDebug(Debugmsg, e.ToString(), filename);
+            GetLogNet(filename)?.WriteDebug(Debugmsg, e.ToString(), filename);
         }
 
         /// <summary>
@@ -78,7 +120,7 @@ namespace Common.Utils
         /// <param name="filename"></param>
         public static void Debug(string Debugmsg, string filename = "common")
         {
-            _logger.WriteDebug(Debugmsg, filename);
+            GetLogNet(filename)?.WriteDebug(Debugmsg, filename);
         }
 
         /// <summary>
@@ -89,7 +131,7 @@ namespace Common.Utils
         /// <param name="filename"></param>
         public static void Error(string Errormsg, Exception e, string filename = "common")
         {
-            _logger.WriteError(Errormsg, e.ToString(), filename);
+            GetLogNet(filename)?.WriteError(Errormsg, e.ToString(), filename);
         }
 
         /// <summary>
@@ -99,7 +141,7 @@ namespace Common.Utils
         /// <param name="filename"></param>
         public static void Error(string Errormsg, string filename = "common")
         {
-            _logger.WriteError(Errormsg, filename);
+            GetLogNet(filename)?.WriteError(Errormsg, filename);
         }
 
         /// <summary>
@@ -110,7 +152,7 @@ namespace Common.Utils
         /// <param name="filename"></param>
         public static void Fatal(string Fatalmsg, Exception e, string filename = "common")
         {
-            _logger.WriteFatal(Fatalmsg, e.ToString(), filename);
+            GetLogNet(filename)?.WriteFatal(Fatalmsg, e.ToString(), filename);
         }
 
         /// <summary>
@@ -120,7 +162,7 @@ namespace Common.Utils
         /// <param name="filename"></param>
         public static void Fatal(string Fatalmsg, string filename = "common")
         {
-            _logger.WriteFatal(Fatalmsg, filename);
+            GetLogNet(filename)?.WriteFatal(Fatalmsg, filename);
         }
 
         /// <summary>
@@ -131,7 +173,7 @@ namespace Common.Utils
         /// <param name="filename"></param>
         public static void Exception(string Exceptionmsg, Exception e, string filename = "common")
         {
-            _logger.WriteException(Exceptionmsg, e, filename);
+            GetLogNet(filename)?.WriteException(Exceptionmsg, e, filename);
         }
 
         /// <summary>
@@ -141,7 +183,7 @@ namespace Common.Utils
         /// <param name="filename"></param>
         public static void Exception(string Exceptionmsg, string filename = "common")
         {
-            _logger.WriteException(Exceptionmsg, new Exception(), filename);
+            GetLogNet(filename)?.WriteException(Exceptionmsg, new Exception(), filename);
         }
     }
 }
