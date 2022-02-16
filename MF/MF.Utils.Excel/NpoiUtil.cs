@@ -304,10 +304,15 @@ namespace MF.Utils.Excel
                     style.FillForegroundColor = HSSFColor.Grey25Percent.Index;
 
                     XSSFFont ffont = (XSSFFont)workbook.CreateFont();
-                    ffont.Color = HSSFColor.White.Index;
-
+                    ffont.Color = HSSFColor.Black.Index;
+                    ffont.IsBold = true;
                     style.SetFont(ffont);
                     style.FillPattern = FillPattern.SolidForeground;
+                    style.BorderBottom = BorderStyle.Thin;//下边框为细线边框
+                    style.BorderLeft = BorderStyle.Thin;//左边框
+                    style.BorderRight = BorderStyle.Thin;//上边框
+                    style.BorderTop = BorderStyle.Thin;//右边框
+
                     cell.CellStyle = style;
                 }
                 else
@@ -354,17 +359,24 @@ namespace MF.Utils.Excel
                         if (model.FrontColor == 0)
                         {
                             //ffont.Color = HSSFColor.White.Index;
-                            style.GetFont(workbook).Color = HSSFColor.White.Index;
+                            style.GetFont(workbook).Color = HSSFColor.Black.Index;
                         }
                         else
                         {
                             //ffont.Color = model.FrontColor;
                             style.GetFont(workbook).Color = model.FrontColor;
                         }
+                        style.GetFont(workbook).IsBold = true;
 
                         //style.SetFont(ffont);
                         //style.FillPattern = FillPattern.SolidForeground;
                         style.FillPattern = FillPattern.SolidForeground;
+
+                        style.FillPattern = FillPattern.SolidForeground;
+                        style.BorderBottom = BorderStyle.Thin;//下边框为细线边框
+                        style.BorderLeft = BorderStyle.Thin;//左边框
+                        style.BorderRight = BorderStyle.Thin;//上边框
+                        style.BorderTop = BorderStyle.Thin;//右边框
                         cell.CellStyle = style;
                     }
                 }
@@ -388,7 +400,9 @@ namespace MF.Utils.Excel
                     {
                         index = 1;
                         countLen = properties.Length + 1;
-                        row1.CreateCell(0).SetCellValue(k + 1);
+                        ICell cell1 = row1.CreateCell(0);
+                        cell1.CellStyle = cellStyle;
+                        cell1.SetCellValue(k + 1);
                     }
                     else
                     {
