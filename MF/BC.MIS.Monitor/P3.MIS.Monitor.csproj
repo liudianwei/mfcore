@@ -235,6 +235,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="P3.MIS.Monitor.nuspec" />
+    <Content Include="README.txt" />
     <None Include="Resources\Image1.gif" />
     <None Include="Resources\BreakPLC.png" />
     <None Include="Resources\green.png" />
