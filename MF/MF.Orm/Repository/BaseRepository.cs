@@ -64,6 +64,16 @@ namespace MF.Orm.Repository
         #region 新增
 
         /// <summary>
+        /// 大数据写入 bulk插入
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public bool BulkCopy(List<T> list)
+        {
+            return db.Fastest<T>().BulkCopy(list) > 0;
+        }
+        /// <summary>
         /// 插入一条记录
         /// </summary>
         /// <param name="entity">实体对象</param>
@@ -303,6 +313,17 @@ namespace MF.Orm.Repository
         #endregion 新增
 
         #region 更新
+
+        /// <summary>
+        /// 大数据更新 bulk插入
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public bool BulkUpdate(List<T> list)
+        {
+            return db.Fastest<T>().BulkUpdate(list) > 0;
+        }
 
         /// <summary>
         /// 乐观锁

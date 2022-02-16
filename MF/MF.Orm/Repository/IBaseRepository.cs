@@ -45,6 +45,12 @@ namespace MF.Orm.Repository
         /// <param name="entity">实体对象</param>
         /// <returns>true 成功，false 失败</returns>
         bool Insert(SqlSugarClient _db, T entity);
+        /// <summary>
+        /// 大数据写入 bulk插入
+        /// </summary>
+        /// <param name="entitys"></param>
+        /// <returns></returns>
+        bool BulkCopy(List<T> entitys);
 
         /// <summary>
         /// 插入一条记录
@@ -138,6 +144,13 @@ namespace MF.Orm.Repository
         #endregion 新增
 
         #region 更新
+
+        /// <summary>
+        /// 大数据写入 bulk插入
+        /// </summary>
+        /// <param name="entitys"></param>
+        /// <returns></returns>
+        bool BulkUpdate(List<T> entitys);
 
         /// <summary>
         /// 更新实体

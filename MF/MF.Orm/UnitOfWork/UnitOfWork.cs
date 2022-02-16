@@ -35,6 +35,27 @@ namespace MF.Orm.UnitOfWork
             });
             return _Customerclient;
         }
+        /// <summary>
+        /// 大数据写入 bulk插入
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public bool BulkCopy<T>(List<T> list) where T : BaseEntity, new()
+        {
+            return GetDbClient().Fastest<T>().BulkCopy(list) > 0;
+        }
+
+        /// <summary>
+        /// 大数据更新 bulk插入
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public bool BulkUpdate<T>(List<T> list) where T : BaseEntity, new()
+        {
+            return GetDbClient().Fastest<T>().BulkUpdate(list) > 0;
+        }
 
         public DbResult<bool> UseTran(Action action, Action<Exception> ex = null)
         {

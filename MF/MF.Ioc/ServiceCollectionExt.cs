@@ -59,9 +59,31 @@ namespace MF.Extensions.DependencyInjection
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(banner);
             Console.ForegroundColor = c;
+            Console.WriteLine("请稍等 正在加载配置......");
             return services;
         }
 
+        public static IServiceCollection BannerShowReport(this IServiceCollection services)
+        {
+            var banner = @"
+     ______    ______   ______   ______   ______   _________  
+    /_____/\  /_____/\ /_____/\ /_____/\ /_____/\ /________/\ 
+    \:::_ \ \ \::::_\/_\:::_ \ \\:::_ \ \\:::_ \ \\__.::.__\/ 
+     \:(_) ) )_\:\/___/\\:(_) \ \\:\ \ \ \\:(_) ) )_ \::\ \   
+      \: __ `\ \\::___\/_\: ___\/ \:\ \ \ \\: __ `\ \ \::\ \  
+       \ \ `\ \ \\:\____/\\ \ \    \:\_\ \ \\ \ `\ \ \ \::\ \ 
+        \_\/ \_\/ \_____\/ \_\/     \_____\/ \_\/ \_\/  \__\/ 
+
+                         苏州宏软信息技术有限公司  V1.0.0.0
+";
+            var c = Console.ForegroundColor;
+            System.Console.OutputEncoding = System.Text.Encoding.Unicode;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(banner);
+            Console.ForegroundColor = c;
+            Console.WriteLine("请稍等 正在加载配置......");
+            return services;
+        }
         public static IServiceCollection AttentionShow(this IServiceCollection services)
         {
             var c = Console.ForegroundColor;

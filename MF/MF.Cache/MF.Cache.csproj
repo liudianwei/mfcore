@@ -2,6 +2,11 @@
 
 	<PropertyGroup>
 		<TargetFramework>net5</TargetFramework>
+		<Version>1.0.1-rc4</Version>
+		<Description></Description>
+		<PackageReleaseNotes>
+			更新ScadaCenter引用的orm
+		</PackageReleaseNotes>
 		<AssemblyName>MF.Cache</AssemblyName>
 		<RootNamespace>MF.Cache</RootNamespace>
 		<AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
@@ -15,6 +20,6 @@
 		<PackageReference Include="CSRedisCore" Version="3.6.6" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\MF.Orm\MF.Orm.csproj" />
+	  <ProjectReference Include="..\MF.Orm\MF.Orm.csproj" />
 	</ItemGroup>
 </Project>
