@@ -11,3 +11,6 @@ v9.3.9  新增BaseScadaApp.InitAllTag获取所有Tag
 v9.4.0  初始化Tag，记录加载错误日志,取消读写分离
 v9.4.1  支持array数组类型的数据类型（例如.intArray.boolArray）
 v9.4.2  redis发布数据使用队列,优化redis初始化
+v9.4.3  新增批量写入redis方法
+v9.4.4-rc1 测试打包版本日志
+v9.4.4-rc2 新增redis密码参数

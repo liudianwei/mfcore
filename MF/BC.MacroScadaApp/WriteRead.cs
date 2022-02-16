@@ -48,7 +48,7 @@ namespace ScadaAppCore
                     }
                     else
                     {
-                        var result = MesRestClient.Get($"/{tag.OpCode}/DeviceRead?TagId={tag.TagID}");
+                        var result = MesRestClient.Get(ScadaApp.HttpUri, $"/{tag.OpCode}/DeviceRead?TagId={tag.TagID}");
                         if (result.IsSuccess)
                         {
                             tag.TagValue = result.Value;
@@ -122,7 +122,7 @@ namespace ScadaAppCore
                 var FromPLC = needReadFromRedis.Where(i => !i.IsMonitor).ToList();
                 FromPLC.ForEach(tag =>
                 {
-                    var result = MesRestClient.Get($"/{tag.OpCode}/DeviceRead?TagId={tag.TagID}");
+                    var result = MesRestClient.Get(ScadaApp.HttpUri, $"/{tag.OpCode}/DeviceRead?TagId={tag.TagID}");
                     if (result.IsSuccess)
                     {
                         tag.TagValue = result.Value;
@@ -206,7 +206,7 @@ namespace ScadaAppCore
                 foreach (var tag in FromPLC)
                 {
                     var tagv = tag;
-                    var result = MesRestClient.Get($"/{tag.OpCode}/DeviceRead?TagId={tag.TagID}");
+                    var result = MesRestClient.Get(ScadaApp.HttpUri, $"/{tag.OpCode}/DeviceRead?TagId={tag.TagID}");
                     if (result.IsSuccess)
                     {
                         tagv.TagValue = result.Value;
@@ -267,7 +267,7 @@ namespace ScadaAppCore
                     }
                     else
                     {
-                        var result = MesRestClient.Post($"/{tag.OpCode}/DeviceWrite", new OperateWriteValue() { TagId = tag.TagID.ToString(), Value = tag.TagValue.ToString() });
+                        var result = MesRestClient.Post(ScadaApp.HttpUri, $"/{tag.OpCode}/DeviceWrite", new OperateWriteValue() { TagId = tag.TagID.ToString(), Value = tag.TagValue.ToString() });
                         if (result.IsSuccess)
                         {
                             ApplicationLog.BusinessLog(tag.OpName, $"WriteApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue.ToString()}");
@@ -276,47 +276,6 @@ namespace ScadaAppCore
                         {
                             ApplicationLog.WriteLog($"WriteApi {tag.TagID } 值为{tag.TagValue.ToString()}到服务端写入失败|{result.Message}");
                         }
-                    }
-                }
-                else
-                {
-                    ApplicationLog.BusinessLog(tag.OpName, $"Write:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
-                }
-
-                flag = true;
-            }
-            catch (Exception err)
-            {
-                ApplicationLog.WriteLog(err, err.Message);
-            }
-            return flag;
-        }
-
-        /// <summary>
-        /// 直接写redis
-        /// </summary>
-        /// <param name="TagID"></param>
-        /// <param name="TagValue"></param>
-        /// <returns></returns>
-        public static bool WritePLCDirect(int TagID, object TagValue)
-        {
-            bool flag = false;
-            try
-            {
-                var tag = ScadaApp.TagList.Find(it => it.TagID == TagID);
-                if (tag.IsEnable)
-                {
-                    tag.TagValue = TagValue;
-                    tag = ScadaApp.ConvertTagTypeToString(tag);
-
-                    if (ScadaApp.mesRedisClient.Write($"{tag.OpCode}:{tag.TagID}", tag.TagValue.ToString(), out var errorMsg))
-                    {
-                        ApplicationLog.BusinessLog(tag.OpName, $"Write:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue}");
-                    }
-                    else
-                    {
-                        ApplicationLog.WriteLog($"Write:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue} 到服务端写入失败|{errorMsg}");
-                        return flag;
                     }
                 }
                 else
@@ -374,6 +333,94 @@ namespace ScadaAppCore
                 else
                 {
                     ApplicationLog.BusinessLog("WritePLC_Sync_DataList", $"Write:WritePLC_Sync_DataList|{JsonConvert.SerializeObject(tagMsgs)}");
+                }
+
+                flag = true;
+            }
+            catch (Exception err)
+            {
+                ApplicationLog.WriteLog(err, err.Message);
+            }
+            return flag;
+        }
+
+        /// <summary>
+        /// 直接写redis
+        /// </summary>
+        /// <param name="TagID"></param>
+        /// <param name="TagValue"></param>
+        /// <returns></returns>
+        public static bool WritePLCDirect(int TagID, object TagValue)
+        {
+            bool flag = false;
+            try
+            {
+                var tag = ScadaApp.TagList.Find(it => it.TagID == TagID);
+                if (tag.IsEnable)
+                {
+                    tag.TagValue = TagValue;
+                    tag = ScadaApp.ConvertTagTypeToString(tag);
+
+                    if (ScadaApp.mesRedisClient.Write($"{tag.OpCode}:{tag.TagID}", tag.TagValue.ToString(), out var errorMsg))
+                    {
+                        ApplicationLog.BusinessLog(tag.OpName, $"Write:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue}");
+                    }
+                    else
+                    {
+                        ApplicationLog.WriteLog($"Write:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue} 到服务端写入失败|{errorMsg}");
+                        return flag;
+                    }
+                }
+                else
+                {
+                    ApplicationLog.BusinessLog(tag.OpName, $"Write:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
+                }
+
+                flag = true;
+            }
+            catch (Exception err)
+            {
+                ApplicationLog.WriteLog(err, err.Message);
+            }
+            return flag;
+        }
+
+        /// <summary>
+        /// 批量写redis
+        /// </summary>
+        /// <param name="List"></param>
+        /// <returns></returns>
+        public static bool WritePLC_Sync_DataList_Direct(List<QualityDataType> List)
+        {
+            bool flag = false;
+            try
+            {
+                string errorMsg = string.Empty;
+                List<string> Keys = new List<string>();
+                List<string> Values = new List<string>();
+                foreach (QualityDataType item in List)
+                {
+                    var tag = ScadaApp.TagList.Find(it => it.TagID == item.TagID);
+                    if (tag.IsEnable)
+                    {
+                        tag.TagValue = item.TagValue;
+                        tag = ScadaApp.ConvertTagTypeToString(tag);
+                        Keys.Add($"{tag.OpCode}:{tag.TagID}");
+                        Values.Add(tag.TagValue.ToString());
+                    }
+                    else
+                    {
+                        ApplicationLog.BusinessLog(tag.OpName, $"Write:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
+                    }
+                }
+                if (!ScadaApp.mesRedisClient.Write(Keys.ToArray(), Values.ToArray(), out errorMsg))
+                {
+                    ApplicationLog.WriteLog($"发送值为Key:{JsonConvert.SerializeObject(Keys)},Value:{JsonConvert.SerializeObject(Values)}到服务端写入失败|{errorMsg}");
+                    return flag;
+                }
+                else
+                {
+                    ApplicationLog.BusinessLog("WritePLC_Sync_DataList_Direct", $"Write:WritePLC_Sync_DataList_Direct|Key:{JsonConvert.SerializeObject(Keys)},Value:{JsonConvert.SerializeObject(Values)}");
                 }
 
                 flag = true;

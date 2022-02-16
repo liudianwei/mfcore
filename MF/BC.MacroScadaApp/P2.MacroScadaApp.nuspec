@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<package >
+<package>
   <metadata>
     <id>MacroScadaApp</id>
-    <version>9.4.2-rc4</version>
+    <version>9.4.4-rc2</version>
     <title>MacroScadaApp</title>
     <authors>corbin chen</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -11,29 +11,35 @@
     <projectUrl>http://192.168.0.111:9009/v3/index.json</projectUrl>
     <description>net framework版本</description>
     <releaseNotes>
-v9.3.0  基础版
-v9.3.1  Redis AbortOnConnectFail=false
-v9.3.2  新增未监控变量，Api调用实时读取，写入数据
-v9.3.3  优化数据类型转换
-v9.3.4  升级最新StackExchange.Redis库,修改批量读取Redis缓存，提高性能；变量change时，日志里面只打印配置文件里面配置的变量
-v9.3.5  ReadPLC_Sync_DataList_MesRead只读取质量数据组
-v9.3.6  初始化两个Redis读写分离
-v9.3.7  初始化RedisSlave时的bug
-v9.3.8  修正识别Tag数据类型DateTime=>datetime
-v9.3.9  新增BaseScadaApp.InitAllTag获取所有Tag
-v9.4.0  初始化Tag，记录加载错误日志,取消读写分离
-v9.4.1  支持array数组类型的数据类型（例如.intArray.boolArray）
-v9.4.2  redis发布数据使用队列,优化redis初始化
-v9.4.2-rc4 发布版
+      v9.3.0  基础版
+      v9.3.1  Redis AbortOnConnectFail=false
+      v9.3.2  新增未监控变量，Api调用实时读取，写入数据
+      v9.3.3  优化数据类型转换
+      v9.3.4  升级最新StackExchange.Redis库,修改批量读取Redis缓存，提高性能；变量change时，日志里面只打印配置文件里面配置的变量
+      v9.3.5  ReadPLC_Sync_DataList_MesRead只读取质量数据组
+      v9.3.6  初始化两个Redis读写分离
+      v9.3.7  初始化RedisSlave时的bug
+      v9.3.8  修正识别Tag数据类型DateTime=>datetime
+      v9.3.9  新增BaseScadaApp.InitAllTag获取所有Tag
+      v9.4.0  初始化Tag，记录加载错误日志,取消读写分离
+      v9.4.1  支持array数组类型的数据类型（例如.intArray.boolArray）
+      v9.4.2  redis发布数据使用队列,优化redis初始化
+      v9.4.2-rc4 发布版
+      v9.4.3  新增批量写入redis方法
+      v9.4.4-rc1 测试打包版本日志
+      v9.4.4-rc2 新增redis密码参数;升级最新StackExchange.Redis;升级最新RestSharp
     </releaseNotes>
     <copyright>Copyright ©2022 Macroinf Corporation</copyright>
     <tags>MacroScadaApp</tags>
-	<dependencies>
-		<group targetFramework=".NETFramework4.6.1">
-			<dependency id="Newtonsoft.Json" version="13.0.1" />
-			<dependency id="RestSharp" version="106.11.7" />
-			<dependency id="StackExchange.Redis" version="2.2.79" />
-		 </group>
-	 </dependencies>
+    <dependencies>
+      <group targetFramework=".NETFramework4.6.1">
+        <dependency id="Newtonsoft.Json" version="13.0.1" />
+        <dependency id="RestSharp" version="106.11.7" />
+        <dependency id="StackExchange.Redis" version="2.2.79" />
+      </group>
+    </dependencies>
   </metadata>
+  <files>
+    <file src="README.txt" />
+  </files>
 </package>

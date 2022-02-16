@@ -57,11 +57,6 @@ namespace ScadaAppCore
                     return flag;
                 }
                 mesRedisClient.RedisSubMessage += MesRedisClient_RedisSubMessage;
-                if (!mesRedisClient.DeleteAllMesKey(out errorMsg))
-                {
-                    ApplicationLog.WriteLog("清空RedisMaster数据库失败|" + errorMsg);
-                    return flag;
-                }
 
                 #endregion 初始化Redis客户端
 
@@ -72,11 +67,6 @@ namespace ScadaAppCore
                     errorMsg = "注册" + ChangeChannelName + "主题失败|" + errorMsg;
                     return flag;
                 }
-                //if (!mesRedisClient.Sub(WriteTagNodeValue, out errorMsg))
-                //{
-                //    errorMsg = "注册" + WriteTagNodeValue + "主题失败|" + errorMsg;
-                //    return flag;
-                //}
 
                 #endregion 注册监控事件，监控TAG写入与变化
 
@@ -294,7 +284,10 @@ namespace ScadaAppCore
                         if (tagMsgs.Count > 0)
                         {
                             mesRedisClient.Pub(WriteTagNodeValue, JsonConvert.SerializeObject(tagMsgs), out string errorMsg);
-                            ApplicationLog.WriteLog($"发送条数{tagMsgs.Count} 明细:" + JsonConvert.SerializeObject(tagMsgs));
+                            if (tagMsgs.Count > 1)
+                            {
+                                ApplicationLog.WriteLog($"发送条数{tagMsgs.Count} 明细:" + JsonConvert.SerializeObject(tagMsgs));
+                            }
                         }
                     }
                     autoResetQueue.Reset();
