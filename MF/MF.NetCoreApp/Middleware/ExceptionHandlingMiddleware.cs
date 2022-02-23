@@ -77,6 +77,7 @@ namespace MF.NetCoreApp.Middleware
                     return Task.CompletedTask;
                 }, context);
                 await _next(context);
+                watch.Stop();
             }
             catch (Exception ex)
             {

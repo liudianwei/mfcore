@@ -3,6 +3,12 @@
   <PropertyGroup>
 	  <TargetFramework>net5</TargetFramework>
 	  <Version>1.0.1-rc7</Version>
+	  <Description>
+		  +修复 异常中间件已知问题
+	  </Description>
+	  <PackageReleaseNotes>
+		  +修复 异常中间件 -add by caladi 2022/2/23
+	  </PackageReleaseNotes>
   </PropertyGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
