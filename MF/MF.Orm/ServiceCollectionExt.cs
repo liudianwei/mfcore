@@ -442,17 +442,20 @@ namespace MF.Extensions.DependencyInjection
                 case DbType.Oracle:
                     ExecuteSql(db, "oracle", log);
                     break;
+
+                case DbType.PostgreSQL:
+                    ExecuteSql(db, "pgsql", log);
+                    break;
             }
         }
 
         private static void ExecuteSql(SqlSugarClient db, string sqlName, ILogger log)
         {
-            //var sqlpath = Path.Combine(Environment.CurrentDirectory, sqlName + ".sql");
             var sqlpath = Path.Combine(Environment.CurrentDirectory, "mysql.sql");
             if (File.Exists(sqlpath))
             {
                 var sql = File.ReadAllText(sqlpath);
-                if (sqlName == "sqlserver")
+                if (sqlName == "sqlserver" || sqlName == "pgsql")
                 {
                     sql = sql.Replace("`", "");
                     sql = sql.Replace("SET NAMES utf8mb4;", "");
@@ -461,7 +464,16 @@ namespace MF.Extensions.DependencyInjection
                 }
                 Console.WriteLine(sqlName + " Init Record...");
                 log.LogInformation(sqlName + " Init Record...");
-                db.Ado.ExecuteCommand(sql);
+                //db.Ado.ExecuteCommand(sql);
+                try
+                {
+                    db.Ado.ExecuteCommand(sql);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("ExecuteCommand：" + ex.StackTrace);
+                    log.LogError("ExecuteCommand：" + ex.StackTrace);
+                }
             }
             else
             {

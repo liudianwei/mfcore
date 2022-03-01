@@ -2,10 +2,14 @@
 
   <PropertyGroup>
 	  <TargetFramework>net5</TargetFramework>
-	  <Version>1.0.4</Version>
+	  <Version>1.0.5-rc1</Version>
+	  <Description>
+		  +修复 PostgreSQL数据库初始化数据库失败
+	  </Description>
 	  <PackageReleaseNotes>
 		  升级netcore5.0.5.4
 		  新增功能－批量插入BulkCopy、批量更新BulkUpdate（SqlSever、MySql、PgSql、Oracle、Sqlite 全支持）
+		  修复 PostgreSQL数据库初始化数据库失败问题
 	  </PackageReleaseNotes>
   </PropertyGroup>
 
