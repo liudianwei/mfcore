@@ -204,7 +204,7 @@ namespace HslCommunication.LogNet
         /// 消息存储文件名<br />
         /// Keyword of the message
         /// </summary>
-        public string FileName { get; set; }
+        public string FileName { get; set; } = "";
 
         /// <summary>
         /// 是否取消写入到文件中去，在事件 <see cref="LogNetBase.BeforeSaveToFile"/> 触发的时候捕获即可设置。<br />
