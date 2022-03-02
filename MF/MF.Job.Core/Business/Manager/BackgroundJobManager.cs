@@ -61,7 +61,7 @@ namespace MF.Job.Core.Business.Manager
         {
             return db.Queryable<JobTask>().Where(it => it.BackgroundJobId == BackgroundJobId && it.State != 2).First();
         }
-        
+
 
         /// <summary>
         /// 根据id列表获取Job详情
@@ -74,7 +74,7 @@ namespace MF.Job.Core.Business.Manager
         }
 
         /// <summary>
-        /// Job集合(分页)
+        /// Job集合(分页) //State 0停止 1运行 2删除 3启动中 5停止中
         /// </summary>
         /// <param name="parameter">参数集</param>
         /// <returns></returns>
@@ -82,9 +82,14 @@ namespace MF.Job.Core.Business.Manager
         {
             int TotalRecord = 0;
             List<JobTask> dataList = null;
-            string Name = parameter.GetParameter("Name");
+            string name = parameter.GetParameter("Name");
+            string state = parameter.GetParameter("State");
+            string jobType = parameter.GetParameter("JobType");
             dataList = db.Queryable<JobTask>()
                      .Where(it => it.State != 2)
+                     .WhereIF(!string.IsNullOrWhiteSpace(name), it => it.Name.Contains(name))
+                     .WhereIF(!string.IsNullOrWhiteSpace(state), it => it.State.Equals(state))
+                     .WhereIF(!string.IsNullOrWhiteSpace(jobType), it => it.JobType.Equals(jobType))
                      .OrderBy(it => it.JobType, OrderByType.Desc)
                      .ToPageList(parameter.currentPageIndex, parameter.rows, ref TotalRecord);
 
@@ -106,7 +111,7 @@ namespace MF.Job.Core.Business.Manager
         {
             List<JobTask> list = null;
             list = db.Queryable<JobTask>()
-                .Where(it => it.State == 1 || it.State == 3 || it.State == 5)
+                .Where(it => it.State == 1 || it.State == 3 || it.State == 5)//0停止 1运行 3启动中 5停止中
                 .OrderBy(it => it.CreatedDateTime, OrderByType.Desc)
                 .ToList();
             return list;

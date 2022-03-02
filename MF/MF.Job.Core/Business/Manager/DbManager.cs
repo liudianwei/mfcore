@@ -20,6 +20,22 @@ namespace MF.Job.Core.Business.Manager
                     BackgroundJobMappingDbTable = string.IsNullOrWhiteSpace(BackgroundJobMappingDbTable) ? "job_task" : BackgroundJobMappingDbTable;
                     _db.MappingTables.Add("BackgroundJobInfo", BackgroundJobMappingDbTable);
                 }
+                var blFlag = false;//是否输出sql日志
+                if (blFlag)
+                {
+                    _db.Aop.OnLogExecuted = (sql, pars) =>
+                    {
+                        foreach (var item in pars)
+                        {
+                            sql = sql.Replace(item.ParameterName.ToString(), $"'{item.Value?.ToString()}'");
+                        }
+                        Console.WriteLine($"执行后SQL==>{sql}");
+                    };
+                    _db.Aop.OnError = (exp) =>//执行SQL 错误事件
+                    {
+                        Console.WriteLine(exp);
+                    };
+                }
                 return _db;
             }
         }

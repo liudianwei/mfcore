@@ -1,9 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFrameworks>netcoreapp3.1;net5</TargetFrameworks>
+	  <TargetFrameworks>net5</TargetFrameworks>
     <RootNamespace>MF.ApiJob</RootNamespace>
     <AssemblyName>MF.ApiJob</AssemblyName>
+	  <Version>1.0.2</Version>
+	  <Description>
+		  +更新MF.Job.Core引用
+	  </Description>
   </PropertyGroup>
 
   <ItemGroup>

@@ -2,6 +2,13 @@
 
   <PropertyGroup>
 	  <TargetFrameworks>net5</TargetFrameworks>
+	  <Version>1.0.2</Version>
+	  <Description>
+		  +更新MF.Job.Core引用
+	  </Description>
+	  <PackageReleaseNotes>
+		  +更新MF.Job.Core引用
+	  </PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
