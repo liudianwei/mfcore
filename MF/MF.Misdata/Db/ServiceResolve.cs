@@ -155,14 +155,19 @@ namespace Common.DBUtils
         /// <param name="configAction"></param>
         /// <param name="lifetime"></param>
         /// <returns></returns>
-        public static IServiceCollection AddSqlSugarScope<T>(this IServiceCollection services, Action<ConnectionConfig> configAction, ServiceLifetime lifetime = ServiceLifetime.Scoped) where T : SqlSugarScope
+        public static IServiceCollection AddSqlSugarScope<T>(this IServiceCollection services, Action<ConnectionConfig> configAction,
+            ServiceLifetime lifetime = ServiceLifetime.Singleton) where T : SqlSugarScope
         {
             //services.GetMachineCodeString();
             switch (lifetime)
             {
-                case ServiceLifetime.Scoped:
-                    services.AddScoped(serviceProvider =>
+                case ServiceLifetime.Singleton:
+                    services.AddSingleton(serviceProvider =>
                     {
+                        var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+                        var log = loggerFactory.CreateLogger<SqlSugarScope>();
+                        var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+                        bool.TryParse(configuration["ConnectronStr:SqlLog"], out bool flag);
                         var configS = new ConnectionConfig()
                         {
                             ConfigureExternalServices = new ConfigureExternalServices
@@ -170,54 +175,47 @@ namespace Common.DBUtils
                             }
                         };
                         configAction.Invoke(configS);
-                        var db = new SqlSugarScope(configS);
+                        var db = new SqlSugarScope(configS, dB =>
+                         {
+                             if (flag)
+                             {
+                                 dB.Ado.IsEnableLogEvent = true;
+                                 //SQL执行前事件
+                                 //db.Aop.OnLogExecuting = (sql, pars) =>
+                                 //{
+                                 //    foreach (var item in pars)
+                                 //    {
+                                 //        sql = sql.Replace(item.ParameterName.ToString(), $"'{item.Value?.ToString()}'");
+                                 //    }
+                                 //    sql = pretySql(sql);
+                                 //    log.LogInformation($"执行前SQL: \r\n{sql}");
+                                 //};
+                                 //SQL执行完事件
+                                 dB.Aop.OnLogExecuted = (sql, pars) =>
+                                 {
+                                     foreach (var item in pars)
+                                     {
+                                         sql = sql.Replace(item.ParameterName.ToString(), $"'{item.Value?.ToString()}'");
+                                     }
 
-                        var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-                        var log = loggerFactory.CreateLogger<SqlSugarScope>();
-                        var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-                        bool.TryParse(configuration["ConnectronStr:SqlLog"], out bool flag);
-                        //if (string.IsNullOrWhiteSpace(flag))
-                        //{
-                        //    flag = "false";
-                        //}
-                        if (flag)
-                        {
-                            db.Ado.IsEnableLogEvent = true;
-                            //SQL执行前事件
-                            //db.Aop.OnLogExecuting = (sql, pars) =>
-                            //{
-                            //    foreach (var item in pars)
-                            //    {
-                            //        sql = sql.Replace(item.ParameterName.ToString(), $"'{item.Value?.ToString()}'");
-                            //    }
-                            //    sql = pretySql(sql);
-                            //    log.LogInformation($"执行前SQL: \r\n{sql}");
-                            //};
-                            //SQL执行完事件
-                            db.Aop.OnLogExecuted = (sql, pars) =>
-                            {
-                                foreach (var item in pars)
-                                {
-                                    sql = sql.Replace(item.ParameterName.ToString(), $"'{item.Value?.ToString()}'");
-                                }
-
-                                log.LogInformation($"执行后SQL: \r\n{sql}");
-                                log.LogInformation($"执行时间: {db.Ado.SqlExecutionTime.TotalSeconds}");
-                                Console.WriteLine($"执行后SQL:{sql}");
-                            };
-                            db.Aop.OnError = (exp) =>//执行SQL 错误事件
-                            {
-                                log.LogDebug(exp, exp.Sql);
-                            };
-                            db.Aop.OnDiffLogEvent = (diff) =>
-                            {
-                                // 审计日志
-                            };
-                        }
-                        else
-                        {
-                            db.Ado.IsEnableLogEvent = false;
-                        }
+                                     log.LogInformation($"执行后SQL: \r\n{sql}");
+                                     log.LogInformation($"执行时间: {dB.Ado.SqlExecutionTime.TotalSeconds}");
+                                     Console.WriteLine($"执行后SQL:{sql}");
+                                 };
+                                 dB.Aop.OnError = (exp) =>//执行SQL 错误事件
+                                 {
+                                     log.LogDebug(exp, exp.Sql);
+                                 };
+                                 dB.Aop.OnDiffLogEvent = (diff) =>
+                                 {
+                                     // 审计日志
+                                 };
+                             }
+                             else
+                             {
+                                 dB.Ado.IsEnableLogEvent = false;
+                             }
+                         });
 
                         return (T)db;
                     });
