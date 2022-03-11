@@ -98,4 +98,8 @@ cd ..
 cd SimplCommerce.Modules
 dotnet pack --output ./../../core-nupkgs
 
+cd ..
+cd MF.CodeGen
+dotnet pack --output ./../../core-nupkgs
+
 pause
