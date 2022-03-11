@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CodeGen
+namespace MF.Authorization
 {
     [Serializable]
     public class LicenseInfo

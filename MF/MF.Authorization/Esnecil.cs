@@ -1,10 +1,9 @@
 ﻿using System;
 using System.IO;
-using MF.Utils;
 using System.Globalization;
 using System.Security.Cryptography;
 
-namespace CodeGen
+namespace MF.Authorization
 {
     public class Esnecil
     {
@@ -18,6 +17,7 @@ namespace CodeGen
             public string company = "";
             public string signal = "";
         }
+
         /// <summary>
         /// 代码生成器授权
         /// </summary>

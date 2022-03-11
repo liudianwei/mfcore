@@ -99,6 +99,10 @@ cd SimplCommerce.Modules
 dotnet pack --output ./../../core-nupkgs
 
 cd ..
+cd MF.Authorization
+dotnet pack --output ./../../core-nupkgs
+
+cd ..
 cd MF.CodeGen
 dotnet pack --output ./../../core-nupkgs
 
