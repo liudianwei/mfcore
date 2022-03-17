@@ -12,6 +12,7 @@ namespace Common.Model
         private TagType tagType = TagType.@bool;
         private string tagQuality = "good";
         private DateTime timeStamp = DateTime.Now;
+        private int bitType = 8;
 
         /// <summary>
         ///
@@ -89,6 +90,15 @@ namespace Common.Model
         {
             get { return this.timeStamp; }
             set { this.timeStamp = value; }
+        }
+
+        /// <summary>
+        /// Î»Ä£(8 bit »ò 16 bit)
+        /// </summary>
+        public int BitType
+        {
+            get { return this.bitType; }
+            set { this.bitType = value; }
         }
     }
 }

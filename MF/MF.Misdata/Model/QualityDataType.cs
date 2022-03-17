@@ -66,5 +66,10 @@ namespace Common.Model
         /// 是否监控
         /// </summary>
         public bool IsMonitor { get; set; }
+
+        /// <summary>
+        /// 位模(8 bit 或 16 bit)
+        /// </summary>
+        public int BitType { get; set; } = 8;
     }
 }

@@ -48,6 +48,26 @@ namespace Common.Model
         /// <summary>
         ///
         /// </summary>
+        longdatetime,
+
+        /// <summary>
+        ///
+        /// </summary>
+        longdatetimeArray,
+
+        /// <summary>
+        ///
+        /// </summary>
+        datetimelong,
+
+        /// <summary>
+        ///
+        /// </summary>
+        datetimelongArray,
+
+        /// <summary>
+        ///
+        /// </summary>
         @string,
 
         /// <summary>
