@@ -105,14 +105,6 @@ namespace ScadaAppCore
             return flag;
         }
 
-        private void MesRedisClient_logMsg(string obj)
-        {
-            //if (obj.Contains(":"))
-            //{
-            //    ApplicationLog.BusinessLog(obj.Split(':')[0], obj);
-            //}
-        }
-
         /// <summary>
         /// 关闭Redis连接
         /// </summary>

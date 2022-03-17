@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>MacroScadaApp</id>
-    <version>9.4.4-rc2</version>
+    <version>9.4.4</version>
     <title>MacroScadaApp</title>
     <authors>corbin chen</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -28,6 +28,7 @@
       v9.4.3  新增批量写入redis方法
       v9.4.4-rc1 测试打包版本日志
       v9.4.4-rc2 新增redis密码参数;升级最新StackExchange.Redis;升级最新RestSharp
+      v9.4.4 将授权打包
     </releaseNotes>
     <copyright>Copyright ©2022 Macroinf Corporation</copyright>
     <tags>MacroScadaApp</tags>
@@ -38,8 +39,14 @@
         <dependency id="StackExchange.Redis" version="2.2.79" />
       </group>
     </dependencies>
+    <contentFiles>
+      <files include="Authentication x64.dll" buildAction="lib" copyToOutput="true" />
+      <files include="authentication x32.dll" buildAction="lib" copyToOutput="true" />
+    </contentFiles>
   </metadata>
   <files>
     <file src="README.txt" />
+    <file src="Authentication x64.dll" target="lib\net461\Authentication x64.dll" />
+    <file src="authentication x32.dll" target="lib\net461\authentication x32.dll" />
   </files>
 </package>

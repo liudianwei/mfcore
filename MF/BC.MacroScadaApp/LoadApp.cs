@@ -22,15 +22,26 @@ namespace ScadaAppCore
             return Assembly.GetExecutingAssembly().GetName().Version.ToString();
         }
 
-        #region PassKey
+        #region Authentication
 
         /// <summary>
-        /// 验证授权码方法，此方法为阻塞类型（验证不通过，无法往下执行代码）；
+        /// 判断当前操作系统是否64位或32位
         /// </summary>
-        [DllImport(@"Authentication.dll", EntryPoint = "VerifyLicenseSN", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
-        private static extern void VerifyLicenseSN();
+        public static bool is64bit = (IntPtr.Size == 8);
 
-        #endregion PassKey
+        /// <summary>
+        ///
+        /// </summary>
+        [DllImport("Authentication x64.dll", EntryPoint = "VerifyLicenseSN", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+        public static extern void VerifyLicenseSN64();
+
+        /// <summary>
+        ///
+        /// </summary>
+        [DllImport("Authentication x32.dll", EntryPoint = "VerifyLicenseSN", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+        public static extern void VerifyLicenseSN32();
+
+        #endregion Authentication
 
         /// <summary>
         /// ScadaApp
@@ -63,7 +74,18 @@ namespace ScadaAppCore
             {
                 #region 验证授权码方法
 
-                VerifyLicenseSN();
+                //VerifyLicenseSN();
+
+                if (is64bit)
+                {
+                    Console.WriteLine("win x64");
+                    VerifyLicenseSN64();
+                }
+                else
+                {
+                    Console.WriteLine("win x32");
+                    VerifyLicenseSN32();
+                }
 
                 #endregion 验证授权码方法
 
