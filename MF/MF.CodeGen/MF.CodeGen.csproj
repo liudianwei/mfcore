@@ -13,9 +13,8 @@
 	  <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
   </PropertyGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\..\MF.Authorization\MF.Authorization.csproj" />
-	  <ProjectReference Include="..\MF.Authorization\MF.Authorization.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MF.Authorization\MF.Authorization.csproj" />
+  </ItemGroup>
 
 </Project>

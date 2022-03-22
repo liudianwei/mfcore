@@ -1,9 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net5</TargetFramework>
-        <Version>1.0.6-rc5</Version>
-    </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net5</TargetFramework>
+		<Version>1.0.7</Version>
+		<Description>
+			工具类
+		</Description>
+		<PackageReleaseNotes>
+			+优化 添加textJson解析
+		</PackageReleaseNotes>
+	</PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="DeviceId" Version="6.0.0" />

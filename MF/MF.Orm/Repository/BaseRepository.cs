@@ -499,7 +499,12 @@ namespace MF.Orm.Repository
         {
             if (logic)
             {
-                return db.Updateable<T>().Where(where).SetColumns(it => it.State == deleteFlag).ExecuteCommand() > 0;
+                return db.Updateable<T>()
+                    .Where(where)
+                    .SetColumns(it => it.State == deleteFlag)
+                    .SetColumns(it => it.UpdateTime == DateTime.Now)
+                    .SetColumns(it => it.Updator == globalCore.UserConcatName)
+                    .ExecuteCommand() > 0;
             }
             return db.Deleteable<T>().Where(where).ExecuteCommand() > 0;
         }
@@ -515,7 +520,12 @@ namespace MF.Orm.Repository
             if (logic)
             {
                 var ids = primaryKeys.ToList();
-                return db.Updateable<T>().Where(i => ids.Contains(i.Id)).SetColumns(it => it.State == deleteFlag).ExecuteCommand() > 0;
+                return db.Updateable<T>()
+                    .Where(i => ids.Contains(i.Id))
+                    .SetColumns(it => it.State == deleteFlag)
+                    .SetColumns(it => it.UpdateTime == DateTime.Now)
+                    .SetColumns(it => it.Updator == globalCore.UserConcatName)
+                    .ExecuteCommand() > 0;
             }
             return db.Deleteable<T>().In(primaryKeys).ExecuteCommand() > 0;
         }
@@ -531,6 +541,8 @@ namespace MF.Orm.Repository
             if (logic)
             {
                 obj.State = deleteFlag;
+                obj.UpdateTime = DateTime.Now;
+                obj.Updator = globalCore.UserConcatName;
                 return db.Updateable<T>(obj).ExecuteCommand() > 0;
                 //return db.Updateable<T>(obj).Where(i=>1==1).SetColumns(it => it.State == deleteFlag).ExecuteCommand() > 0;
             }
