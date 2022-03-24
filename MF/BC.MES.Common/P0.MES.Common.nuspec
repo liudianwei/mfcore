@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>MES.Common</id>
-    <version>1.1.2-rc4</version>
+    <version>1.1.2</version>
     <title>MES.Common</title>
     <authors>corbin chen</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -11,11 +11,12 @@
     <projectUrl>http://192.168.0.111:9009/v3/index.json</projectUrl>
     <description>net framework版本</description>
     <releaseNotes>
-      v1.0.0.0  基础版本
+      v1.0.0  基础版本
       v1.1.0  新增netmq断线重连机制
-      v1.1.1 发布版
+      v1.1.1  发布版
       v1.1.2-rc3 增加mqttClient获取通讯地址变量
       v1.1.2-rc4 测试打包版本日志
+      v1.1.2 将SqlSugar引用dll打包
     </releaseNotes>
     <copyright>Copyright ©2022 Macroinf Corporation</copyright>
     <tags>MES.Common</tags>
@@ -23,11 +24,25 @@
       <group targetFramework=".NETFramework4.6.1">
         <dependency id="MQTTnet" version="3.0.8" />
         <dependency id="NetMQ" version="4.0.0.1" />
-        <dependency id="SqlSugar" version="5.0.3" />
+        <dependency id="SqlSugar" version="5.0.6.1" />
       </group>
     </dependencies>
+    <contentFiles>
+      <files include="DmProvider.dll" buildAction="lib" copyToOutput="true" />
+      <files include="Kdbndp.dll" buildAction="lib" copyToOutput="true" />
+      <files include="Newtonsoft.Json.dll" buildAction="lib" copyToOutput="true" />
+      <files include="Npgsql.dll" buildAction="lib" copyToOutput="true" />
+      <files include="Oracle.ManagedDataAccess.dll" buildAction="lib" copyToOutput="true" />
+      <files include="System.Data.SQLite.dll" buildAction="lib" copyToOutput="true" />
+    </contentFiles>
   </metadata>
   <files>
     <file src="README.txt" />
+    <file src="DmProvider.dll" target="lib\net461\DmProvider.dll" />
+    <file src="Kdbndp.dll" target="lib\net461\Kdbndp.dll" />
+    <file src="Newtonsoft.Json.dll" target="lib\net461\Newtonsoft.Json.dll" />
+    <file src="Npgsql.dll" target="lib\net461\Npgsql.dll" />
+    <file src="Oracle.ManagedDataAccess.dll" target="lib\net461\Oracle.ManagedDataAccess.dll" />
+    <file src="System.Data.SQLite.dll" target="lib\net461\System.Data.SQLite.dll" />
   </files>
 </package>
