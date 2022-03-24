@@ -56,7 +56,8 @@ namespace MF.Job.JobItems
                     {
                         var task = result.Data.First();
                         Console.WriteLine(task);
-                        var args = new { moduleName = task.ModuleName, taskId = task.Id };
+                        var obj = JsonConvert.DeserializeObject<RestQuery>(task.QueryItem);
+                        var args = new { moduleName = task.ModuleName, taskId = task.Id, Condition = obj.Condition };
                         //执行任务
                         resultstr = MRestClient.Post(task.Url, "", JsonConvert.SerializeObject(args), task.Token);
                     }
@@ -143,6 +144,11 @@ namespace MF.Job.JobItems
             public List<ExportLogDto> Data { get; set; }
             public string Message { get; set; }
             public string Status { get; set; }
+        }
+
+        public class RestQuery
+        {
+            public string Condition { get; set; }
         }
     }
 }

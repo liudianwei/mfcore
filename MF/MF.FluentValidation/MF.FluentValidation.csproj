@@ -2,6 +2,7 @@
 
   <PropertyGroup>
 	  <TargetFramework>net5</TargetFramework>
+	  <Version>1.0.1-rc1</Version>
   </PropertyGroup>
 
   <ItemGroup>
