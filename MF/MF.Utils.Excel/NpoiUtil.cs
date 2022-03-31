@@ -63,12 +63,12 @@ namespace MF.Utils.Excel
         /// </summary>
         /// <param name="dt"></param>
         /// <param name="version"></param>
+        /// <param name="_sheetname"></param>
         /// <returns></returns>
-        public static byte[] Export(DataTable dt, ExcelVersion version = ExcelVersion.V2007)
+        public static byte[] Export(DataTable dt, ExcelVersion version = ExcelVersion.V2007, string _sheetname = "sheet1")
         {
             Workbook(version);
-            string sheetname = "sheet1";
-            ISheet sheet = workbook.CreateSheet(sheetname);
+            ISheet sheet = workbook.CreateSheet(_sheetname);
             IRow row = sheet.CreateRow(0);
             for (int i = 0; i < dt.Columns.Count; i++)
             {
@@ -94,7 +94,14 @@ namespace MF.Utils.Excel
             return buffer;
         }
 
-        public static MemoryStream ExportDataTableToExcel(DataTable sourceTable, ExcelVersion version = ExcelVersion.V2007)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="sourceTable"></param>
+        /// <param name="version"></param>
+        /// <param name="_sheetname"></param>
+        /// <returns></returns>
+        public static MemoryStream ExportDataTableToExcel(DataTable sourceTable, ExcelVersion version = ExcelVersion.V2007, string _sheetname = "sheet")
         {
             Workbook(version);
             int dtRowsCount = sourceTable.Rows.Count;
@@ -102,7 +109,7 @@ namespace MF.Utils.Excel
             int SheetNum = 1;
             int rowIndex = 1;
             int tempIndex = 1; //标示
-            ISheet sheet = workbook.CreateSheet("sheet" + SheetNum);
+            ISheet sheet = workbook.CreateSheet(_sheetname + SheetNum);
             for (int i = 0; i < dtRowsCount; i++)
             {
                 if (i == 0 || tempIndex == 1)
@@ -119,7 +126,7 @@ namespace MF.Utils.Excel
                 if (tempIndex == Max)
                 {
                     SheetNum++;
-                    sheet = workbook.CreateSheet("sheet" + SheetNum);//
+                    sheet = workbook.CreateSheet(_sheetname + SheetNum);//
                     tempIndex = 0;
                 }
                 rowIndex++;
@@ -136,7 +143,14 @@ namespace MF.Utils.Excel
             return ms;
         }
 
-        public static byte[] ExportToByte(DataTable dt, ExcelVersion version = ExcelVersion.V2007)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <param name="version"></param>
+        /// <param name="_sheetname"></param>
+        /// <returns></returns>
+        public static byte[] ExportToByte(DataTable dt, ExcelVersion version = ExcelVersion.V2007, string _sheetname = "sheet")
         {
             Workbook(version);
             int count = dt.Rows.Count;
@@ -147,7 +161,7 @@ namespace MF.Utils.Excel
             }
             for (int i = 0; i < sheetCount; i++)
             {
-                var sheetname = "sheet" + (i + 1);
+                var sheetname = _sheetname + (i + 1);
 
                 ISheet sheet = workbook.CreateSheet(sheetname);
                 IRow row = sheet.CreateRow(0);
@@ -179,7 +193,16 @@ namespace MF.Utils.Excel
             return buffer;
         }
 
-        public static byte[] Export<T>(List<T> list, ExcelVersion version = ExcelVersion.V2007, string[] ignoreExport = null)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <param name="version"></param>
+        /// <param name="ignoreExport"></param>
+        /// <param name="_sheetname"></param>
+        /// <returns></returns>
+        public static byte[] Export<T>(List<T> list, ExcelVersion version = ExcelVersion.V2007, string[] ignoreExport = null, string _sheetname = "sheet")
         {
             if (!list.Any())
             {
@@ -194,7 +217,7 @@ namespace MF.Utils.Excel
             }
             for (int i = 0; i < sheetCount; i++)
             {
-                string sheetname = "sheet" + (i + 1);
+                var sheetname = _sheetname + (i + 1);
                 ISheet sheet = workbook.CreateSheet(sheetname);
                 IRow row = sheet.CreateRow(0);
                 Type entityType = list[0].GetType();
@@ -248,14 +271,14 @@ namespace MF.Utils.Excel
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="list"></param>
-        /// <param name="sheetname"></param>
+        /// <param name="_sheetname"></param>
         /// <param name="version"></param>
         /// <param name="ignoreExport"></param>
         /// <param name="sn">是否包含序号</param>
         /// <returns></returns>
-        public static IWorkbook ExportToExcel<T>(List<T> list, string sheetname = "sheet", bool sn = true, ExcelVersion version = ExcelVersion.V2007, string[] ignoreExport = null)
+        public static IWorkbook ExportToExcel<T>(List<T> list, string _sheetname = "sheet", bool sn = true, ExcelVersion version = ExcelVersion.V2007, string[] ignoreExport = null)
         {
-            return ExportToExcel(list, 0, sheetname, sn, version, ignoreExport);
+            return ExportToExcel(list, 0, _sheetname, sn, version, ignoreExport);
         }
 
         /// <summary>
@@ -268,12 +291,12 @@ namespace MF.Utils.Excel
         /// <param name="ignoreExport"></param>
         /// <param name="sn">是否包含序号</param>
         /// <returns></returns>
-        public static IWorkbook ExportToExcel<T>(List<T> list, int startRow, string sheetname = "sheet", bool sn = true, ExcelVersion version = ExcelVersion.V2007, string[] ignoreExport = null)
+        public static IWorkbook ExportToExcel<T>(List<T> list, int startRow, string _sheetname = "sheet", bool sn = true, ExcelVersion version = ExcelVersion.V2007, string[] ignoreExport = null)
         {
             Workbook(version);
             if (!list.Any())
             {
-                workbook.CreateSheet(sheetname);
+                workbook.CreateSheet(_sheetname);
                 return workbook;
             }
 
@@ -289,7 +312,7 @@ namespace MF.Utils.Excel
                 {
                     startRow = 0;
                 }
-                sheetname = sheetname + (i + 1);
+                var sheetname = _sheetname + (i + 1);
                 ISheet sheet = workbook.CreateSheet(sheetname);
                 IRow row = sheet.CreateRow(startRow);
                 Type entityType = list[0].GetType();
@@ -622,7 +645,7 @@ namespace MF.Utils.Excel
                         bool hasValue = false;
                         for (int k = 0; k < columns; k++)
                         {
-                            dr[k] = GetValueType(sheet.GetRow(j).GetCell(k));
+                            dr[k] = GetValueType(sheet.GetRow(j)?.GetCell(k));
                             if (dr[k] != null && !string.IsNullOrEmpty(dr[k].ToString()))
                             {
                                 hasValue = true;
@@ -700,7 +723,7 @@ namespace MF.Utils.Excel
                         bool hasValue = false;
                         for (int k = 0; k < columns; k++)
                         {
-                            dr[k] = GetValueType(sheet.GetRow(j).GetCell(k));
+                            dr[k] = GetValueType(sheet.GetRow(j)?.GetCell(k));
 
                             if (dr[k] != null && !string.IsNullOrEmpty(dr[k].ToString()))
                             {
