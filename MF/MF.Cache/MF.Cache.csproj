@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net5</TargetFramework>
-		<Version>1.0.3-rc1</Version>
+		<TargetFramework>net5.0</TargetFramework>
+		<Version>1.0.3-rc5</Version>
 		<Description>缓存工具</Description>
 		<PackageReleaseNotes>
 			升级ORM:SqlSugarCore(5.0.5.4=>5.0.5.9)

@@ -248,13 +248,14 @@ namespace MF.Utils.Excel
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="list"></param>
+        /// <param name="sheetname"></param>
         /// <param name="version"></param>
         /// <param name="ignoreExport"></param>
         /// <param name="sn">是否包含序号</param>
         /// <returns></returns>
-        public static IWorkbook ExportToExcel<T>(List<T> list, bool sn = true, ExcelVersion version = ExcelVersion.V2007, string[] ignoreExport = null)
+        public static IWorkbook ExportToExcel<T>(List<T> list, string sheetname = "sheet", bool sn = true, ExcelVersion version = ExcelVersion.V2007, string[] ignoreExport = null)
         {
-            return ExportToExcel(list, 0, sn, version, ignoreExport);
+            return ExportToExcel(list, 0, sheetname, sn, version, ignoreExport);
         }
 
         /// <summary>
@@ -262,16 +263,17 @@ namespace MF.Utils.Excel
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="list"></param>
+        /// <param name="sheetname"></param>
         /// <param name="version"></param>
         /// <param name="ignoreExport"></param>
         /// <param name="sn">是否包含序号</param>
         /// <returns></returns>
-        public static IWorkbook ExportToExcel<T>(List<T> list, int startRow, bool sn = true, ExcelVersion version = ExcelVersion.V2007, string[] ignoreExport = null)
+        public static IWorkbook ExportToExcel<T>(List<T> list, int startRow, string sheetname = "sheet", bool sn = true, ExcelVersion version = ExcelVersion.V2007, string[] ignoreExport = null)
         {
             Workbook(version);
             if (!list.Any())
             {
-                workbook.CreateSheet("sheet1");
+                workbook.CreateSheet(sheetname);
                 return workbook;
             }
 
@@ -287,7 +289,7 @@ namespace MF.Utils.Excel
                 {
                     startRow = 0;
                 }
-                string sheetname = "sheet" + (i + 1);
+                sheetname = sheetname + (i + 1);
                 ISheet sheet = workbook.CreateSheet(sheetname);
                 IRow row = sheet.CreateRow(startRow);
                 Type entityType = list[0].GetType();

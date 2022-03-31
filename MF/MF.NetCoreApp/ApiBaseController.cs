@@ -223,13 +223,14 @@ namespace MF.NetCoreApp
         /// <typeparam name="T"></typeparam>
         /// <param name="resp"></param>
         /// <param name="outpath"></param>
+        /// <param name="sheetname"></param>
         /// <param name="rowstart"></param>
         /// <param name="imgs"></param>
         /// <param name="ExportRecord"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         [NonAction]
-        protected async Task<IActionResult> ExportExcel<T>(PubResponse resp, string outpath, int rowstart = 0, List<Utils.Excel.ImgAttribute> imgs = null, bool ExportRecord = true)
+        protected async Task<IActionResult> ExportExcel<T>(PubResponse resp, string outpath, int rowstart = 0, List<Utils.Excel.ImgAttribute> imgs = null, bool ExportRecord = true, string sheetname = "sheet")
         {
             IWorkbook workbook;
             if (ExportRecord)
@@ -240,11 +241,11 @@ namespace MF.NetCoreApp
                     throw new Exception("没有记录，不能导出");
                 }
 
-                workbook = Utils.Excel.NpoiUtil.ExportToExcel(list, rowstart);
+                workbook = Utils.Excel.NpoiUtil.ExportToExcel(list, rowstart, sheetname);
             }
             else
             {
-                workbook = Utils.Excel.NpoiUtil.ExportToExcel(new List<T>(), rowstart);
+                workbook = Utils.Excel.NpoiUtil.ExportToExcel(new List<T>(), rowstart, sheetname);
             }
 
             if (imgs?.Count > 0)

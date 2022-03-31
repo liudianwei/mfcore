@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 	  <TargetFramework>net5</TargetFramework>
-	  <Version>1.0.5-rc4</Version>
+	  <Version>1.0.5-rc7</Version>
 	  <Description>
 		  +修复 删除操作没有更新时间和用户信息
 	  </Description>
