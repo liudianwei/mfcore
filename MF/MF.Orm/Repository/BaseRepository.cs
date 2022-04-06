@@ -444,7 +444,9 @@ namespace MF.Orm.Repository
                         PreUpdate(i);
                     });
             //ts = ts.Select(i => { i.UpdateTime ??= DateTime.Now; return i; }).ToList();
-            return db.Updateable(entitys).IsEnableUpdateVersionValidation().ExecuteCommand() > 0;
+            //return db.Updateable(entitys).IsEnableUpdateVersionValidation().ExecuteCommand() > 0;
+            //IsEnableUpdateVersionValidation 不适合批量
+            return db.Updateable(entitys).ExecuteCommand() > 0;
         }
 
         #endregion 更新
