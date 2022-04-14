@@ -50,6 +50,7 @@ namespace Common.Utils
                     config.ConnectionString = sqlSugarConfig.Item2;
                     config.IsAutoCloseConnection = true;
                     config.InitKeyType = InitKeyType.Attribute;
+                    config.MoreSettings = new ConnMoreSettings() { DisableNvarchar = true };//添加这一行 ,将参数全部转成varchar模式
                 });
                 IServiceProvider serviceProvider = services.BuildServiceProvider();
                 ServiceResolve.SetServiceResolve(serviceProvider);
