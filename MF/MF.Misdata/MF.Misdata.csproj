@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net5.0</TargetFrameworks>
     <Platforms>AnyCPU;ARM64</Platforms>
-    <Version>1.0.8</Version>
+    <Version>1.0.9</Version>
     <PackageReleaseNotes>
       1、机器码记录到日志
       2、优化日志组件
@@ -13,6 +13,7 @@
       6、新增redis连接状态变量,更新MQTTnet(3.1.1=&gt;3.1.2)
       7、优化SqlSugarScope的日志事件
       8、QualityDataType对象新增BitType字段
+      9、SqlSugarScope新增属性:将nvarchar参数全部转成varchar模式
     </PackageReleaseNotes>
   </PropertyGroup>
 
