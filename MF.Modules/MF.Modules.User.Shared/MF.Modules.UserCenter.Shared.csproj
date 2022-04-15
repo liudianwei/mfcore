@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>net5</TargetFramework>
+    <AssemblyName>MF.Modules.UserCenter.Shared</AssemblyName>
+    <RootNamespace>MF.Modules.UserCenter.Shared</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\MF\MF.FluentValidation\MF.FluentValidation.csproj" />
+    <ProjectReference Include="..\..\MF\MF.Orm\MF.Orm.csproj" />
+  </ItemGroup>
+</Project>
