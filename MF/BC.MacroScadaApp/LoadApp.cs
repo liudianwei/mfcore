@@ -92,11 +92,11 @@ namespace ScadaAppCore
                 #region 初始化配置文件
 
                 _ScadaApp = new ScadaApp();
-                _ScadaApp.ChangeTagNames = ChangeTagNames;
-                _ScadaApp.TagDataOnChange += new ScadaApp.GetDataHandler(TagData);
                 if (!_ScadaApp.InitConfig()) return Start;
                 if (!_ScadaApp.InitRedisClient()) return Start;
                 if (!_ScadaApp.InitTags(OpNames)) return Start;
+                _ScadaApp.ChangeTagNames = ChangeTagNames;
+                _ScadaApp.TagDataOnChange += new ScadaApp.GetDataHandler(TagData);
 
                 #endregion 初始化配置文件
 
