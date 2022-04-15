@@ -17,4 +17,4 @@
       v9.4.4-rc2 新增redis密码参数;升级最新StackExchange.Redis;升级最新RestSharp
       v9.4.4 将授权打包
       v9.4.5 与SqlSugar统一Newtonsoft.Json版本,使用低版本v9.0.0
-      v9.4.6 优化LoadScadaApp:先加载完Tag,再委托回调
+      v9.5.0 优化LoadScadaApp:先加载完Tag,再委托回调

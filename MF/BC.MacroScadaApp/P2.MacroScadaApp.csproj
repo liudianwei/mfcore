@@ -76,16 +76,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BC.BasicData\BasicData.csproj">
-      <Project>{32d1f0c6-8d6b-465f-bc20-f639c7907375}</Project>
-      <Name>BasicData</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\BC.MES.Common\P0.MES.Common.csproj">
-      <Project>{5884c693-dc0c-4ad0-b4e3-0fd9ae180ea5}</Project>
-      <Name>P0.MES.Common</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Authentication x64.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -98,7 +88,16 @@
     </Content>
     <Content Include="README.txt" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\BC.BasicData\BasicData.csproj">
+      <Project>{32d1f0c6-8d6b-465f-bc20-f639c7907375}</Project>
+      <Name>BasicData</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BC.MES.Common\P0.MES.Common.csproj">
+      <Project>{5884c693-dc0c-4ad0-b4e3-0fd9ae180ea5}</Project>
+      <Name>P0.MES.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

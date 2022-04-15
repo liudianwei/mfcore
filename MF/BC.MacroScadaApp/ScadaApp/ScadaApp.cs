@@ -27,7 +27,7 @@ namespace ScadaAppCore
         /// <summary>
         /// 是否允许工作
         /// </summary>
-        public bool IsCanWork { set; get; } = false;
+        public static bool IsCanWork { set; get; } = false;
 
         #endregion Fields
 
@@ -92,7 +92,6 @@ namespace ScadaAppCore
 
                 #endregion 与配置信号程序之间的心跳
 
-                IsCanWork = true;
                 CreateQueue();
 
                 flag = true;
@@ -134,9 +133,9 @@ namespace ScadaAppCore
         }
 
         /// <summary>
-        ///
+        /// 记录跳变的Tag名称
         /// </summary>
-        public List<string> ChangeTagNames = new List<string>();
+        public List<string> ChangeTagNames { get; set; } = new List<string>();
 
         /// <summary>
         /// 接受到Redis请求
@@ -163,53 +162,57 @@ namespace ScadaAppCore
 
             try
             {
-                //变量回调
-                if (Topic.Equals(ChangeChannelName))
+                //开始工作时
+                if (IsCanWork)
                 {
-                    foreach (var tagMsg in tagMsgs)
+                    //变量回调
+                    if (Topic.Equals(ChangeChannelName))
                     {
-                        var tag = TagList.Find(it => it.TagID.ToString().Equals(tagMsg.TagID));
-                        if (tag == null)
+                        foreach (var tagMsg in tagMsgs)
                         {
-                            continue;
-                        }
-
-                        tag.TagValue = tagMsg.TagValue;
-                        ConvertStringToTagType(ref tag);
-
-                        CustomeEvetnArgs e = new CustomeEvetnArgs()
-                        {
-                            TagID = tag.TagID,
-                            OpName = tag.OpName,
-                            TagClassType = tag.TagClassType,
-                            TagTypeID = tag.TagTypeID,
-                            TagType = tag.TagType,
-                            TagName = tag.TagName,
-                            TagValue = tag.TagValue,
-                            TagQuality = tagMsg.TagQuality == "good" ? 192 : 0,
-                            TimeStamp = DateTime.Now
-                        };
-                        OPCTagData_TagDataOnChange(this, e);
-                        OPCTagData.InvokeTagData(this, e);
-
-                        #region 逻辑日志
-
-                        if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
-                        {
-                            if (ChangeTagNames != null)
+                            var tag = TagList.Find(it => it.TagID.ToString().Equals(tagMsg.TagID));
+                            if (tag == null)
                             {
-                                if (ChangeTagNames.Contains(tag.TagName))
+                                continue;
+                            }
+
+                            tag.TagValue = tagMsg.TagValue;
+                            ConvertStringToTagType(ref tag);
+
+                            CustomeEvetnArgs e = new CustomeEvetnArgs()
+                            {
+                                TagID = tag.TagID,
+                                OpName = tag.OpName,
+                                TagClassType = tag.TagClassType,
+                                TagTypeID = tag.TagTypeID,
+                                TagType = tag.TagType,
+                                TagName = tag.TagName,
+                                TagValue = tag.TagValue,
+                                TagQuality = tagMsg.TagQuality == "good" ? 192 : 0,
+                                TimeStamp = DateTime.Now
+                            };
+                            OPCTagData_TagDataOnChange(this, e);
+                            OPCTagData.InvokeTagData(this, e);
+
+                            #region 逻辑日志
+
+                            if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
+                            {
+                                if (ChangeTagNames != null)
+                                {
+                                    if (ChangeTagNames.Contains(tag.TagName))
+                                    {
+                                        ApplicationLog.BusinessLog(tag.OpName, "ValueChange:" + tag.TagDescription + "|" + tag.TagValue.ToString());
+                                    }
+                                }
+                                else
                                 {
                                     ApplicationLog.BusinessLog(tag.OpName, "ValueChange:" + tag.TagDescription + "|" + tag.TagValue.ToString());
                                 }
                             }
-                            else
-                            {
-                                ApplicationLog.BusinessLog(tag.OpName, "ValueChange:" + tag.TagDescription + "|" + tag.TagValue.ToString());
-                            }
-                        }
 
-                        #endregion 逻辑日志
+                            #endregion 逻辑日志
+                        }
                     }
                 }
             }
@@ -235,8 +238,11 @@ namespace ScadaAppCore
         /// <param name="tagMsg"></param>
         public static void Enqueue(TagMsg tagMsg)
         {
-            concurrentQueue.Enqueue(tagMsg);
-            autoResetQueue.Set(); //通知task队列里有内容了  可以开始循环读取
+            if (IsCanWork)
+            {
+                concurrentQueue.Enqueue(tagMsg);
+                autoResetQueue.Set(); //通知task队列里有内容了  可以开始循环读取
+            }
         }
 
         /// <summary>
@@ -246,7 +252,7 @@ namespace ScadaAppCore
         {
             new Thread(() =>
             {
-                while (IsCanWork)
+                while (true)
                 {
                     autoResetQueue.WaitOne();
                     while (concurrentQueue.Any())
@@ -276,10 +282,10 @@ namespace ScadaAppCore
                         if (tagMsgs.Count > 0)
                         {
                             mesRedisClient.Pub(WriteTagNodeValue, JsonConvert.SerializeObject(tagMsgs), out string errorMsg);
-                            if (tagMsgs.Count > 1)
-                            {
-                                ApplicationLog.WriteLog($"发送条数{tagMsgs.Count} 明细:" + JsonConvert.SerializeObject(tagMsgs));
-                            }
+                            //if (tagMsgs.Count > 1)
+                            //{
+                            //    ApplicationLog.WriteLog($"发送条数{tagMsgs.Count} 明细:" + JsonConvert.SerializeObject(tagMsgs));
+                            //}
                         }
                     }
                     autoResetQueue.Reset();

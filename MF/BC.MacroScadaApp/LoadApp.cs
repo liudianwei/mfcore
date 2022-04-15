@@ -46,16 +46,13 @@ namespace ScadaAppCore
         /// <summary>
         /// ScadaApp
         /// </summary>
-        private ScadaApp _ScadaApp;
+        public static ScadaApp _ScadaApp;
 
         /// <summary>
         /// 是否允许工作
         /// </summary>
         /// <returns></returns>
-        public bool IsCanWork()
-        {
-            return _ScadaApp.IsCanWork;
-        }
+        public bool IsCanWork() => ScadaApp.IsCanWork;
 
         /// <summary>
         /// 获取所有
@@ -92,14 +89,15 @@ namespace ScadaAppCore
                 #region 初始化配置文件
 
                 _ScadaApp = new ScadaApp();
+                _ScadaApp.ChangeTagNames = ChangeTagNames;
+                _ScadaApp.TagDataOnChange += new ScadaApp.GetDataHandler(TagData);
                 if (!_ScadaApp.InitConfig()) return Start;
                 if (!_ScadaApp.InitRedisClient()) return Start;
                 if (!_ScadaApp.InitTags(OpNames)) return Start;
-                _ScadaApp.ChangeTagNames = ChangeTagNames;
-                _ScadaApp.TagDataOnChange += new ScadaApp.GetDataHandler(TagData);
 
                 #endregion 初始化配置文件
 
+                ScadaApp.IsCanWork = true;
                 Start = true;
             }
             catch (Exception err)
