@@ -52,7 +52,12 @@ namespace UserCenter.Controllers.v1
         [AllowAnonymous]
         public async Task<IActionResult> TestToken(string password)
         {
-            var response = await _bus.SendAsync(new LoginUserCommand() { Name = SystemConstants.superName, Password = SecurityUtil.ToMd5(password).ToLower(), LoginType = "web" });
+            var response = await _bus.SendAsync(new LoginUserCommand() { 
+                Name = SystemConstants.superName, 
+                Password = SecurityUtil.ToMd5(password).ToLower(), 
+                LoginType = "web" ,
+                LoginFalse=true
+            });
             return Result(response);
         }
 

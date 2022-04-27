@@ -17,6 +17,8 @@ namespace MF.Job.JobItems
     public sealed class ExportExcelJob : IJob
     {
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private static DateTime _expireTime = DateTime.Now;
+        private static string _token = "";
 
         public async Task Execute(IJobExecutionContext context)
         {
@@ -58,8 +60,22 @@ namespace MF.Job.JobItems
                         Console.WriteLine(task);
                         var obj = JsonConvert.DeserializeObject<RestQuery>(task.QueryItem);
                         var args = new { moduleName = task.ModuleName, taskId = task.Id, Condition = obj.Condition };
+                        if (DateTime.Now >= _expireTime)
+                        {
+                            //获取token
+                            string resultToken = MRestClient.Get(uri, "rest/usercenter/v1/user/testtoken/123456");
+                            var results = JsonConvert.DeserializeObject<HttpResults>(resultToken);
+                            if (results != null && results.Code == 200 && results.Data != null)
+                            {
+                                _expireTime = results.Data.ExpireTime;
+                                _token = results.Data.Token;
+                            }
+                        }
                         //执行任务
-                        resultstr = MRestClient.Post(task.Url, "", JsonConvert.SerializeObject(args), task.Token);
+                        resultstr = MRestClient.Post(task.Url, "", JsonConvert.SerializeObject(args), $"Bearer {_token}");
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        logger.Info($"执行结果：＝＝＝＝＝＝＝{resultstr}");
+                        Console.WriteLine($"执行结果：＝＝＝＝＝＝＝{resultstr}");
                     }
                 }
 
@@ -149,6 +165,26 @@ namespace MF.Job.JobItems
         public class RestQuery
         {
             public string Condition { get; set; }
+        }
+
+        public class HttpResults
+        {
+            public int Code { get; set; }
+
+            public string Status { get; set; }
+
+            public string Message { get; set; }
+
+            public UserLoginResp Data { get; set; }
+        }
+        public class UserLoginResp
+        {
+            public string Username { get; set; }
+            public string UserId { get; set; }
+            public string LoginType { get; set; }
+            public DateTime ExpireTime { get; set; }
+            public string Token { get; set; }
+            public bool Enable { get; set; }
         }
     }
 }

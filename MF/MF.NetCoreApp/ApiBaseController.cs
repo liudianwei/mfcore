@@ -306,11 +306,11 @@ namespace MF.NetCoreApp
         [NonAction]
         protected void SubmitExportTask(string url, dynamic cmd)
         {
-            var token1 = GetToken();
+            //var token1 = GetToken();
             var domain1 = GetDomain();
             Task.Run(() =>
             {
-                var token = token1;
+                //var token = token1;
                 var domain = domain1;
                 var startTime = DateTime.Now;
                 var reqparams = new
@@ -329,7 +329,7 @@ namespace MF.NetCoreApp
                     Url = url
                 };
                 //创建导出任务
-                var result = MRestClient.Post(domain, "rest/productcenter/v1/exportlog", JsonConvert.SerializeObject(reqparams), $"Bearer {token}");
+                var result = MRestClient.Post(domain, "rest/productcenter/v1/exportlog", JsonConvert.SerializeObject(reqparams),"");
             });
         }
 

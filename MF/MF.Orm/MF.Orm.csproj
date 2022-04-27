@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 	  <TargetFramework>net5</TargetFramework>
-	  <Version>1.0.5-rc9</Version>
+	  <Version>1.0.5-rc10</Version>
 	  <Description>
 		  +修复 List更新,移除IsEnableUpdateVersionValidation;升级SqlSugarCore5.0.6.4
 	  </Description>

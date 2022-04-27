@@ -361,9 +361,10 @@ namespace UserCenter.CommandHandles
                 Enable = user.State.Equals(BaseStateConstants.ACTIVATE),
                 AdditionalInformation = new Additionalinformation()
             };
-
-            //记录访问日志
-            RecordLoginSuccess(user);
+            if (!cmd.LoginFalse)
+            {                
+                RecordLoginSuccess(user);//记录访问日志
+            }            
             return Succeed(data);
         }
 
