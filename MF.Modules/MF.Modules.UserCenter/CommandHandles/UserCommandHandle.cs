@@ -356,6 +356,7 @@ namespace UserCenter.CommandHandles
                 Token = jwtobj.Item1,
                 ExpireTime = jwtobj.Item2,
                 Username = user.Name,
+                UserFullName=user.FullName,
                 UserId = user.Id,
                 LoginType = cmd.LoginType,
                 Enable = user.State.Equals(BaseStateConstants.ACTIVATE),
