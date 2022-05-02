@@ -71,8 +71,7 @@ namespace UserCenter.CommandHandles
                 return Failed(BaseSystemError.OBJECT_CANNOT_BE_NULL);
             }
             PermissionDto dto = cmd.Dto;
-            // 根据名称和父id查询权限
-            var permission = _permissionRepository.Queryable().First(p => p.Name.Equals(dto.Name) && p.ParentId.Equals(dto.ParentId));
+            var permission = _permissionRepository.Queryable().First(p => p.Name.Equals(dto.Name) && !p.Type.Equals(PermissionType.BUTTON));
 
             // 判断权限是否存在
             if (permission.NotNull())
@@ -293,7 +292,7 @@ namespace UserCenter.CommandHandles
             //名称发生修改 不能和别人重名
             if (!dto.Name.Equals(permission.Name))
             {
-                var permissionIndb = _permissionRepository.Queryable().First(p => p.ParentId.Equals(dto.ParentId) && p.Name.Equals(dto.Name));
+                var permissionIndb = _permissionRepository.Queryable().First(p => !p.Id.Equals(dto.Id) && p.Name.Equals(dto.Name) && !p.Type.Equals(PermissionType.BUTTON));
                 if (permissionIndb.NotNull())
                 {
                     return Failed(BaseSystemError.OBJECT_ALREADY_EXIST);
@@ -320,17 +319,17 @@ namespace UserCenter.CommandHandles
                 }
             }
 
-            List<Permission> children = new List<Permission>();
-            var allpermission = _permissionRepository.QueryAll();
-            FindAllChildNode(children, permission.Id, allpermission);
+            //List<Permission> children = new List<Permission>();
+            //var allpermission = _permissionRepository.QueryAll();
+            //FindAllChildNode(children, permission.Id, allpermission);
 
-            foreach (var p in children)
-            {
-                if (p.Id.Equals(dto.ParentId))
-                {
-                    return Failed(BaseSystemError.PARENT_ID_IS_CHILDREN);
-                }
-            }
+            //foreach (var p in children)
+            //{
+            //    if (p.Id.Equals(dto.ParentId))
+            //    {
+            //        return Failed(BaseSystemError.PARENT_ID_IS_CHILDREN);
+            //    }
+            //}
 
             permission.Name = dto.Name;
             permission.Code = dto.Code;
@@ -453,14 +452,14 @@ namespace UserCenter.CommandHandles
                     return Failed(UserCenterError.PERMISSION_NOT_FOUND);
                 }
 
-                FindAllChildNode(children, dto.Id, allpermissions);//查询子权限
-                foreach (var p in children)
-                {
-                    if (p.Id.Equals(dto.ParentId))// 如果子孙节点的id等于父id 提示错误信息
-                    {
-                        return Failed(BaseSystemError.PARENT_ID_IS_CHILDREN);
-                    }
-                }
+                //FindAllChildNode(children, dto.Id, allpermissions);//查询子权限
+                //foreach (var p in children)
+                //{
+                //    if (p.Id.Equals(dto.ParentId))// 如果子孙节点的id等于父id 提示错误信息
+                //    {
+                //        return Failed(BaseSystemError.PARENT_ID_IS_CHILDREN);
+                //    }
+                //}
 
                 permission.Name = dto.Name;
                 permission.Code = dto.Code;
@@ -621,7 +620,7 @@ namespace UserCenter.CommandHandles
         }
 
         /// <summary>
-        /// 批量操作权限
+        /// 按钮 批量操作权限
         /// </summary>
         /// <param name="cmd"></param>
         /// <param name="cancellationToken"></param>
