@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 	  <TargetFramework>net5</TargetFramework>
-	  <Version>1.0.5-rc10</Version>
+	  <Version>1.0.6-rc1</Version>
 	  <Description>
 		  +修复 List更新,移除IsEnableUpdateVersionValidation;升级SqlSugarCore5.0.6.4
 	  </Description>
@@ -12,13 +12,14 @@
 		  修复 PostgreSQL数据库初始化数据库失败问题
 		  修复 删除操作没有更新时间和用户信息;升级netcore5.0.5.9---2022/3/15
 		  修复 List批量更新,移除IsEnableUpdateVersionValidation(sqlserver会有问题);升级SqlSugarCore5.0.6.4
+		  升级SqlSugarCore5.0.7.7-preview03
 	  </PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
-    <PackageReference Include="SqlSugarCore" Version="5.0.6.4" />
+    <PackageReference Include="SqlSugarCore" Version="5.0.7.7-preview03" />
   </ItemGroup>
 
   <ItemGroup>
