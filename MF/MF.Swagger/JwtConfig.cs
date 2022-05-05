@@ -94,5 +94,21 @@ namespace MF.Swagger
             JwtSecurityToken jwtToken = jwtHandler.ReadJwtToken(token);
             return jwtToken;
         }
+
+        public string CreateToken(List<Claim> claims,DateTime expireTime)
+        {
+            var now = DateTime.Now;
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtSecurityKey));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var token = new JwtSecurityToken(
+                issuer: JwtIssuer,
+                audience: JwtAudience,
+                claims: claims,
+                notBefore: now,
+                expires: expireTime,
+                signingCredentials: creds);
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+            return (jwt);
+        }
     }
 }
