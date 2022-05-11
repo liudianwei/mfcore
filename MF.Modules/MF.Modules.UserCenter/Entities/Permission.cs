@@ -80,6 +80,14 @@ namespace DAL.UserCenter.Entities
         public string ApiUrl{ get; set; }
 
         /// <summary>
+        /// Desc:权限api
+        /// Default:NULL
+        /// Nullable:True
+        /// </summary>
+        [SugarColumn(ColumnName = "iframe_url", ColumnDescription = "内嵌的iframe路径", IsNullable = true, Length = 500, ColumnDataType = "varchar")]
+        public string IframeUrl { get; set; }
+
+        /// <summary>
         /// Desc:父级id
         /// Default:NULL
         /// Nullable:True

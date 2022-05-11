@@ -107,6 +107,7 @@ namespace UserCenter.CommandHandles
                 Type = dto.Type,
                 Icon = dto.Icon,
                 ApiUrl = dto.ApiUrl,
+                IframeUrl = dto.IframeUrl,
                 Remark = dto.Remark,
                 Updator = dto.Updator
             };
@@ -174,6 +175,7 @@ namespace UserCenter.CommandHandles
                     Code = dto.Code,
                     ParentId = dto.ParentId,
                     Url = dto.Url,
+                    IframeUrl = dto.IframeUrl,
                     OrderNum = dto.OrderNum,
                     Perms = dto.Perms,
                     Type = dto.Type,
@@ -349,6 +351,7 @@ namespace UserCenter.CommandHandles
 
             permission.ParentId = dto.ParentId;
             permission.Url = dto.Url;
+            permission.IframeUrl = dto.IframeUrl;
             permission.OrderNum = dto.OrderNum;
             permission.Perms = dto.Perms;
 
@@ -481,6 +484,7 @@ namespace UserCenter.CommandHandles
 
                 permission.ParentId = dto.ParentId;
                 permission.Url = dto.Url;
+                permission.IframeUrl = dto.IframeUrl;                
                 permission.OrderNum = dto.OrderNum;
                 permission.Perms = dto.Perms;
 
@@ -725,6 +729,7 @@ namespace UserCenter.CommandHandles
                     ApiUrl = p.ApiUrl,
                     OrderNum = p.OrderNum,
                     Url = p.Url,
+                    IframeUrl = p.IframeUrl,
                     Type = p.Type,
                     Icon = p.Icon,
                     CreateTime = p.CreateTime,
@@ -768,6 +773,7 @@ namespace UserCenter.CommandHandles
                 ApiUrl = p.ApiUrl,
                 OrderNum = p.OrderNum,
                 Url = p.Url,
+                IframeUrl = p.IframeUrl,
                 Type = p.Type,
                 Icon = p.Icon,
                 CreateTime = p.CreateTime,
@@ -806,6 +812,7 @@ namespace UserCenter.CommandHandles
                     ApiUrl = p.ApiUrl,
                     OrderNum = p.OrderNum,
                     Url = p.Url,
+                    IframeUrl = p.IframeUrl,
                     Type = p.Type,
                     Icon = p.Icon,
                     CreateTime = p.CreateTime,
@@ -856,6 +863,7 @@ namespace UserCenter.CommandHandles
                 ApiUrl = p.ApiUrl,
                 OrderNum = p.OrderNum,
                 Url = p.Url,
+                IframeUrl = p.IframeUrl,
                 Type = p.Type,
                 Icon = p.Icon,
                 CreateTime = p.CreateTime,
@@ -881,6 +889,7 @@ namespace UserCenter.CommandHandles
                 ApiUrl = p.ApiUrl,
                 OrderNum = p.OrderNum,
                 Url = p.Url,
+                IframeUrl = p.IframeUrl,
                 Type = p.Type,
                 Icon = p.Icon,
                 CreateTime = p.CreateTime,
@@ -889,7 +898,7 @@ namespace UserCenter.CommandHandles
                 Perms = p.Perms
             })
             .Distinct();
-            var list = db.UnionAll(list1, list2).OrderBy(it => it.CreateTime, OrderByType.Desc).ToList();
+            var list = db.UnionAll(list1, list2).OrderBy(it => it.CreateTime, OrderByType.Desc).Distinct().ToList();
             return list;
         }
 
@@ -913,6 +922,7 @@ namespace UserCenter.CommandHandles
                 ApiUrl = p.ApiUrl,
                 OrderNum = p.OrderNum,
                 Url = p.Url,
+                IframeUrl = p.IframeUrl,
                 Type = p.Type,
                 Icon = p.Icon,
                 CreateTime = p.CreateTime,

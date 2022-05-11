@@ -18,6 +18,7 @@ namespace UserCenter.Dtos
         public string Type { get;  set; }
         public string Icon { get;  set; }
         public string ApiUrl { get;  set; }
+        public string IframeUrl { get; set; }
         public string Remark { get; set; }
     }
     //数据去重
