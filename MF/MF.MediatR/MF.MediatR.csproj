@@ -2,11 +2,15 @@
 
   <PropertyGroup>
 	  <TargetFramework>net5</TargetFramework>
+	  <Version>1.0.1</Version>
+	  <Description>
+		  MediatR是用.Net实现的简单中介者模式，无需其他依赖就能处理进程内的消息传递，支持请求/响应、命令、查询、通知和事件的同步或异步传递，通过C#的泛型智能调度。
+	  </Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MediatR" Version="9.0.0" />
-    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="MediatR" Version="10.0.1" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="10.0.1" />
   </ItemGroup>
 
   <ItemGroup>

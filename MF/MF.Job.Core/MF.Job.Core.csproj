@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 	  <TargetFramework>net5</TargetFramework>
-	  <Version>1.0.2</Version>
+	  <Version>1.0.3</Version>
 	  <Description>
 		  +修复 调度任务界面无法带参查询
 	  </Description>
@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SqlSugarCore" Version="5.0.7.7-preview03" />
+    <PackageReference Include="SqlSugarCore" Version="5.0.7.9" />
   </ItemGroup>
 
 </Project>
