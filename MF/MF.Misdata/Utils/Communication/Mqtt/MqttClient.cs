@@ -20,12 +20,12 @@ namespace Common.Communication
         /// <summary>
         ///
         /// </summary>
-        private IMqttClient Client = null;
+        private IMqttClient Client { get; set; } = null;
 
         /// <summary>
         /// Client配置
         /// </summary>
-        private IMqttClientOptions options = null;
+        private IMqttClientOptions options { get; set; } = null;
 
         /// <summary>
         /// 接收到订阅消息的事件
@@ -33,44 +33,49 @@ namespace Common.Communication
         public event Action<string> Recive;
 
         /// <summary>
+        /// 接收到发布消息的事件
+        /// </summary>
+        public event Action<string> Send;
+
+        /// <summary>
         /// mqtt Ip
         /// </summary>
-        public string _Ip = "127.0.0.1";
+        public string _Ip { get; set; } = "127.0.0.1";
 
         /// <summary>
         /// mqtt Port
         /// </summary>
-        public int _port = 1883;
+        public int _port { get; set; } = 1883;
 
         /// <summary>
         /// mqtt ClientID
         /// </summary>
-        public string _clientid = "clientid";
+        public string _clientid { get; set; } = "clientid";
 
         /// <summary>
         /// mqtt UserName
         /// </summary>
-        public string _username = "admin";
+        public string _username { get; set; } = "admin";
 
         /// <summary>
         /// mqtt Password
         /// </summary>
-        public string _password = "";
+        public string _password { get; set; } = "";
 
         /// <summary>
         /// mqtt CleanSession
         /// </summary>
-        public bool _cleansession = false;
+        public bool _cleansession { get; set; } = false;
 
         /// <summary>
         /// mqtt发布通道
         /// </summary>
-        public string _senttopic = "A";
+        public string _senttopic { get; set; } = "A";
 
         /// <summary>
         /// mqtt订阅通道
         /// </summary>
-        public string _recvtopic = "B";
+        public string _recvtopic { get; set; } = "B";
 
         /// <summary>
         /// 是否连接成功
@@ -221,6 +226,8 @@ namespace Common.Communication
                 {
                     SystemLog.Error($"### MQTT PUBLISH FAILED,DISCONNECTED FROM SERVER ###");
                 }
+
+                Send?.Invoke(message);
             }
             catch (Exception ex)
             {

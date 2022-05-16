@@ -761,7 +761,9 @@ namespace HslCommunication.LogNet
                     // 释放托管状态(托管对象)。
 
                     m_simpleHybirdLock.Dispose();
+#if NET50
                     m_WaitForSave.Clear();
+#endif
                     m_fileSaveLock.Dispose();
                 }
 

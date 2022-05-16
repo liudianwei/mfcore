@@ -34,16 +34,8 @@ namespace Common.Utils
                     configurationBuilder.AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), "config", "appsettings.json"));
                     return configurationBuilder.Build();
                 });
-                IConfiguration configuration = services.BuildServiceProvider().GetService<IConfiguration>();
-                config = configuration;
+                config = services.BuildServiceProvider().GetService<IConfiguration>();
                 var sqlSugarConfig = SugarAccess.GetConnectionParam();
-                //services.AddSqlSugarClient<SqlSugarClient>(config =>
-                //{
-                //    config.DbType = sqlSugarConfig.Item1;
-                //    config.ConnectionString = sqlSugarConfig.Item2;
-                //    config.IsAutoCloseConnection = true;
-                //    config.InitKeyType = InitKeyType.Attribute;
-                //});
                 services.AddSqlSugarScope<SqlSugarScope>(config =>
                 {
                     config.DbType = sqlSugarConfig.Item1;
@@ -54,10 +46,9 @@ namespace Common.Utils
                 });
                 IServiceProvider serviceProvider = services.BuildServiceProvider();
                 ServiceResolve.SetServiceResolve(serviceProvider);
-                //config = new ConfigurationBuilder()
-                //    .SetBasePath($"{Directory.GetCurrentDirectory()}/Config")
-                //    .AddJsonFile("appsettings.json", true, true)
-                //    .Build();
+
+                BusinessLog.Path = $"{GetAppseting("Logger:DirPath")}{GetAppseting("Logger:BusinessName")}";
+                SystemLog.Path = $"{GetAppseting("Logger:DirPath")}{GetAppseting("Logger:SystemName")}";
             }
             catch (Exception e)
             {

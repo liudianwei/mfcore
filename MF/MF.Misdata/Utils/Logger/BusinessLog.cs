@@ -12,7 +12,7 @@ namespace Common.Utils
         /// <summary>
         /// 日志路径
         /// </summary>
-        protected static string Path = ConfigHelper.GetAppseting("Logger:DirPath") + ConfigHelper.GetAppseting("Logger:BusinessName");
+        public static string Path { get; set; } = Environment.CurrentDirectory + "/BusinessLog";
 
         /// <summary>
         /// 按工位区分日志集合
