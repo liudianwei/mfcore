@@ -330,6 +330,7 @@ namespace MF.NetCoreApp
                 };
                 //创建导出任务
                 var result = MRestClient.Post(domain, "rest/productcenter/v1/exportlog", JsonConvert.SerializeObject(reqparams), $"Bearer {token}");
+                Console.WriteLine($"TaskResult==>{result}");
             });
         }
 

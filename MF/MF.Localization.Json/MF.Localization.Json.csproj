@@ -2,7 +2,7 @@
 
     <PropertyGroup>
 		<TargetFramework>net5</TargetFramework>
-		<Version>1.0.1-rc1</Version>
+		<Version>1.0.1-rc3</Version>
 		<Description>
 			+更新MF.Job引用
 		</Description>

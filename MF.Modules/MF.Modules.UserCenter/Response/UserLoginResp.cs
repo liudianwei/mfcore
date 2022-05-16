@@ -11,6 +11,7 @@ namespace UserCenter.Response.User
         public string UserId { get; set; }
         public string LoginType { get; set; }
         public DateTime ExpireTime { get; set; }
+        public string UserFullName { get; set; }
 
         public string UserType { get; set; }
         public string Token { get; set; }

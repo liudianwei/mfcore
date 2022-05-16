@@ -2,6 +2,10 @@
 
   <PropertyGroup>
 	  <TargetFramework>net5</TargetFramework>
+	  <Version>1.0.1-rc4</Version>
+	  <Description>
+		  模块共享类库
+	  </Description>
     <AssemblyName>MF.Modules.UserCenter.Shared</AssemblyName>
     <RootNamespace>MF.Modules.UserCenter.Shared</RootNamespace>
   </PropertyGroup>

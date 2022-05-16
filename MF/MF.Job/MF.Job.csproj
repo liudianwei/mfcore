@@ -2,13 +2,14 @@
 
   <PropertyGroup>
 	  <TargetFrameworks>net5</TargetFrameworks>
-	  <Version>1.0.3-rc1</Version>
+	  <Version>1.0.3-rc7</Version>
 	  <Description>
 		 Excel任务导出
 	  </Description>
 	  <PackageReleaseNotes>
 		  +更新MF.Job.Core引用
 		  +修复 Job任务导出数据错误-2022/3/24
+		  +修复 Job任务导出Token失效问题-2022/4/27
 	  </PackageReleaseNotes>
   </PropertyGroup>
 

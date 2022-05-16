@@ -356,14 +356,16 @@ namespace UserCenter.CommandHandles
                 Token = jwtobj.Item1,
                 ExpireTime = jwtobj.Item2,
                 Username = user.Name,
+                UserFullName=user.FullName,
                 UserId = user.Id,
                 LoginType = cmd.LoginType,
                 Enable = user.State.Equals(BaseStateConstants.ACTIVATE),
                 AdditionalInformation = new Additionalinformation()
             };
-
-            //记录访问日志
-            RecordLoginSuccess(user);
+            if (!cmd.LoginFalse)
+            {                
+                RecordLoginSuccess(user);//记录访问日志
+            }            
             return Succeed(data);
         }
 
