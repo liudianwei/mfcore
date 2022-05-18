@@ -84,6 +84,11 @@ namespace Common.Communication
         public bool IsConnected => Client.IsConnected;
 
         /// <summary>
+        /// 主动关闭
+        /// </summary>
+        private bool _close { get; set; } = false;
+
+        /// <summary>
         /// 初始化MQTT客户端
         /// </summary>
         /// <param name="ip"></param>
@@ -175,14 +180,17 @@ namespace Common.Communication
         /// <returns></returns>
         private async Task MqttClient_Disconnected(MqttClientDisconnectedEventArgs e)
         {
-            SystemLog.Error($"### MQTT DISCONNECTED FROM SERVER ###");
-            try
+            if (!_close)
             {
-                await Client.ConnectAsync(options);
-            }
-            catch (Exception ex)
-            {
-                SystemLog.Exception($"### MQTT RECONNECTING FAILED ###", ex);
+                SystemLog.Error($"### MQTT DISCONNECTED FROM SERVER ###");
+                try
+                {
+                    await Client.ConnectAsync(options);
+                }
+                catch (Exception ex)
+                {
+                    SystemLog.Exception($"### MQTT RECONNECTING FAILED ###", ex);
+                }
             }
         }
 
@@ -240,6 +248,9 @@ namespace Common.Communication
         /// </summary>
         public void Close()
         {
+            _close = true;
+            Client.UnsubscribeAsync(_recvtopic);
+            Client.DisconnectAsync(new MqttClientDisconnectOptions() { ReasonCode = MqttClientDisconnectReason.NormalDisconnection, ReasonString = "NormalClose" });
             Dispose();
         }
 
