@@ -298,6 +298,79 @@ namespace MF.NetCoreApp
         }
 
         /// <summary>
+        /// 报表平台 普通报表导出Excel 用 NPOI 组件
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="resp"></param>
+        /// <param name="outpath"></param>
+        /// <param name="sheetname"></param>
+        /// <param name="rowstart"></param>
+        /// <param name="imgs"></param>
+        /// <param name="ExportRecord"></param>
+        /// <returns></returns>AAA
+        /// <exception cref="Exception"></exception>
+        [NonAction]
+        public async Task<IActionResult> ExportExcel(List<Utils.Excel.FiledInfo> fileds, PubResponse resp, string outpath, int rowstart = 0, List<Utils.Excel.ImgAttribute> imgs = null, bool ExportRecord = true, string sheetname = "sheet")
+        {
+            IWorkbook workbook;
+            dynamic listA = ((dynamic)resp.Data).list;
+            List<dynamic> list = listA as List<dynamic>;
+            if (list == null || list.Count == 0)
+            {
+                throw new Exception("没有记录，不能导出");
+            }
+            workbook = Utils.Excel.NpoiUtil.ExportToExcelC(fileds, list, rowstart, sheetname);
+
+            if (imgs?.Count > 0)
+            {
+                foreach (var item in imgs)
+                {
+                    if (item.ImgBase64 != "")
+                    {
+                        string base64 = item.ImgBase64;
+                        var arr = base64.Split(',');
+                        if (arr.Length > 1)
+                        {
+                            base64 = arr[1];
+                            Utils.Excel.NpoiUtil.AddPic2Excel(workbook, Convert.FromBase64String(base64), item.ImgPosition);
+                        }
+                    }
+                }
+            }
+            if (false == Directory.Exists(outpath))
+            {
+                Directory.CreateDirectory(outpath);
+            }
+            var OutFullPath = $"{outpath}{Guid.NewGuid()}.xlsx";
+            using (var fs = System.IO.File.OpenWrite(OutFullPath))
+            {
+                workbook.Write(fs);//流会自动关闭
+            }
+
+            MemoryStream memoryStream = new MemoryStream();
+            using (var stream = new FileStream(OutFullPath, FileMode.Open))
+            {
+                await stream.CopyToAsync(memoryStream);
+            }
+            _ = memoryStream.Seek(0, SeekOrigin.Begin);
+
+            // 文件名必须编码，否则会有特殊字符(如中文)无法在此下载。
+            var fileName = DateTime.Now.ToString("yyyyMdHms");
+            string encodeFilename = HttpUtility.UrlEncode($"{fileName}.xlsx", Encoding.GetEncoding("UTF-8"));
+            Response.Headers.Add("Content-Disposition", $"attachment; filename={encodeFilename}");
+
+            // 完成后删除文件
+            Response.OnCompleted(() =>
+            {
+                return Task.Run(() =>
+                {
+                    System.IO.File.Delete(OutFullPath);
+                });
+            });
+            return GetOctetStream(memoryStream);
+        }
+
+        /// <summary>
         /// 创建下载任务
         /// </summary>
         /// <typeparam name="T"></typeparam>
