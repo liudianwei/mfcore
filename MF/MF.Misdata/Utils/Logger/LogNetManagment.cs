@@ -42,16 +42,29 @@ namespace HslCommunication.LogNet
 
         internal static string GetDegreeDescription(HslMessageDegree degree)
         {
-            return degree switch
+            switch (degree)
             {
-                HslMessageDegree.DEBUG => "调试",
-                HslMessageDegree.INFO => "信息",
-                HslMessageDegree.WARN => "警告",
-                HslMessageDegree.ERROR => "错误",
-                HslMessageDegree.FATAL => "致命",
-                HslMessageDegree.None => "放弃",
-                _ => "全部",
-            };
+                case HslMessageDegree.None:
+                    return "放弃";
+
+                case HslMessageDegree.FATAL:
+                    return "致命";
+
+                case HslMessageDegree.ERROR:
+                    return "错误";
+
+                case HslMessageDegree.WARN:
+                    return "警告";
+
+                case HslMessageDegree.INFO:
+                    return "信息";
+
+                case HslMessageDegree.DEBUG:
+                    return "调试";
+
+                default:
+                    return "全部";
+            }
         }
 
         /// <summary>

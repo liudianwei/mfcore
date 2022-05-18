@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>BasicData</id>
-    <version>1.0.3</version>
+    <version>1.1.0-rc1</version>
     <title>BasicData</title>
     <authors>corbin chen</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -18,6 +18,7 @@
       v1.0.3-rc5 发布版
       v1.0.3-rc7 优化日志性能
       v1.0.3 稳定版
+      v1.1.0-rc1 删减日志业务代码
     </releaseNotes>
     <copyright>Copyright ©2022 Macroinf Corporation</copyright>
     <tags>BasicData</tags>
