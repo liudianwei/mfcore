@@ -450,22 +450,6 @@ namespace MF.Utils.Excel
             }
             return workbook;
         }
-
-
-        /// <summary>
-        /// 报表平台 普通报表 包含序号生成 默认从首行开始
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="list"></param>
-        /// <param name="_sheetname"></param>
-        /// <param name="version"></param>
-        /// <param name="ignoreExport"></param>
-        /// <param name="sn">是否包含序号</param>
-        /// <returns></returns>
-        public static IWorkbook ExportToExcelC(List<FiledInfo> fileds, List<dynamic> list, int startRow, string _sheetname = "sheet", bool sn = true, ExcelVersion version = ExcelVersion.V2007, string[] ignoreExport = null)
-        {
-            return ExportToExcelA(fileds, list, startRow, _sheetname, sn, version, ignoreExport);
-        }
         /// <summary>
         /// 报表平台 普通报表
         /// </summary>
@@ -477,7 +461,7 @@ namespace MF.Utils.Excel
         /// <param name="version"></param>
         /// <param name="ignoreExport"></param>
         /// <returns></returns>
-        public static IWorkbook ExportToExcelA(List<FiledInfo> fileds, List<dynamic> list, int startRow, string _sheetname = "sheet", bool sn = true, ExcelVersion version = ExcelVersion.V2007, string[] ignoreExport = null)
+        public static IWorkbook ExportToExcelList(List<FiledInfo> fileds, List<dynamic> list, int startRow, string _sheetname = "sheet", bool sn = true, ExcelVersion version = ExcelVersion.V2007, string[] ignoreExport = null)
         {
             Workbook(version);
             if (!list.Any())
@@ -486,7 +470,12 @@ namespace MF.Utils.Excel
                 return workbook;
             }
             int count = list.Count;
+
             int sheetCount = 1;
+            if (count >= Max)
+            {
+                sheetCount = GetSheetsCount(count);
+            }
             for (int i = 0; i < sheetCount; i++)
             {
                 if (i > 0)
@@ -578,9 +567,125 @@ namespace MF.Utils.Excel
                             rule = "yyyy-MM-dd hh:mm:ss";
                         }
                         var key = dic.TryGetValue(name, out object value);
-                        DateTime dtDate;
-                        var isTime = DateTime.TryParse((key ? value.ToString() : ""), out dtDate);
-                        cell.SetCellValue(isTime ? dtDate.ToString(rule) : (key ? value.ToString() : ""));
+                        if (key && value != null && value.ToString() != "")
+                        {
+                            DateTime dtDate;
+                            var isTime = DateTime.TryParse(value.ToString(), out dtDate);
+                            cell.SetCellValue(isTime ? dtDate.ToString(rule) : value.ToString());
+                        }
+                        else
+                        {
+                            cell.SetCellValue("");
+                        }
+                    }
+                }
+                AutoSizeColumns(sheet, startRow);
+            }
+            return workbook;
+        }
+
+
+        public static IWorkbook ExportToDataTable(List<FiledInfo> fileds, DataTable dt, int startRow, string _sheetname = "sheet", bool sn = true, ExcelVersion version = ExcelVersion.V2007, string[] ignoreExport = null)
+        {
+            Workbook(version);
+            if (dt.Rows.Count <= 0)
+            {
+                workbook.CreateSheet("sheet1");
+                return workbook;
+            }
+            int count = dt.Rows.Count;
+
+            int sheetCount = 1;
+            if (count >= Max)
+            {
+                sheetCount = GetSheetsCount(count);
+            }
+            for (int i = 0; i < sheetCount; i++)
+            {
+                if (i > 0)
+                {
+                    startRow = 0;
+                }
+                var sheetname = _sheetname + (i + 1);
+                ISheet sheet = workbook.CreateSheet(sheetname);
+                IRow row = sheet.CreateRow(startRow);
+                int index;
+                int countLen;
+                if (sn)
+                {
+                    index = 1;
+                    countLen = fileds.Count + 1;
+                    var cell = row.CreateCell(0);
+                    cell.SetCellValue("序号");
+                    ICellStyle style = workbook.CreateCellStyle();
+                    style.FillForegroundColor = HSSFColor.Grey25Percent.Index;
+
+                    XSSFFont ffont = (XSSFFont)workbook.CreateFont();
+                    ffont.Color = HSSFColor.Black.Index;
+                    ffont.IsBold = true;
+                    style.SetFont(ffont);
+                    style.FillPattern = FillPattern.SolidForeground;
+                    style.BorderBottom = BorderStyle.Thin;//下边框为细线边框
+                    style.BorderLeft = BorderStyle.Thin;//左边框
+                    style.BorderRight = BorderStyle.Thin;//上边框
+                    style.BorderTop = BorderStyle.Thin;//右边框
+
+                    cell.CellStyle = style;
+                }
+                else
+                {
+                    index = 0;
+                    countLen = fileds.Count;
+                }
+                //除序号外的列名
+                for (int j = index; j < countLen; j++)
+                {
+                    ICell cell = row.CreateCell(j);
+                    var name = fileds[j - 1].Name;
+                    cell.SetCellValue(name);
+
+                    ICellStyle style = workbook.CreateCellStyle();
+
+                    style.FillForegroundColor = HSSFColor.Grey25Percent.Index;
+
+                    style.GetFont(workbook).Color = HSSFColor.Black.Index;
+                    style.GetFont(workbook).IsBold = true;
+
+                    style.FillPattern = FillPattern.SolidForeground;
+
+                    style.FillPattern = FillPattern.SolidForeground;
+                    style.BorderBottom = BorderStyle.Thin;//下边框为细线边框
+                    style.BorderLeft = BorderStyle.Thin;//左边框
+                    style.BorderRight = BorderStyle.Thin;//上边框
+                    style.BorderTop = BorderStyle.Thin;//右边框
+                    cell.CellStyle = style;
+                }
+
+                //填充数据
+                //数据
+                for (int m = 0; m < dt.Rows.Count; m++)
+                {
+                    IRow row1 = sheet.CreateRow(m + 1 + startRow);
+                    if (sn)
+                    {
+                        index = 1;
+                        countLen = fileds.Count + 1;
+                        ICell cell1 = row1.CreateCell(0);
+                        cell1.CellStyle = cellStyle;
+                        cell1.SetCellValue(m + 1);
+                    }
+                    else
+                    {
+                        index = 0;
+                        countLen = fileds.Count;
+                    }
+
+                    for (int p = index; p < countLen; p++)
+                    {
+                        var filedsName = fileds[p - 1].Key;
+                        ICell cell = row1.CreateCell(p);
+                        cell.CellStyle = cellStyle;
+                        cell.SetCellValue(dt.Rows[m][filedsName]?.ToString());
                     }
                 }
                 AutoSizeColumns(sheet, startRow);

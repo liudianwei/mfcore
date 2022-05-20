@@ -64,17 +64,17 @@ namespace MF.Authorization
 
                 if (info.Product != null && info.Product != "AMES-CodeGen")
                 {
-                    return (false, "Product invalid");
+                    return (false, "invalid product");
                 }
 
                 if (info.MachineId != null && info.MachineId != strMachineCode)
                 {
-                    return (false, "MachineId invalid");
+                    return (false, "invalid machine code");
                 }
 
                 if (info.Company != null && info.Company == "")
                 {
-                    return (false, "Company invalid");
+                    return (false, "invalid company code");
                 }
 
                 if (info.StartDateTime != null && info.StartDateTime != "")
@@ -85,12 +85,12 @@ namespace MF.Authorization
                     }
                     catch
                     {
-                        return (false, "StartDateTime invalid");
+                        return (false, "invalid start time");
                     }
                 }
                 else
                 {
-                    return (false, "StartDateTime is null");
+                    return (false, "start time  cannot be empty");
                 }
 
                 if (info.EndDateTime != null && info.EndDateTime != "")
@@ -101,22 +101,22 @@ namespace MF.Authorization
 
                         if (DateTime.Compare(StartDateTime, EndDateTime) > 0)
                         {
-                            return (false, "license expired");
+                            return (false, "authorization has expired");
                         }
 
                         if (DateTime.Compare(DateTime.Now, EndDateTime) > 0)
                         {
-                            return (false, "license expired");
+                            return (false, "authorization has expired");
                         }
                     }
                     catch
                     {
-                        return (false, "license expired");
+                        return (false, "authorization has expired");
                     }
                 }
                 else
                 {
-                    return (false, "license expired");
+                    return (false, "authorization has expired");
                 }
 
                 if (info.Sig != null && info.Sig != "")
@@ -129,18 +129,18 @@ namespace MF.Authorization
 
                     if (!RSAUtils.Verify(str, info.Sig, pubkey, "UTF-8"))
                     {
-                        return (false, "Sig expired");
+                        return (false, "signature expired");
                     }
                 }
                 else
                 {
-                    return (false, "Sig is nu");
+                    return (false, "signature cannot be empty");
                 }
                 expiredTime = info.EndDateTime;
             }
             else
             {
-                return (false, "license not found");
+                return (false, "authorization file does not exist");
             }
             return (true, $"authorization deadline: {expiredTime}");
         }

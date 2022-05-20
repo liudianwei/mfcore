@@ -11,5 +11,6 @@ namespace MF.Utils.Excel
         public string Name { get; set; }
         public string Key { get; set; }
         public string Rule { get; set; }
+        public string Type { get; set; }
     }
 }
