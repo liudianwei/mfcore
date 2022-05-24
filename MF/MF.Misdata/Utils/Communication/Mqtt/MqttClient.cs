@@ -169,7 +169,10 @@ namespace Common.Communication
             }
             catch (Exception ex)
             {
-                SystemLog.Exception($"### MQTT PUBLISH FAILED ###", ex);
+                if (!ex.Message.Contains("The return codes are not matching the topic filters [MQTT-3.9.3-1]."))
+                {
+                    SystemLog.Exception($"### MQTT PUBLISH FAILED ###", ex);
+                }
             }
         }
 
