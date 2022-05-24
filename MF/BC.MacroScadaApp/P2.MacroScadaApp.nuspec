@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>MacroScadaApp</id>
-    <version>9.5.0</version>
+    <version>9.5.1-rc1</version>
     <title>MacroScadaApp</title>
     <authors>corbin chen</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -31,6 +31,7 @@
       v9.4.4 将授权打包
       v9.4.5 与SqlSugar统一Newtonsoft.Json版本,使用低版本v9.0.0
       v9.5.0 优化LoadScadaApp:先加载完Tag,再委托回调
+      v9.5.1-rc1 标准授权
     </releaseNotes>
     <copyright>Copyright ©2022 Macroinf Corporation</copyright>
     <tags>MacroScadaApp</tags>
@@ -41,15 +42,11 @@
       </group>
     </dependencies>
     <contentFiles>
-      <files include="Authentication x64.dll" buildAction="lib" copyToOutput="true" />
-      <files include="authentication x32.dll" buildAction="lib" copyToOutput="true" />
       <files include="Newtonsoft.Json.dll" buildAction="lib" copyToOutput="true" />
     </contentFiles>
   </metadata>
   <files>
     <file src="README.txt" />
-    <file src="Authentication x64.dll" target="lib\net461\Authentication x64.dll" />
-    <file src="authentication x32.dll" target="lib\net461\authentication x32.dll" />
     <file src="Newtonsoft.Json.dll" target="lib\net461\Newtonsoft.Json.dll" />
   </files>
 </package>

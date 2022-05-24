@@ -3,7 +3,6 @@ using System.Drawing;
 using System.ComponentModel;
 using System.Windows.Forms;
 using System.Data;
-using SystemFramework;
 using EvetnArgData;
 
 namespace Monitor
@@ -588,7 +587,6 @@ namespace Monitor
             }
             catch (Exception err)
             {
-                ApplicationLog.WriteLog(err, err.Message);
             }
         }
     }

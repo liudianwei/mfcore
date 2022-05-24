@@ -42,7 +42,7 @@ namespace ScadaAppCore
         /// 初始化Redis客户端
         /// </summary>
         /// <returns></returns>
-        public bool InitRedisClient()
+        public bool InitRedisClient(string Product)
         {
             bool flag = false;
             try
@@ -78,12 +78,12 @@ namespace ScadaAppCore
                     {
                         try
                         {
-                            mesRedisClient.Pub("MisdataHeartbeat", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), out errorMsg);
+                            mesRedisClient.Pub($"{Product}Heartbeat", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), out errorMsg);
                             Thread.Sleep(3000);
                         }
                         catch (Exception ex)
                         {
-                            ApplicationLog.WriteLog("MisdataHeartbeat:" + ex.ToString());
+                            ApplicationLog.WriteLog($"{Product}Heartbeat:{ex.ToString()}");
                         }
                     }
                 });

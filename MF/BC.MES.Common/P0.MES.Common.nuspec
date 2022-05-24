@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>MES.Common</id>
-    <version>1.1.2</version>
+    <version>1.2.0-rc2</version>
     <title>MES.Common</title>
     <authors>corbin chen</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -16,7 +16,8 @@
       v1.1.1  发布版
       v1.1.2-rc3 增加mqttClient获取通讯地址变量
       v1.1.2-rc4 测试打包版本日志
-      v1.1.2 将SqlSugar引用dll打包
+      v1.1.2  将SqlSugar引用dll打包
+      v1.2.0-rc2 新增日志业务代码、补全Mysql.dll、新增新版授权方式
     </releaseNotes>
     <copyright>Copyright ©2022 Macroinf Corporation</copyright>
     <tags>MES.Common</tags>
@@ -25,6 +26,11 @@
         <dependency id="MQTTnet" version="3.0.8" />
         <dependency id="NetMQ" version="4.0.0.1" />
         <dependency id="SqlSugar" version="5.0.6.1" />
+        <dependency id="DeviceId" version="6.0.0" />
+        <dependency id="DeviceId.Linux" version="6.0.0" />
+        <dependency id="DeviceId.Windows" version="6.0.0" />
+        <dependency id="DeviceId.Windows.Wmi" version="6.1.0" />
+        <dependency id="MySql.Data" version="6.9.12" />
       </group>
     </dependencies>
     <contentFiles>
