@@ -36,7 +36,7 @@ namespace ScadaAppCore
                         if (ScadaApp.mesRedisClient.Read($"{tag.OpCode}:{tag.TagID}", out MesVal, out errorMsg))
                         {
                             tag.TagValue = MesVal;
-                            ScadaApp.ConvertStringToTagType(ref tag);
+                            tag.TagValue = ScadaApp.ConvertStringToTagType(tag);
                             TagValue = tag.TagValue;
                             ApplicationLog.BusinessLog(tag.OpName, $"Read:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{MesVal}");
                         }
@@ -52,7 +52,7 @@ namespace ScadaAppCore
                         if (result.IsSuccess)
                         {
                             tag.TagValue = result.Value;
-                            ScadaApp.ConvertStringToTagType(ref tag);
+                            tag.TagValue = ScadaApp.ConvertStringToTagType(tag);
                             TagValue = tag.TagValue;
                             ApplicationLog.BusinessLog(tag.OpName, $"ReadApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{result.Value}");
                         }
@@ -82,7 +82,7 @@ namespace ScadaAppCore
         /// </summary>
         /// <param name="tags"></param>
         /// <returns>Hashtable(TagID,QualityDataType)</returns>
-        public static void ReadPLC_Sync_DataList(ref List<QualityDataType> tags)
+        public static List<QualityDataType> ReadPLC_Sync_DataList(List<QualityDataType> tags)
         {
             string errorMsg = string.Empty;
             try
@@ -92,15 +92,15 @@ namespace ScadaAppCore
                 #region 间接缓存读取
 
                 var FromRedis = needReadFromRedis.Where(i => i.IsMonitor).ToList();
-                string[] keys = FromRedis.Select(i => i.OpCode + ":" + i.TagID).ToArray();
+                string[] keys = FromRedis.Select(i => $"{i.OpCode}:{i.TagID}").ToArray();
                 string[] vals = new string[keys.Length];
                 if (ScadaApp.mesRedisClient.Read(keys, out vals, out errorMsg))
                 {
                     for (int i = 0; i < keys.Length; i++)
                     {
-                        var tag = FromRedis.Where(x => (x.OpCode + ":" + x.TagID).Equals(keys[i])).FirstOrDefault();
+                        var tag = FromRedis.Where(x => ($"{x.OpCode}:{x.TagID}").Equals(keys[i])).FirstOrDefault();
                         tag.TagValue = vals[i];
-                        ScadaApp.ConvertStringToTagType(ref tag);
+                        tag.TagValue = ScadaApp.ConvertStringToTagType(tag);
                     }
                     if (keys.Length > 0)
                     {
@@ -126,7 +126,7 @@ namespace ScadaAppCore
                     if (result.IsSuccess)
                     {
                         tag.TagValue = result.Value;
-                        ScadaApp.ConvertStringToTagType(ref tag);
+                        tag.TagValue = ScadaApp.ConvertStringToTagType(tag);
                         ApplicationLog.BusinessLog(tag.OpName, $"ReadApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{result.Value}");
                     }
                     else
@@ -142,6 +142,7 @@ namespace ScadaAppCore
             {
                 ApplicationLog.WriteLog(err, err.Message);
             }
+            return tags;
         }
 
         /// <summary>
@@ -174,15 +175,15 @@ namespace ScadaAppCore
                 #region 间接缓存读取
 
                 var FromRedis = needReadFromRedis.Where(i => i.IsMonitor).ToList();
-                string[] keys = FromRedis.Select(i => i.OpCode + ":" + i.TagID).ToArray();
+                string[] keys = FromRedis.Select(i => $"{i.OpCode}:{i.TagID}").ToArray();
                 string[] vals = new string[keys.Length];
                 if (ScadaApp.mesRedisClient.Read(keys, out vals, out errorMsg))
                 {
                     for (int i = 0; i < keys.Length; i++)
                     {
-                        var tagv = FromRedis.Where(x => (x.OpCode + ":" + x.TagID).Equals(keys[i])).FirstOrDefault();
+                        var tagv = FromRedis.Where(x => ($"{x.OpCode}:{x.TagID}").Equals(keys[i])).FirstOrDefault();
                         tagv.TagValue = vals[i];
-                        ScadaApp.ConvertStringToTagType(ref tagv);
+                        tagv.TagValue = ScadaApp.ConvertStringToTagType(tagv);
                         valueList.Add(tagv);
                     }
                     if (keys.Length > 0)
@@ -210,7 +211,7 @@ namespace ScadaAppCore
                     if (result.IsSuccess)
                     {
                         tagv.TagValue = result.Value;
-                        ScadaApp.ConvertStringToTagType(ref tagv);
+                        tagv.TagValue = ScadaApp.ConvertStringToTagType(tagv);
                         ApplicationLog.BusinessLog(tag.OpName, $"ReadApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{result.Value}");
                     }
                     else

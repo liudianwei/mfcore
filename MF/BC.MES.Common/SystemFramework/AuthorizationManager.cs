@@ -38,9 +38,6 @@ namespace SystemFramework
                 .AddProcessorId()
                 .AddMotherboardSerialNumber()
                 .AddSystemDriveSerialNumber())
-            .OnLinux(linux => linux
-                .AddMotherboardSerialNumber()
-                .AddSystemDriveSerialNumber())
             .ToString();
 
             return machineCodeString;

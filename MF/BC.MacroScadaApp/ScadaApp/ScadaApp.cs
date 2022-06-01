@@ -177,7 +177,7 @@ namespace ScadaAppCore
                             }
 
                             tag.TagValue = tagMsg.TagValue;
-                            ConvertStringToTagType(ref tag);
+                            tag.TagValue = ConvertStringToTagType(tag);
 
                             CustomeEvetnArgs e = new CustomeEvetnArgs()
                             {
@@ -382,14 +382,15 @@ namespace ScadaAppCore
         /// 字符串类型转换数据类型
         /// </summary>
         /// <param name="e"></param>
-        public static void ConvertStringToTagType(ref QualityDataType e)
+        public static object ConvertStringToTagType(QualityDataType e)
         {
+            object TagValue = null;
             try
             {
                 switch (e.TagType)
                 {
                     case "short":
-                        e.TagValue = Convert.ToInt16(e.TagValue == null || e.TagValue.ToString() == "" ? 0 : e.TagValue);
+                        TagValue = Convert.ToInt16(e.TagValue == null || e.TagValue.ToString() == "" ? 0 : e.TagValue);
                         break;
 
                     case "shortArray":
@@ -403,13 +404,21 @@ namespace ScadaAppCore
                                 {
                                     vaule[i] = short.Parse(strvaule[i]);
                                 }
-                                e.TagValue = vaule;
+                                TagValue = vaule;
                             }
+                            else
+                            {
+                                TagValue = e.TagValue;
+                            }
+                        }
+                        else
+                        {
+                            TagValue = e.TagValue;
                         }
                         break;
 
                     case "int":
-                        e.TagValue = Convert.ToInt32(e.TagValue == null || e.TagValue.ToString() == "" ? 0 : e.TagValue);
+                        TagValue = Convert.ToInt32(e.TagValue == null || e.TagValue.ToString() == "" ? 0 : e.TagValue);
                         break;
 
                     case "intArray":
@@ -423,13 +432,21 @@ namespace ScadaAppCore
                                 {
                                     vaule[i] = int.Parse(strvaule[i]);
                                 }
-                                e.TagValue = vaule;
+                                TagValue = vaule;
                             }
+                            else
+                            {
+                                TagValue = e.TagValue;
+                            }
+                        }
+                        else
+                        {
+                            TagValue = e.TagValue;
                         }
                         break;
 
                     case "float":
-                        e.TagValue = float.Parse(Convert.ToString(e.TagValue == null || e.TagValue.ToString() == "" ? "-1" : e.TagValue));
+                        TagValue = float.Parse(Convert.ToString(e.TagValue == null || e.TagValue.ToString() == "" ? "-1" : e.TagValue));
                         break;
 
                     case "floatArray":
@@ -443,13 +460,21 @@ namespace ScadaAppCore
                                 {
                                     vaule[i] = float.Parse(strvaule[i]);
                                 }
-                                e.TagValue = vaule;
+                                TagValue = vaule;
                             }
+                            else
+                            {
+                                TagValue = e.TagValue;
+                            }
+                        }
+                        else
+                        {
+                            TagValue = e.TagValue;
                         }
                         break;
 
                     case "datetime":
-                        e.TagValue = DateTime.Parse(Convert.ToString(e.TagValue ?? DateTime.Parse("0000/00/00 00:00:00")));
+                        TagValue = DateTime.Parse(Convert.ToString(e.TagValue ?? DateTime.Parse("0000/00/00 00:00:00")));
                         break;
 
                     case "datetimeArray":
@@ -463,17 +488,25 @@ namespace ScadaAppCore
                                 {
                                     vaule[i] = DateTime.Parse(strvaule[i]);
                                 }
-                                e.TagValue = vaule;
+                                TagValue = vaule;
                             }
+                            else
+                            {
+                                TagValue = e.TagValue;
+                            }
+                        }
+                        else
+                        {
+                            TagValue = e.TagValue;
                         }
                         break;
 
                     case "string":
-                        e.TagValue = Convert.ToString(e.TagValue ?? "");
+                        TagValue = Convert.ToString(e.TagValue ?? "");
                         break;
 
                     case "bool":
-                        e.TagValue = bool.Parse(e.TagValue == null || e.TagValue.ToString() == "" ? "False" : e.TagValue.ToString());
+                        TagValue = bool.Parse(e.TagValue == null || e.TagValue.ToString() == "" ? "False" : e.TagValue.ToString());
                         break;
 
                     case "boolArray":
@@ -487,13 +520,21 @@ namespace ScadaAppCore
                                 {
                                     bytevaule[i] = bool.Parse(strvaule[i]);
                                 }
-                                e.TagValue = bytevaule;
+                                TagValue = bytevaule;
                             }
+                            else
+                            {
+                                TagValue = e.TagValue;
+                            }
+                        }
+                        else
+                        {
+                            TagValue = e.TagValue;
                         }
                         break;
 
                     case "sbyte":
-                        e.TagValue = Convert.ToSByte(e.TagValue == null || e.TagValue.ToString() == "" ? 0 : e.TagValue);
+                        TagValue = Convert.ToSByte(e.TagValue == null || e.TagValue.ToString() == "" ? 0 : e.TagValue);
                         break;
 
                     case "sbyteArray":
@@ -507,13 +548,21 @@ namespace ScadaAppCore
                                 {
                                     bytevaule[i] = sbyte.Parse(strvaule[i]);
                                 }
-                                e.TagValue = bytevaule;
+                                TagValue = bytevaule;
                             }
+                            else
+                            {
+                                TagValue = e.TagValue;
+                            }
+                        }
+                        else
+                        {
+                            TagValue = e.TagValue;
                         }
                         break;
 
                     case "byte":
-                        e.TagValue = Convert.ToByte(e.TagValue == null || e.TagValue.ToString() == "" ? 0 : e.TagValue);
+                        TagValue = Convert.ToByte(e.TagValue == null || e.TagValue.ToString() == "" ? 0 : e.TagValue);
                         break;
 
                     case "byteArray":
@@ -527,13 +576,21 @@ namespace ScadaAppCore
                                 {
                                     bytevaule[i] = byte.Parse(strvaule[i]);
                                 }
-                                e.TagValue = bytevaule;
+                                TagValue = bytevaule;
                             }
+                            else
+                            {
+                                TagValue = e.TagValue;
+                            }
+                        }
+                        else
+                        {
+                            TagValue = e.TagValue;
                         }
                         break;
 
                     case "ushort":
-                        e.TagValue = Convert.ToUInt16(e.TagValue == null || e.TagValue.ToString() == "" ? 0 : e.TagValue);
+                        TagValue = Convert.ToUInt16(e.TagValue == null || e.TagValue.ToString() == "" ? 0 : e.TagValue);
                         break;
 
                     case "ushortArray":
@@ -547,13 +604,21 @@ namespace ScadaAppCore
                                 {
                                     bytevaule[i] = ushort.Parse(strvaule[i]);
                                 }
-                                e.TagValue = bytevaule;
+                                TagValue = bytevaule;
                             }
+                            else
+                            {
+                                TagValue = e.TagValue;
+                            }
+                        }
+                        else
+                        {
+                            TagValue = e.TagValue;
                         }
                         break;
 
                     case "uint":
-                        e.TagValue = Convert.ToUInt32(e.TagValue == null || e.TagValue.ToString() == "" ? 0 : e.TagValue);
+                        TagValue = Convert.ToUInt32(e.TagValue == null || e.TagValue.ToString() == "" ? 0 : e.TagValue);
                         break;
 
                     case "uintArray":
@@ -567,13 +632,21 @@ namespace ScadaAppCore
                                 {
                                     bytevaule[i] = uint.Parse(strvaule[i]);
                                 }
-                                e.TagValue = bytevaule;
+                                TagValue = bytevaule;
                             }
+                            else
+                            {
+                                TagValue = e.TagValue;
+                            }
+                        }
+                        else
+                        {
+                            TagValue = e.TagValue;
                         }
                         break;
 
                     case "tod":
-                        e.TagValue = Convert.ToInt32(e.TagValue == null || e.TagValue.ToString() == "" ? 0 : e.TagValue);
+                        TagValue = Convert.ToInt32(e.TagValue == null || e.TagValue.ToString() == "" ? 0 : e.TagValue);
                         break;
 
                     case "todArray":
@@ -587,8 +660,16 @@ namespace ScadaAppCore
                                 {
                                     bytevaule[i] = int.Parse(strvaule[i]);
                                 }
-                                e.TagValue = bytevaule;
+                                TagValue = bytevaule;
                             }
+                            else
+                            {
+                                TagValue = e.TagValue;
+                            }
+                        }
+                        else
+                        {
+                            TagValue = e.TagValue;
                         }
                         break;
                 }
@@ -597,6 +678,7 @@ namespace ScadaAppCore
             {
                 ApplicationLog.WriteLog(JsonConvert.SerializeObject(e) + " " + ex.ToString());
             }
+            return TagValue;
         }
 
         /// <summary>
