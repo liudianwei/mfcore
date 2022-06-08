@@ -63,7 +63,7 @@ namespace CodeGen
                     if (names.Length > 1)
                     {
                         preFix = names[0];
-                        //preFix=Regex.Replace(preFix, @"^\w", t => t.Value.ToUpper());//首字母转大写
+                        preFix=Regex.Replace(preFix, @"^\w", t => t.Value.ToUpper());//首字母转大写
                     }
 
                     if ((dbPrefix?.ToLower() ?? "") == "true")
