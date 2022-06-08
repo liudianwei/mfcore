@@ -44,7 +44,25 @@ namespace SystemFramework
             IpPort = @"tcp://" + ipPort;
         }
 
-        private TimeSpan timeout = new TimeSpan(0, 5, 0);
+        /// <summary>
+        /// 超时时间
+        /// </summary>
+        private TimeSpan timeout { get; set; } = new TimeSpan(0, 5, 0);
+
+        /// <summary>
+        /// 创建一个线程接收接收远程主机发来的信息
+        /// </summary>
+        private Thread recDataThread { get; set; }
+
+        /// <summary>
+        /// 轮询开始
+        /// </summary>
+        private bool start { get; set; } = true;
+
+        /// <summary>
+        /// socket
+        /// </summary>
+        private SubscriberSocket subscriberSocket { get; set; } = new SubscriberSocket(null);
 
         /// <summary>
         /// 开始订阅消息
@@ -52,11 +70,22 @@ namespace SystemFramework
         public void StartRecData(TimeSpan _timeout = default)
         {
             timeout = _timeout != default ? _timeout : timeout;
-            //创建一个线程接收接收远程主机发来的信息
-            Thread mythread = new Thread(new ThreadStart(RecData));
+            recDataThread = new Thread(new ThreadStart(RecData));
             //将线程设为后台运行
-            mythread.IsBackground = true;
-            mythread.Start();
+            recDataThread.IsBackground = true;
+            recDataThread.Start();
+        }
+
+        /// <summary>
+        /// 移除订阅消息
+        /// </summary>
+        public void AbortRecData()
+        {
+            start = false;
+            subscriberSocket.Close();
+            subscriberSocket.Dispose();
+            recDataThread?.Abort();
+            recDataThread = null;
         }
 
         /// <summary>
@@ -64,25 +93,23 @@ namespace SystemFramework
         /// </summary>
         private void RecData()
         {
-            SubscriberSocket subscriberSocket = null;
             try
             {
-                subscriberSocket = new SubscriberSocket(null);
-                try
+                if (start)
                 {
-                    subscriberSocket.Connect(IpPort);
-                    subscriberSocket.Subscribe("");
-                    while (true)
+                    try
                     {
-                        var message = subscriberSocket.ReceiveFrameString();
-                        OnGetData?.Invoke(message);
+                        subscriberSocket?.Connect(IpPort);
+                        subscriberSocket?.Subscribe("");
+                        while (start)
+                        {
+                            var message = subscriberSocket?.ReceiveFrameString();
+                            OnGetData?.Invoke(message);
+                        }
                     }
-                }
-                finally
-                {
-                    if (subscriberSocket != null)
+                    finally
                     {
-                        ((IDisposable)subscriberSocket).Dispose();
+                        subscriberSocket?.Dispose();
                     }
                 }
             }
@@ -90,7 +117,7 @@ namespace SystemFramework
             {
                 OnConnectionError?.Invoke(e.Message);
                 Thread.Sleep(5000);
-                ReConnection(subscriberSocket);
+                ReConnection();
             }
         }
 
@@ -98,14 +125,14 @@ namespace SystemFramework
         /// 重连
         /// </summary>
         /// <param name="sub"></param>
-        private void ReConnection(SubscriberSocket sub)
+        private void ReConnection()
         {
-            if (sub != null)
+            if (subscriberSocket != null)
             {
                 try
                 {
-                    sub.Close();
-                    sub.Dispose();
+                    subscriberSocket.Close();
+                    subscriberSocket.Dispose();
                 }
                 catch (Exception ee)
                 {

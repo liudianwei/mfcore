@@ -32,8 +32,6 @@ namespace Monitor
             set
             {
                 tagNameID = value;
-                //string tagTimeStamp;
-                //GetResulDataByDataChanged(tagNameID,out lableText,out  tagTimeStamp);
             }
         }
 
@@ -61,16 +59,6 @@ namespace Monitor
             }
         }
 
-        //
-        // <doc>
-        // <desc>
-        //      Overrides the text property of Control.  This label ignores
-        //      the text property, so we add additional attributes here so the
-        //      property does not show up in the properties window and is not
-        //      persisted.
-        // </desc>
-        // </doc>
-        //
         /// <summary>
         ///
         /// </summary>
@@ -102,11 +90,6 @@ namespace Monitor
             // TODO: 在 InitializeComponent 调用后添加任何初始化
 
             GlobleData.tagData_Lable.TagDataOnChange += new DelegateClassHandle(tagData_Lable_TagDataOnChange);
-
-            //if(GlobleData.ResultDataOnDataChange!=null)
-            //{
-            //    GlobleData.ResultDataOnDataChange.RowChanged+=new DataRowChangeEventHandler(ResultData_RowChanged);
-            //}
         }
 
         private void tagData_Lable_TagDataOnChange(object sender, CustomeEvetnArgs e)
@@ -116,56 +99,7 @@ namespace Monitor
                 LableText = e.TagValue.ToString();
                 Invalidate();
             }
-            //LableText=
         }
-
-        //        /// <summary>
-        //        /// 根据变量标识，确定对应数据
-        //        /// </summary>
-        //        /// <param name="tagValue"></param>
-        //        /// <param name="tagTimeStamp"></param>
-        //        private void GetResulDataByDataChanged(int tagID,out string tagValue,out string tagTimeStamp)
-        //        {
-        ////			DataRow []dataRow;
-        ////			string selectString;
-        ////
-        //            int index ;
-
-        //            try
-        //            {
-        //                if(GlobleData.ResultData!=null)
-        //                {
-        //                    if(!GlobleData.table_TagID_ResultDataIndex.ContainsKey(tagID))
-        //                    {
-        //                        tagValue = this.lableText;
-        //                        tagTimeStamp = DateTime.Now.ToString();
-
-        //                        return ;
-
-        //                    }
-
-        //                    index = (int)GlobleData.table_TagID_ResultDataIndex[tagID];
-
-        //                    tagValue = GlobleData.ResultData.Rows[index][BaseData_tagTableData.TagValue_FIELD].ToString() ;
-        //                    tagTimeStamp =   GlobleData.ResultData.Rows[index][BaseData_tagTableData.lastupdatetime_FIELD].ToString();
-
-        //                }
-        //                else
-        //                {
-        //                    tagValue = this.lableText;
-        //                    tagTimeStamp = DateTime.Now.ToString();
-        //                }
-        //            }
-        //            catch(Exception error)
-        //            {
-        //                //MessageBox.Show(String.Format("Error while 根据变量标识，确定对应数据:-{0}" ,error.Message),"UserControlLable-GetResulDataByDataChanged - ",MessageBoxButtons.OK,MessageBoxIcon.Error);
-        //                tagValue = this.lableText;
-        //                tagTimeStamp = DateTime.Now.ToString();
-        //                ApplicationLog.WriteLog(error,"\r\n根据变量标识，确定对应数据\r\nGetResulDataByDataChanged\r\ntagID="+tagID.ToString());
-
-        //            }
-
-        //        }
 
         /// <summary>
         /// 清理所有正在使用的资源。
@@ -209,32 +143,5 @@ namespace Monitor
             base.OnPaint(e);
             this.Text = this.lableText;
         }
-
-        ///// <summary>
-        ///// 监控值变化时，图形重绘
-        ///// </summary>
-        ///// <param name="sender"></param>
-        ///// <param name="e"></param>
-        //private void ResultData_RowChanged(object sender, DataRowChangeEventArgs e)
-        //{
-        //    try
-        //    {
-        //        if(GlobleData.ResultDataOnDataChangeRow!=null)
-        //        {
-        //            if(tagNameID==int.Parse(GlobleData.ResultDataOnDataChangeRow[TagNameDataResulteData.ItemNameID_FIELD].ToString()))
-        //            {
-        //                lableText = GlobleData.ResultDataOnDataChangeRow[TagNameDataResulteData.ItemValue_FIELD].ToString();
-        //                this.Invalidate();
-
-        //            }
-        //        }
-        //    }
-        //    catch(Exception err)
-        //    {
-        //        ApplicationLog.WriteLog(err,"\r\n监控值变化时，图形重绘\r\nResultData_RowChanged");
-
-        //    }
-
-        //}
     }
 }

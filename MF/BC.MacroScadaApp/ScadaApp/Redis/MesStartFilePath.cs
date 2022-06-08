@@ -2,6 +2,9 @@
 
 namespace Mes.Exe.Driver.Redis
 {
+    /// <summary>
+    ///
+    /// </summary>
     public class MesStartFilePath
     {
         /// <summary>
@@ -17,7 +20,7 @@ namespace Mes.Exe.Driver.Redis
                 string serviceFileName = location.Substring(0, location.LastIndexOf('\\') + 1);
                 path = serviceFileName;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }

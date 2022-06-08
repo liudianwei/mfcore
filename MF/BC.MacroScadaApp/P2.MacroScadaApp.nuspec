@@ -2,14 +2,14 @@
 <package>
   <metadata>
     <id>MacroScadaApp</id>
-    <version>9.5.0</version>
+    <version>9.5.1-rc7</version>
     <title>MacroScadaApp</title>
     <authors>corbin chen</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
     <!-- <icon>icon.png</icon> -->
     <projectUrl>http://192.168.0.111:9009/v3/index.json</projectUrl>
-    <description>优化LoadScadaApp:先加载完Tag,再委托回调</description>
+    <description>标准授权，优化写法,去掉ref</description>
     <releaseNotes>
       v9.3.0  基础版
       v9.3.1  Redis AbortOnConnectFail=false
@@ -31,6 +31,7 @@
       v9.4.4 将授权打包
       v9.4.5 与SqlSugar统一Newtonsoft.Json版本,使用低版本v9.0.0
       v9.5.0 优化LoadScadaApp:先加载完Tag,再委托回调
+      v9.5.1-rc7 标准授权，优化写法,去掉ref
     </releaseNotes>
     <copyright>Copyright ©2022 Macroinf Corporation</copyright>
     <tags>MacroScadaApp</tags>
@@ -38,18 +39,15 @@
       <group targetFramework=".NETFramework4.6.1">
         <dependency id="RestSharp" version="106.11.7" />
         <dependency id="StackExchange.Redis" version="2.2.79" />
+        <dependency id="System.ValueTuple" version="4.5.0" />
       </group>
     </dependencies>
     <contentFiles>
-      <files include="Authentication x64.dll" buildAction="lib" copyToOutput="true" />
-      <files include="authentication x32.dll" buildAction="lib" copyToOutput="true" />
       <files include="Newtonsoft.Json.dll" buildAction="lib" copyToOutput="true" />
     </contentFiles>
   </metadata>
   <files>
     <file src="README.txt" />
-    <file src="Authentication x64.dll" target="lib\net461\Authentication x64.dll" />
-    <file src="authentication x32.dll" target="lib\net461\authentication x32.dll" />
     <file src="Newtonsoft.Json.dll" target="lib\net461\Newtonsoft.Json.dll" />
   </files>
 </package>

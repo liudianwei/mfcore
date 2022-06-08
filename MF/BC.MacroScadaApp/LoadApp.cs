@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Reflection;
 using EvetnArgData;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace ScadaAppCore
 {
@@ -21,27 +22,6 @@ namespace ScadaAppCore
         {
             return Assembly.GetExecutingAssembly().GetName().Version.ToString();
         }
-
-        #region Authentication
-
-        /// <summary>
-        /// 判断当前操作系统是否64位或32位
-        /// </summary>
-        public static bool is64bit = (IntPtr.Size == 8);
-
-        /// <summary>
-        ///
-        /// </summary>
-        [DllImport("Authentication x64.dll", EntryPoint = "VerifyLicenseSN", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
-        public static extern void VerifyLicenseSN64();
-
-        /// <summary>
-        ///
-        /// </summary>
-        [DllImport("Authentication x32.dll", EntryPoint = "VerifyLicenseSN", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
-        public static extern void VerifyLicenseSN32();
-
-        #endregion Authentication
 
         /// <summary>
         /// ScadaApp
@@ -61,30 +41,29 @@ namespace ScadaAppCore
         public bool InitAllTag() => _ScadaApp.InitTags();
 
         /// <summary>
+        /// 获取机器码
+        /// </summary>
+        public string MachineCode { set; get; } = AuthorizationManager.GetMachineCodeString();
+
+        /// <summary>
         /// 加载ScadaApp通讯模块
         /// </summary>
-        public bool LoadScadaApp(List<string> OpNames = null, List<string> ChangeTagNames = null)
+        /// <param name="OpNames"></param>
+        /// <param name="ChangeTagNames"></param>
+        /// <param name="Product"></param>
+        /// <returns></returns>
+        public bool LoadScadaApp(List<string> OpNames = null, List<string> ChangeTagNames = null, string Product = "AMES-Misdata")
         {
             bool Start = false;
 
             try
             {
-                #region 验证授权码方法
+                #region 验证授权
 
-                //VerifyLicenseSN();
+                ApplicationLog.SystemLog("common", $"产品：{Product} 机器码:{MachineCode}", "INFO");
+                Authorization(Product);
 
-                if (is64bit)
-                {
-                    Console.WriteLine("win x64");
-                    VerifyLicenseSN64();
-                }
-                else
-                {
-                    Console.WriteLine("win x32");
-                    VerifyLicenseSN32();
-                }
-
-                #endregion 验证授权码方法
+                #endregion 验证授权
 
                 #region 初始化配置文件
 
@@ -92,12 +71,11 @@ namespace ScadaAppCore
                 _ScadaApp.ChangeTagNames = ChangeTagNames;
                 _ScadaApp.TagDataOnChange += new ScadaApp.GetDataHandler(TagData);
                 if (!_ScadaApp.InitConfig()) return Start;
-                if (!_ScadaApp.InitRedisClient()) return Start;
+                if (!_ScadaApp.InitRedisClient(Product)) return Start;
                 if (!_ScadaApp.InitTags(OpNames)) return Start;
 
                 #endregion 初始化配置文件
 
-                ScadaApp.IsCanWork = true;
                 Start = true;
             }
             catch (Exception err)
@@ -105,6 +83,29 @@ namespace ScadaAppCore
                 ApplicationLog.WriteLog(err, err.Message);
             }
             return Start;
+        }
+
+        /// <summary>
+        /// 授权
+        /// </summary>
+        private void Authorization(string Product)
+        {
+            var authorization = new Thread(() =>
+             {
+                 while (true)
+                 {
+                     var res = AuthorizationManager.Check(MachineCode, Product);
+                     ScadaApp.IsCanWork = res.Item1;
+                     if (!res.Item1)
+                     {
+                         Common.Frm.FrmAuthorizationInfo authorizationInfo = new Common.Frm.FrmAuthorizationInfo(MachineCode, Product);
+                         authorizationInfo.ShowDialog();
+                     }
+                     Thread.Sleep(3000);
+                 }
+             });
+            authorization.SetApartmentState(ApartmentState.STA);
+            authorization.Start();
         }
 
         /// <summary>

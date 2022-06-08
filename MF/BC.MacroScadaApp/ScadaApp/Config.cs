@@ -162,7 +162,7 @@ namespace ScadaAppCore
                 catch
                 {
                     redisIp = "127.0.0.1";
-                    ApplicationLog.WriteLog("未适配Redis服务IP:配置<RedisIp>将以默认值(" + redisIp + ")启动");
+                    ApplicationLog.SystemLog("common", $"未适配Redis服务IP:配置<RedisIp>将以默认值({redisIp})启动", "INFO");
                 }
 
                 try
@@ -172,7 +172,7 @@ namespace ScadaAppCore
                 catch
                 {
                     redisPort = 18222;
-                    ApplicationLog.WriteLog("未适配Redis服务端口:配置<RedisPort>将以默认值(" + redisPort + ")启动");
+                    ApplicationLog.SystemLog("common", $"未适配Redis服务端口:配置<RedisPort>将以默认值({redisPort})启动", "INFO");
                 }
 
                 try
@@ -182,7 +182,7 @@ namespace ScadaAppCore
                 catch
                 {
                     httpPort = 18555;
-                    ApplicationLog.WriteLog("未适配Http服务端口:配置<HttpPort>将以默认值(" + httpPort + ")启动");
+                    ApplicationLog.SystemLog("common", $"未适配Http服务端口:配置<HttpPort>将以默认值({httpPort})启动", "INFO");
                 }
                 try
                 {
@@ -191,7 +191,7 @@ namespace ScadaAppCore
                 catch
                 {
                     changeChannelName = "ChangeTagNodeValue";
-                    ApplicationLog.WriteLog("未适配Redis订阅通道:配置<ChangeChannelName>将以默认值(" + changeChannelName + ")启动");
+                    ApplicationLog.SystemLog("common", $"未适配Redis订阅通道:配置<ChangeChannelName>将以默认值({changeChannelName})启动", "INFO");
                 }
 
                 try
@@ -201,7 +201,7 @@ namespace ScadaAppCore
                 catch
                 {
                     writeTagNodeValue = "WriteTagNodeValue";
-                    ApplicationLog.WriteLog("未适配Redis发布通道:配置<WriteTagNodeValue>将以默认值(" + writeTagNodeValue + ")启动");
+                    ApplicationLog.SystemLog("common", $"未适配Redis发布通道:配置<WriteTagNodeValue>将以默认值({writeTagNodeValue})启动", "INFO");
                 }
 
                 try
@@ -211,7 +211,7 @@ namespace ScadaAppCore
                 catch
                 {
                     allowRWCode = new string[] { "" };
-                    ApplicationLog.WriteLog("未适配允许MES监控读写变量类型:配置<AllowRWCode>将以默认值(" + allowRWCode + ")启动");
+                    ApplicationLog.SystemLog("common", $"未适配允许监控读写变量类型:配置<AllowRWCode>将以默认值({allowRWCode})启动", "INFO");
                 }
             }
             catch (Exception ex)
@@ -236,7 +236,7 @@ namespace ScadaAppCore
                 string errorMsg = string.Empty;
                 if (!mesRedisClient.ReadConfig(out settings, out errorMsg))
                 {
-                    ApplicationLog.WriteLog("请检查Tag是否配置:" + errorMsg);
+                    ApplicationLog.WriteLog($"请检查Tag是否配置:{errorMsg}");
                     return flag;
                 }
                 XElement element = XElement.Parse(settings);
@@ -283,7 +283,7 @@ namespace ScadaAppCore
                             }
                             catch (Exception ex)
                             {
-                                ApplicationLog.WriteLog(ex, tagNode + " 错误消息:" + ex.Message);
+                                ApplicationLog.WriteLog(ex, $"{tagNode} 错误消息:{ex.Message}");
                             }
                         }
                     }
