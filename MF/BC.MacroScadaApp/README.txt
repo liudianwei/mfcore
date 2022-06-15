@@ -19,3 +19,4 @@
       v9.4.5 与SqlSugar统一Newtonsoft.Json版本,使用低版本v9.0.0
       v9.5.0 优化LoadScadaApp:先加载完Tag,再委托回调
       v9.5.1 标准授权，优化写法,去掉ref
+      v9.5.2 去掉System.Valuetuple,去掉Newtonsoft.Json,使用RestSharp.SimpleJson

@@ -45,12 +45,12 @@ namespace Common.Frm
         /// <param name="MachineCode"></param>
         public void ReadAuthorization(string MachineCode)
         {
-            var res = SystemFramework.AuthorizationManager.Check(MachineCode, label_Product.Text);
-            if (res.Item1)
+            var res = SystemFramework.AuthorizationManager.Check(MachineCode, label_Product.Text, out string msg, out var info);
+            if (res)
             {
-                label_starttime.Text = DateTime.ParseExact(res.Item3.StartDateTime, "yyyyMMdd HH:mm:ss", CultureInfo.CurrentCulture).ToString("yyyy-MM-dd HH:mm");
-                label_endtime.Text = DateTime.ParseExact(res.Item3.EndDateTime, "yyyyMMdd HH:mm:ss", CultureInfo.CurrentCulture).ToString("yyyy-MM-dd HH:mm");
-                label_company.Text = res.Item3.Company;
+                label_starttime.Text = DateTime.ParseExact(info?.StartDateTime, "yyyyMMdd HH:mm:ss", CultureInfo.CurrentCulture).ToString("yyyy-MM-dd HH:mm");
+                label_endtime.Text = DateTime.ParseExact(info?.EndDateTime, "yyyyMMdd HH:mm:ss", CultureInfo.CurrentCulture).ToString("yyyy-MM-dd HH:mm");
+                label_company.Text = info?.Company;
                 Icon = System.Drawing.Icon.FromHandle(Resources.已授权.GetHicon());
                 button_upload.Visible = false;
                 button_close.Location = new System.Drawing.Point(98, 266);

@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using RestSharp;
+﻿using RestSharp;
 using System;
 
 namespace Mes.Exe.Driver.Rest
@@ -32,10 +31,10 @@ namespace Mes.Exe.Driver.Rest
                 var request = new RestRequest(resource, Method.POST);
                 if (data != null)
                 {
-                    request.AddParameter(mediatype, JsonConvert.SerializeObject(data), ParameterType.RequestBody);
+                    request.AddParameter(mediatype, SimpleJson.SerializeObject(data), ParameterType.RequestBody);
                 }
                 var response = client.Execute(request);
-                ResultValue = JsonConvert.DeserializeObject<OperateResultValue>(response.Content);
+                ResultValue = SimpleJson.DeserializeObject<OperateResultValue>(response.Content);
             }
             catch (Exception e)
             {
@@ -69,7 +68,7 @@ namespace Mes.Exe.Driver.Rest
                 request.AddParameter(p);
                 request.AddHeader("content-type", mediatype);
                 var response = client.Execute(request);
-                ResultValue = JsonConvert.DeserializeObject<OperateResultValue>(response.Content);
+                ResultValue = SimpleJson.DeserializeObject<OperateResultValue>(response.Content);
             }
             catch (Exception e)
             {
@@ -105,7 +104,7 @@ namespace Mes.Exe.Driver.Rest
                 request.AddHeader("content-type", mediatype);
                 request.AddHeader("content-encoding", "gzip");
                 var response = client.Execute(request);
-                ResultValue = JsonConvert.DeserializeObject<OperateResultValue>(response.Content);
+                ResultValue = SimpleJson.DeserializeObject<OperateResultValue>(response.Content);
             }
             catch (Exception e)
             {

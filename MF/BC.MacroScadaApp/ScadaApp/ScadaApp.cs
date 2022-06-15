@@ -5,10 +5,9 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
 using BasicData;
-using Newtonsoft.Json;
 using EvetnArgData;
-using Mes.Exe.Driver.Rest;
 using System.Collections.Concurrent;
+using RestSharp;
 
 namespace ScadaAppCore
 {
@@ -150,7 +149,7 @@ namespace ScadaAppCore
 
             try
             {
-                tagMsgs = JsonConvert.DeserializeObject<List<TagMsg>>(Message);
+                tagMsgs = SimpleJson.DeserializeObject<List<TagMsg>>(Message);
             }
             catch (Exception e)
             {
@@ -281,7 +280,7 @@ namespace ScadaAppCore
                         }
                         if (tagMsgs.Count > 0)
                         {
-                            mesRedisClient.Pub(WriteTagNodeValue, JsonConvert.SerializeObject(tagMsgs), out string errorMsg);
+                            mesRedisClient.Pub(WriteTagNodeValue, SimpleJson.SerializeObject(tagMsgs), out string errorMsg);
                             //if (tagMsgs.Count > 1)
                             //{
                             //    ApplicationLog.WriteLog($"发送条数{tagMsgs.Count} 明细:" + JsonConvert.SerializeObject(tagMsgs));
@@ -373,7 +372,7 @@ namespace ScadaAppCore
             }
             catch (Exception ex)
             {
-                ApplicationLog.WriteLog(JsonConvert.SerializeObject(e) + " " + ex.ToString());
+                ApplicationLog.WriteLog(SimpleJson.SerializeObject(e) + " " + ex.ToString());
             }
             return e;
         }
@@ -676,7 +675,7 @@ namespace ScadaAppCore
             }
             catch (Exception ex)
             {
-                ApplicationLog.WriteLog(JsonConvert.SerializeObject(e) + " " + ex.ToString());
+                ApplicationLog.WriteLog(SimpleJson.SerializeObject(e) + " " + ex.ToString());
             }
             return TagValue;
         }

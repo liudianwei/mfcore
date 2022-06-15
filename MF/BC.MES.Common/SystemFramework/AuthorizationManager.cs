@@ -49,17 +49,23 @@ namespace SystemFramework
         /// <param name="strMachineCode"></param>
         /// <param name="Product">AMES-Print</param>
         /// <returns></returns>
-        public static (bool, string, LicenseInfo) Check(string strMachineCode, string Product = "")
+        public static bool Check(string strMachineCode, string Product, out string Msg, out LicenseInfo info)
         {
+            bool flag = false;
+            Msg = "";
+            info = new LicenseInfo();
             var templicense = Environment.CurrentDirectory + "\\license.lic";
             var tempPath = Environment.CurrentDirectory + "\\abcd.data";
-            var info = new LicenseInfo();
             string datetimeFormat = "yyyyMMdd HH:mm:ss";
             DateTime StartDateTime = DateTime.Now;
             DateTime EndDateTime = DateTime.Now;
             if (File.Exists(templicense))
             {
-                if (!pubkeys.TryGetValue(Product, out string pubkey)) return (false, "ProductKey unknown", info);
+                if (!pubkeys.TryGetValue(Product, out string pubkey))
+                {
+                    Msg = "ProductKey unknown";
+                    return flag;
+                }
 
                 DecryptFile(templicense, tempPath, "TEST_PASSWORD_~!@#");
                 FileStream fileStream = new FileStream(tempPath, FileMode.OpenOrCreate, FileAccess.Read);
@@ -84,17 +90,20 @@ namespace SystemFramework
 
                 if (info.Product != null && info.Product != Product)
                 {
-                    return (false, "Product invalid", info);
+                    Msg = "Product invalid";
+                    return flag;
                 }
 
                 if (info.MachineId != null && info.MachineId != strMachineCode)
                 {
-                    return (false, "MachineId invalid", info);
+                    Msg = "MachineId invalid";
+                    return flag;
                 }
 
                 if (info.Company != null && info.Company == "")
                 {
-                    return (false, "Company invalid", info);
+                    Msg = "Company invalid";
+                    return flag;
                 }
 
                 if (info.StartDateTime != null && info.StartDateTime != "")
@@ -105,12 +114,14 @@ namespace SystemFramework
                     }
                     catch
                     {
-                        return (false, "StartDateTime invalid", info);
+                        Msg = "StartDateTime invalid";
+                        return flag;
                     }
                 }
                 else
                 {
-                    return (false, "StartDateTime is null", info);
+                    Msg = "StartDateTime is null";
+                    return flag;
                 }
 
                 if (info.EndDateTime != null && info.EndDateTime != "")
@@ -121,22 +132,26 @@ namespace SystemFramework
 
                         if (DateTime.Compare(StartDateTime, EndDateTime) > 0)
                         {
-                            return (false, "license expired", info);
+                            Msg = "license expired";
+                            return flag;
                         }
 
                         if (DateTime.Compare(DateTime.Now, EndDateTime) > 0)
                         {
-                            return (false, "license expired", info);
+                            Msg = "license expired";
+                            return flag;
                         }
                     }
                     catch
                     {
-                        return (false, "license expired", info);
+                        Msg = "license expired";
+                        return flag;
                     }
                 }
                 else
                 {
-                    return (false, "license expired", info);
+                    Msg = "license expired";
+                    return flag;
                 }
 
                 if (info.Sig != null && info.Sig != "")
@@ -149,19 +164,24 @@ namespace SystemFramework
 
                     if (!Verify(str, info.Sig, pubkey, "UTF-8"))
                     {
-                        return (false, "Sig expired", info);
+                        Msg = "Sig expired";
+                        return flag;
                     }
                 }
                 else
                 {
-                    return (false, "Sig is null", info);
+                    Msg = "Sig is null";
+                    return flag;
                 }
             }
             else
             {
-                return (false, "unauthorized", info);
+                Msg = "unauthorized";
+                return flag;
             }
-            return (true, $"许可证到期:{DateTime.ParseExact(info.EndDateTime, datetimeFormat, CultureInfo.CurrentCulture).ToString("yyyy-MM-dd HH:mm")}", info);
+            flag = true;
+            Msg = $"许可证到期:{DateTime.ParseExact(info.EndDateTime, datetimeFormat, CultureInfo.CurrentCulture).ToString("yyyy-MM-dd HH:mm")}";
+            return flag;
         }
 
         #region 解密文件

@@ -4,10 +4,10 @@ using System.Collections;
 using SystemFramework;
 using BasicData;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using Mes.Exe.Driver.Rest;
 using System.Collections.Concurrent;
 using System.Threading;
+using RestSharp;
 
 namespace ScadaAppCore
 {
@@ -326,14 +326,14 @@ namespace ScadaAppCore
                         ApplicationLog.BusinessLog(tag.OpName, $"Write:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
                     }
                 }
-                if (!ScadaApp.mesRedisClient.Pub(ScadaApp.WriteTagNodeValue, JsonConvert.SerializeObject(tagMsgs), out errorMsg))
+                if (!ScadaApp.mesRedisClient.Pub(ScadaApp.WriteTagNodeValue, SimpleJson.SerializeObject(tagMsgs), out errorMsg))
                 {
-                    ApplicationLog.WriteLog($"发送值为{JsonConvert.SerializeObject(tagMsgs)}到服务端写入失败|{errorMsg}");
+                    ApplicationLog.WriteLog($"发送值为{SimpleJson.SerializeObject(tagMsgs)}到服务端写入失败|{errorMsg}");
                     return flag;
                 }
                 else
                 {
-                    ApplicationLog.BusinessLog("WritePLC_Sync_DataList", $"Write:WritePLC_Sync_DataList|{JsonConvert.SerializeObject(tagMsgs)}");
+                    ApplicationLog.BusinessLog("WritePLC_Sync_DataList", $"Write:WritePLC_Sync_DataList|{SimpleJson.SerializeObject(tagMsgs)}");
                 }
 
                 flag = true;
@@ -416,12 +416,12 @@ namespace ScadaAppCore
                 }
                 if (!ScadaApp.mesRedisClient.Write(Keys.ToArray(), Values.ToArray(), out errorMsg))
                 {
-                    ApplicationLog.WriteLog($"发送值为Key:{JsonConvert.SerializeObject(Keys)},Value:{JsonConvert.SerializeObject(Values)}到服务端写入失败|{errorMsg}");
+                    ApplicationLog.WriteLog($"发送值为Key:{SimpleJson.SerializeObject(Keys)},Value:{SimpleJson.SerializeObject(Values)}到服务端写入失败|{errorMsg}");
                     return flag;
                 }
                 else
                 {
-                    ApplicationLog.BusinessLog("WritePLC_Sync_DataList_Direct", $"Write:WritePLC_Sync_DataList_Direct|Key:{JsonConvert.SerializeObject(Keys)},Value:{JsonConvert.SerializeObject(Values)}");
+                    ApplicationLog.BusinessLog("WritePLC_Sync_DataList_Direct", $"Write:WritePLC_Sync_DataList_Direct|Key:{SimpleJson.SerializeObject(Keys)},Value:{SimpleJson.SerializeObject(Values)}");
                 }
 
                 flag = true;
