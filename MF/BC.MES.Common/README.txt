@@ -6,3 +6,4 @@
       v1.1.2 将SqlSugar引用dll打包
       v1.2.0-rc4 新增日志业务代码、补全Mysql.dll、新增新版授权方式
       v1.2.0  去掉System.Valuetuple
+      v1.2.1  新增授权

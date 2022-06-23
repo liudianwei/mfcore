@@ -2,14 +2,14 @@
 <package>
   <metadata>
     <id>MES.Common</id>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
     <title>MES.Common</title>
     <authors>corbin chen</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
     <!-- <icon>icon.png</icon> -->
     <projectUrl>http://192.168.0.111:9009/v3/index.json</projectUrl>
-    <description>去掉System.Valuetuple</description>
+    <description>新增授权</description>
     <releaseNotes>
       v1.0.0  基础版本
       v1.1.0  新增netmq断线重连机制
@@ -19,6 +19,7 @@
       v1.1.2  将SqlSugar引用dll打包
       v1.2.0-rc4 新增日志业务代码、补全Mysql.dll、新增新版授权方式
       v1.2.0  去掉System.Valuetuple
+      v1.2.1  新增授权
     </releaseNotes>
     <copyright>Copyright ©2022 Macroinf Corporation</copyright>
     <tags>MES.Common</tags>

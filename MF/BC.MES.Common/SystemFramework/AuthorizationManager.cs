@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using SystemFramework;
 
 namespace SystemFramework
@@ -374,8 +375,45 @@ namespace SystemFramework
                     + "6QI2NrGwBPBJ8yv/768DQj5uluJoFaseB9BiffBgR5pPolwWjW+hn+OSy8wgO1+0"
                     + "n5uLxd4/6rJ+ZUQEiLBgUuF55KC2YhTQvB3XEOVhHxkx/JvJ//NZix8wZrjMx9Nk"
                     + "V5iM64nrs2ut1t7qCQIDAQAB"
+            },
+            {
+                "AMES-DBBACK2","MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDEIQIGtINzG79m7ihGxSn2RBaC"
+                    + "5s1ZFba8tfQorlgwevHwmrpiPGzU9boGWrHWkBHgm/S7ccvMWUhFwcGv4+rh5jTH"
+                    + "9wC5M55J8Uy0X6GkTVaPj+9CdFQ5v/KafnW/hNc35MGaCD4W2+y5LC9pxh1KXBfG"
+                    + "31vaPrheDgAdqM7gxwIDAQAB"
+            },
+            {
+                "AMES-PLC-SIMULATOR","MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDB0mf+CyoMnwu9crCGb7RJJczc"
+                    + "VyVjZXBZPan1L+x7buYKfBaVMz320jV9NVj//3t/HgikG9fatWj8MU9B3Ju3a4SF"
+                    + "vJOkixuI3ScZAZPJ8mbn7zQMmz4hawxXPCrIx6ZfymTHs5QYrWW3+61dDXzDLa26"
+                    + "GaTSx6ONw9vcf66kEQIDAQAB"
             }
         };
+
+        /// <summary>
+        /// 授权
+        /// </summary>
+        /// <param name="MachineCode"></param>
+        /// <param name="Product"></param>
+        /// <param name="SleepNum"></param>
+        public static void Authorization(string MachineCode, string Product, int SleepNum = 3000)
+        {
+            var authorization = new Thread(() =>
+            {
+                while (true)
+                {
+                    var res = Check(MachineCode, Product, out string Msg, out var info);
+                    if (!res)
+                    {
+                        Common.Frm.FrmAuthorizationInfo authorizationInfo = new Common.Frm.FrmAuthorizationInfo(MachineCode, Product);
+                        authorizationInfo.ShowDialog();
+                    }
+                    Thread.Sleep(SleepNum);
+                }
+            });
+            authorization.SetApartmentState(ApartmentState.STA);
+            authorization.Start();
+        }
     }
 
     /// <summary>

@@ -75,9 +75,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="P2.MacroScadaApp.nuspec" />
-    <Content Include="Newtonsoft.Json.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="README.txt" />
   </ItemGroup>
   <ItemGroup>
