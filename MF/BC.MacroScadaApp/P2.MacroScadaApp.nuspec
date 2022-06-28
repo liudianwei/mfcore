@@ -2,14 +2,14 @@
 <package>
   <metadata>
     <id>MacroScadaApp</id>
-    <version>9.5.2</version>
+    <version>9.5.3</version>
     <title>MacroScadaApp</title>
     <authors>corbin chen</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
     <!-- <icon>icon.png</icon> -->
     <projectUrl>http://192.168.0.111:9009/v3/index.json</projectUrl>
-    <description>去掉System.Valuetuple,去掉Newtonsoft.Json,使用RestSharp.SimpleJson</description>
+    <description>稳定版</description>
     <releaseNotes>
       v9.3.0  基础版
       v9.3.1  Redis AbortOnConnectFail=false
@@ -33,6 +33,7 @@
       v9.5.0 优化LoadScadaApp:先加载完Tag,再委托回调
       v9.5.1 标准授权，优化写法,去掉ref
       v9.5.2 去掉System.Valuetuple,去掉Newtonsoft.Json,使用RestSharp.SimpleJson
+      v9.5.3 稳定版
     </releaseNotes>
     <copyright>Copyright ©2022 Macroinf Corporation</copyright>
     <tags>MacroScadaApp</tags>
