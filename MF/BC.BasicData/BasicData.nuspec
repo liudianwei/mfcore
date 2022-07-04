@@ -2,14 +2,14 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>BasicData</id>
-    <version>1.1.0-rc1</version>
+    <version>1.1.0</version>
     <title>BasicData</title>
     <authors>corbin chen</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
     <!-- <icon>icon.png</icon> -->
     <projectUrl>http://192.168.0.111:9009/v3/index.json</projectUrl>
-    <description>删减日志业务代码</description>
+    <description>稳定版</description>
     <releaseNotes>
       v1.0.0 基础版
       v1.0.1 发布版
@@ -19,6 +19,7 @@
       v1.0.3-rc7 优化日志性能
       v1.0.3 稳定版
       v1.1.0-rc1 删减日志业务代码
+      v1.1.0 稳定版
     </releaseNotes>
     <copyright>Copyright ©2022 Macroinf Corporation</copyright>
     <tags>BasicData</tags>
