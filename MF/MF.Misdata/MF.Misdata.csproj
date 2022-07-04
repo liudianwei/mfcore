@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net5.0</TargetFrameworks>
     <Platforms>AnyCPU;ARM64</Platforms>
-    <Version>1.1.0-rc2</Version>
+    <Version>1.1.0-rc3.1</Version>
     <PackageReleaseNotes>
       1、机器码记录到日志
       2、优化日志组件
