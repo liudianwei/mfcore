@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 	  <TargetFramework>net5</TargetFramework>
-	  <Version>1.0.4-rc1</Version>
+	  <Version>1.0.4-rc2</Version>
 	  <Description>
 		  +修复 调度任务界面无法带参查询
 	  </Description>

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 	  <TargetFrameworks>net5</TargetFrameworks>
-	  <Version>1.0.3-rc7</Version>
+	  <Version>1.0.3-rc8</Version>
 	  <Description>
 		 Excel任务导出
 	  </Description>
