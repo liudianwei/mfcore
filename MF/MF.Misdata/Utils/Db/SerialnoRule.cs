@@ -155,7 +155,7 @@ namespace Common.DBUtils
                                         Rule.CurrentDay = DateTime.Now;
                                     }
                                     var MinYear = new DateTime(((DateTime)Rule.CurrentDay).Year, 1, 1);
-                                    var MaxYear = new DateTime(((DateTime)Rule.CurrentDay).AddYears(Convert.ToInt32(rule["value"]["resetDay"].Value)).Month, 1, 1);
+                                    var MaxYear = new DateTime(((DateTime)Rule.CurrentDay).AddYears(Convert.ToInt32(rule["value"]["resetDay"].Value)).Year, 1, 1);
 
                                     if (currentYear > MaxYear)
                                     {
@@ -165,6 +165,14 @@ namespace Common.DBUtils
                                     else if (currentYear < MinYear)
                                     {
                                         Rule.CurrentDay = currentYear;
+                                    }
+                                }
+                                else if (rule["value"]["resetType"].Value == "maxNum") //流水号按最大值重置
+                                {
+                                    if ((Rule.CurrentNo + Convert.ToInt32(rule["value"]["uper"].Value) > Convert.ToInt32("1".PadRight(Convert.ToInt32(rule["value"]["length"].Value) + 1, '0'))))
+                                    {
+                                        Rule.CurrentNo = 0;
+                                        Rule.CurrentDay = DateTime.Now;
                                     }
                                 }
 
