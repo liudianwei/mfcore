@@ -3,7 +3,8 @@
   <PropertyGroup>
     <TargetFrameworks>net5.0</TargetFrameworks>
     <Platforms>AnyCPU;ARM64</Platforms>
-    <Version>1.1.0-rc3.1</Version>
+    <Version>1.1.0</Version>
+    <Description>修复自定义流水号按年不加1的bug;新增自定义流水号按最大值重置</Description>
     <PackageReleaseNotes>
       1、机器码记录到日志
       2、优化日志组件
@@ -16,7 +17,9 @@
       9、SqlSugarScope新增属性:将nvarchar参数全部转成varchar模式
       10、优化日志路径赋值
       11、mqttClient初始化日志记录
+      12、修复自定义流水号按年不加1的bug;新增自定义流水号按最大值重置
     </PackageReleaseNotes>
+    
   </PropertyGroup>
 
   <ItemGroup>
