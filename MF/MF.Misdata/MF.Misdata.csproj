@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net5.0</TargetFrameworks>
     <Platforms>AnyCPU;ARM64</Platforms>
-    <Version>1.1.0</Version>
+    <Version>1.1.1-rc1</Version>
     <Description>修复自定义流水号按年不加1的bug;新增自定义流水号按最大值重置</Description>
     <PackageReleaseNotes>
       1、机器码记录到日志
@@ -18,6 +18,7 @@
       10、优化日志路径赋值
       11、mqttClient初始化日志记录
       12、修复自定义流水号按年不加1的bug;新增自定义流水号按最大值重置
+      13、新增初始化实体，初始化“更新时间”字段
     </PackageReleaseNotes>
     
   </PropertyGroup>
