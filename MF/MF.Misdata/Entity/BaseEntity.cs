@@ -78,7 +78,8 @@ namespace Common.DBUtils
         /// 创建、新增
         /// </summary>
         /// <param name="nickName"></param>
-        public virtual void InitEntiy(string nickName)
+        /// <param name="isUPdateTime">是否初始化实体时,更新时间</param>
+        public virtual void InitEntiy(string nickName, bool isUPdateTime = false)
         {
             if (string.IsNullOrWhiteSpace(Id))
             {
@@ -86,6 +87,11 @@ namespace Common.DBUtils
                 State = "0";
                 Creator = nickName;
                 CreateTime = DateTime.Now;
+                if (isUPdateTime)
+                {
+                    Updator = nickName;
+                    UpdateTime = DateTime.Now;
+                }
             }
             else
             {
