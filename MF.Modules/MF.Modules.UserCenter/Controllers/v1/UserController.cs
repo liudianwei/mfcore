@@ -1,30 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-
-using DAL.UserCenter.IRepository;
-
+﻿using DAL.UserCenter.IRepository;
 using MF.Core.Security;
 using MF.FluentValidation;
 using MF.MediatR;
 using MF.NetCoreApp;
 using MF.NetCoreApp.Attributes;
+using MF.Swagger;
 using MF.Utils;
 using MF.Utils.Excel;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
-
-
 using ProductCenter.Commands.ProduceMonitor;
-
+using System;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using UserCenter.Commands;
 using UserCenter.Dtos;
 using UserCenter.Enums;
 using UserCenter.Response;
+using UserCenter.Response.User;
 
 namespace UserCenter.Controllers.v1
 {
@@ -35,13 +32,15 @@ namespace UserCenter.Controllers.v1
         private readonly ILogger<UserController> _logger;
         private readonly IBus _bus;
         private readonly IUserRepository _userRepository;
+        private readonly IConfiguration _configuration;
 
-        public UserController(ILogger<UserController> logger, IBus bus, IUserRepository userRepository, IStringLocalizer<Msg> localizer) : base(localizer)
+        public UserController(ILogger<UserController> logger, IBus bus, IUserRepository userRepository, IConfiguration configuration, IStringLocalizer<Msg> localizer) : base(localizer)
         {
             _logger = logger;
             _bus = bus;
             _default_localizer = localizer;
             _userRepository = userRepository;
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -59,6 +58,38 @@ namespace UserCenter.Controllers.v1
                 LoginFalse=true
             });
             return Result(response);
+        }
+
+        /// <summary>
+        /// Excel获取token
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("getToken")]
+        [AllowAnonymous]
+        public async Task<IActionResult> TestToken()
+        {
+            var ex = DateTime.Now.AddDays(1);
+            var token = getToken(ex);
+            UserLoginResp data = new UserLoginResp();
+            data.Token = token;
+            data.ExpireTime = ex;
+            return Result(PubResponse.Succeed(data));
+        }
+        private string getToken(DateTime exTime)
+        {
+            // 生成jwt
+            JwtConfig jwt = _configuration?.GetSection("Jwt")?.Get<JwtConfig>();
+            var claims = new List<Claim>()
+                        {
+                           new Claim("loginType","WEB"),
+                           new Claim("userFullName","system"),
+                           new Claim("userName","sysytem"),
+                           new Claim("userId","00000000-0000-0000-0000-000000000000"),
+                           new Claim("jti",Guid.NewGuid().ToString()),
+                           new Claim("enabled","true")
+                        };
+
+            return jwt.CreateToken(claims, exTime);
         }
 
         /// <summary>
