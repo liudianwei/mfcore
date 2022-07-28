@@ -94,13 +94,20 @@ namespace ScadaAppCore
              {
                  while (true)
                  {
-                     var res = AuthorizationManager.Check(MachineCode, Product, out string Msg, out var info);
-                     ScadaApp.IsCanWork = res;
-                     if (!res)
+                     try
                      {
-                         Common.Frm.FrmAuthorizationInfo authorizationInfo = new Common.Frm.FrmAuthorizationInfo(MachineCode, Product);
-                         authorizationInfo.ShowDialog();
+                         var res = AuthorizationManager.Check(MachineCode, Product, out string Msg, out var info);
+                         ScadaApp.IsCanWork = res;
+                         if (!res)
+                         {
+                             Common.Frm.FrmAuthorizationInfo authorizationInfo = new Common.Frm.FrmAuthorizationInfo(MachineCode, Product);
+                             authorizationInfo.ShowDialog();
+                         }
                      }
+                     catch (Exception)
+                     {
+                     }
+
                      Thread.Sleep(3000);
                  }
              });
