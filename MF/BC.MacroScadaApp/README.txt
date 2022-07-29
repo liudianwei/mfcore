@@ -22,3 +22,5 @@
       v9.5.2 去掉System.Valuetuple,去掉Newtonsoft.Json,使用RestSharp.SimpleJson
       v9.5.3 稳定版
       v9.5.4-rc1 优化实时监控授权bug
+      v9.5.4-rc2 屏蔽授权
+      v9.5.4 优化授权bug

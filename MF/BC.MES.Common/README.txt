@@ -8,3 +8,5 @@
       v1.2.0  去掉System.Valuetuple
       v1.2.1  新增授权
       v1.2.3  稳定版
+      v1.2.4-rc2  优化授权bug
+      v1.2.4  优化授权bug;优化授权界面

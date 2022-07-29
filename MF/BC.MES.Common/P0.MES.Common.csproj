@@ -207,6 +207,7 @@
     <Content Include="README.txt" />
     <None Include="Resources\授权警告.png" />
     <Content Include="Resources\已授权.png" />
+    <None Include="Resources\背景图.png" />
     <Content Include="System.Data.SQLite.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

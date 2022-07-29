@@ -217,6 +217,7 @@ namespace SystemFramework
 
                 // 创建散列对象, 校验文件
                 HashAlgorithm hasher = SHA256.Create();
+
                 using (CryptoStream cin = new CryptoStream(fin, sma.CreateDecryptor(), CryptoStreamMode.Read),
                     chash = new CryptoStream(Stream.Null, hasher, CryptoStreamMode.Write))
                 {
@@ -298,7 +299,9 @@ namespace SystemFramework
             SymmetricAlgorithm sma = Rijndael.Create();
             sma.KeySize = 256;
             sma.Key = pdb.GetBytes(32);
-            sma.Padding = PaddingMode.PKCS7;
+            // 填充无效,无法被移除的问题,禁用一下代码,从PKCS7改成None
+            //sma.Padding = PaddingMode.PKCS7;
+            sma.Padding = PaddingMode.None;
             return sma;
         }
 

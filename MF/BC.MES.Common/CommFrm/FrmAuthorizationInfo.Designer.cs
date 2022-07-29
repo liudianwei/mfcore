@@ -50,7 +50,8 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(27, 55);
+            this.label1.BackColor = System.Drawing.Color.Transparent;
+            this.label1.Location = new System.Drawing.Point(31, 323);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(53, 12);
             this.label1.TabIndex = 1;
@@ -58,18 +59,19 @@
             // 
             // txt_code
             // 
-            this.txt_code.Location = new System.Drawing.Point(96, 52);
+            this.txt_code.Location = new System.Drawing.Point(100, 320);
             this.txt_code.Multiline = true;
             this.txt_code.Name = "txt_code";
             this.txt_code.ReadOnly = true;
-            this.txt_code.Size = new System.Drawing.Size(161, 71);
+            this.txt_code.Size = new System.Drawing.Size(248, 58);
             this.txt_code.TabIndex = 2;
             this.toolTip1.SetToolTip(this.txt_code, "这里应该填的是发布端的IP");
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(27, 168);
+            this.label3.BackColor = System.Drawing.Color.Transparent;
+            this.label3.Location = new System.Drawing.Point(31, 410);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(53, 12);
             this.label3.TabIndex = 5;
@@ -78,7 +80,8 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(27, 198);
+            this.label4.BackColor = System.Drawing.Color.Transparent;
+            this.label4.Location = new System.Drawing.Point(31, 434);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(53, 12);
             this.label4.TabIndex = 8;
@@ -86,7 +89,7 @@
             // 
             // button_upload
             // 
-            this.button_upload.Location = new System.Drawing.Point(29, 266);
+            this.button_upload.Location = new System.Drawing.Point(499, 440);
             this.button_upload.Name = "button_upload";
             this.button_upload.Size = new System.Drawing.Size(87, 29);
             this.button_upload.TabIndex = 12;
@@ -96,7 +99,7 @@
             // 
             // button_close
             // 
-            this.button_close.Location = new System.Drawing.Point(170, 266);
+            this.button_close.Location = new System.Drawing.Point(592, 440);
             this.button_close.Name = "button_close";
             this.button_close.Size = new System.Drawing.Size(87, 29);
             this.button_close.TabIndex = 13;
@@ -107,7 +110,8 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(27, 229);
+            this.label5.BackColor = System.Drawing.Color.Transparent;
+            this.label5.Location = new System.Drawing.Point(31, 458);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(53, 12);
             this.label5.TabIndex = 10;
@@ -115,10 +119,10 @@
             // 
             // button_copy
             // 
-            this.button_copy.Font = new System.Drawing.Font("宋体", 9F);
-            this.button_copy.Location = new System.Drawing.Point(98, 126);
+            this.button_copy.Font = new System.Drawing.Font("宋体", 7F);
+            this.button_copy.Location = new System.Drawing.Point(354, 320);
             this.button_copy.Name = "button_copy";
-            this.button_copy.Size = new System.Drawing.Size(61, 23);
+            this.button_copy.Size = new System.Drawing.Size(55, 23);
             this.button_copy.TabIndex = 19;
             this.button_copy.Text = "复制(&C)";
             this.button_copy.UseVisualStyleBackColor = true;
@@ -131,7 +135,8 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(27, 22);
+            this.label10.BackColor = System.Drawing.Color.Transparent;
+            this.label10.Location = new System.Drawing.Point(31, 386);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(53, 12);
             this.label10.TabIndex = 20;
@@ -140,7 +145,8 @@
             // label_Product
             // 
             this.label_Product.AutoSize = true;
-            this.label_Product.Location = new System.Drawing.Point(96, 22);
+            this.label_Product.BackColor = System.Drawing.Color.Transparent;
+            this.label_Product.Location = new System.Drawing.Point(100, 386);
             this.label_Product.Name = "label_Product";
             this.label_Product.Size = new System.Drawing.Size(65, 12);
             this.label_Product.TabIndex = 23;
@@ -149,7 +155,8 @@
             // label_starttime
             // 
             this.label_starttime.AutoSize = true;
-            this.label_starttime.Location = new System.Drawing.Point(96, 168);
+            this.label_starttime.BackColor = System.Drawing.Color.Transparent;
+            this.label_starttime.Location = new System.Drawing.Point(100, 410);
             this.label_starttime.Name = "label_starttime";
             this.label_starttime.Size = new System.Drawing.Size(101, 12);
             this.label_starttime.TabIndex = 24;
@@ -158,7 +165,8 @@
             // label_endtime
             // 
             this.label_endtime.AutoSize = true;
-            this.label_endtime.Location = new System.Drawing.Point(96, 198);
+            this.label_endtime.BackColor = System.Drawing.Color.Transparent;
+            this.label_endtime.Location = new System.Drawing.Point(100, 433);
             this.label_endtime.Name = "label_endtime";
             this.label_endtime.Size = new System.Drawing.Size(101, 12);
             this.label_endtime.TabIndex = 25;
@@ -167,7 +175,8 @@
             // label_company
             // 
             this.label_company.AutoSize = true;
-            this.label_company.Location = new System.Drawing.Point(96, 229);
+            this.label_company.BackColor = System.Drawing.Color.Transparent;
+            this.label_company.Location = new System.Drawing.Point(100, 458);
             this.label_company.Name = "label_company";
             this.label_company.Size = new System.Drawing.Size(149, 12);
             this.label_company.TabIndex = 26;
@@ -177,7 +186,9 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(288, 321);
+            this.BackgroundImage = global::MES.Common.Properties.Resources.背景图;
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.ClientSize = new System.Drawing.Size(702, 485);
             this.Controls.Add(this.label_company);
             this.Controls.Add(this.label_endtime);
             this.Controls.Add(this.label_starttime);
