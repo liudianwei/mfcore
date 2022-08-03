@@ -2,9 +2,9 @@
 
   <PropertyGroup>
 	  <TargetFramework>net5</TargetFramework>
-	  <Version>1.0.8-rc4</Version>
+	  <Version>1.0.8-rc4.2</Version>
 	  <Description>
-		  SqlSugarCore 5.1.1-preview09
+		  SqlSugarCore 5.1.1-preview13
 	  </Description>
 	  <PackageReleaseNotes>
 		  升级netcore5.0.5.4
@@ -17,13 +17,14 @@
 		  升级SqlSugarCore 5.0.9.2
 		  升级SqlSugarCore 5.0.9.7---2022/7/21
 		  升级SqlSugarCore 5.1.1-preview09---2022/8/1
+		  升级SqlSugarCore 5.1.1-preview13---2022/8/3
 	  </PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
-    <PackageReference Include="SqlSugarCore" Version="5.1.1-preview09" />
+    <PackageReference Include="SqlSugarCore" Version="5.1.1-preview13" />
   </ItemGroup>
 
   <ItemGroup>
