@@ -167,6 +167,10 @@ namespace MF.Utils
 
         public readonly static string BATCH_STATE_NULL = "BATCH_STATE_NULL";
         public readonly static string BATCH_STATE_DATA_NULL = "BATCH_STATE_DATA_NULL";
+        public readonly static string CATEGORY_LANGUAGE_ALREADY_EXIST = "CATEGORY_LANGUAGE_ALREADY_EXIST";
+        public readonly static string NO_DATA_RELEASE = "NO_DATA_RELEASE";
+        public readonly static string CONNECTION_FAILED = "Connection Failed";
+        public readonly static string STATE_UPDATE_ERROR = "STATE_UPDATE_ERROR";
 
         #endregion 通用操作
     }
