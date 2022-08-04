@@ -50,6 +50,9 @@ namespace HslCommunication.LogNet
                 case HslMessageDegree.FATAL:
                     return "致命";
 
+                case HslMessageDegree.EXCEPTION:
+                    return "异常";
+
                 case HslMessageDegree.ERROR:
                     return "错误";
 
@@ -78,7 +81,7 @@ namespace HslCommunication.LogNet
         /// <param name="text">文本消息</param>
         /// <param name="ex">异常</param>
         /// <returns>异常最终信息</returns>
-        public static string GetSaveStringFromException(string text, Exception ex)
+        public static string GetSaveStringFromException(string text, Exception ex, HslMessageDegree degree)
         {
             StringBuilder builder = new StringBuilder(text);
 
@@ -88,32 +91,21 @@ namespace HslCommunication.LogNet
                 {
                     builder.Append(" : ");
                 }
-
+                builder.Append(Environment.NewLine);
                 try
                 {
+                    builder.Append($"{GetDegreeDescription(degree)}信息:"); builder.Append(ex.Message);
                     builder.Append(Environment.NewLine);
-                    builder.Append("错误信息：");
-                    builder.Append(Environment.NewLine);
-                    builder.Append(ex.Message);
-                    builder.Append(Environment.NewLine);
-                    //builder.Append("错误源：");
-                    //builder.Append(ex.Source);
-                    //builder.Append(Environment.NewLine);
-                    builder.Append("错误堆栈：");
+                    builder.Append($"{GetDegreeDescription(degree)}堆栈:");
                     builder.Append(Environment.NewLine);
                     builder.Append(ex.StackTrace);
                     builder.Append(Environment.NewLine);
-                    builder.Append("错误类型：");
-                    builder.Append(Environment.NewLine);
-                    builder.Append(ex.GetType().ToString());
-                    //builder.Append("错误方法：");
-                    //builder.Append(ex.TargetSite?.ToString());
+                    builder.Append($"{GetDegreeDescription(degree)}类型:"); builder.Append(ex.GetType().ToString());
                 }
                 catch
                 {
                 }
                 builder.Append(Environment.NewLine);
-                builder.Append("/====[Exception]====/");
             }
 
             return builder.ToString();

@@ -185,12 +185,33 @@ namespace HslCommunication.LogNet
         /// <summary>
         /// 写入一条致命错误信息
         /// </summary>
+        /// <param name="text">文本内容</param>
+        /// <param name="filename">写入文件名</param>
+        public void WriteFatal(string text, Exception ex, string filename)
+        {
+            WriteFatal(string.Empty, text, ex, filename);
+        }
+
+        /// <summary>
+        /// 写入一条致命错误信息
+        /// </summary>
         /// <param name="keyWord">关键字</param>
         /// <param name="text">文本内容</param>
         /// <param name="filename">写入文件名</param>
         public void WriteFatal(string keyWord, string text, string filename)
         {
             RecordMessage(HslMessageDegree.FATAL, keyWord, text, filename);
+        }
+
+        /// <summary>
+        /// 写入一条致命错误信息
+        /// </summary>
+        /// <param name="keyWord">关键字</param>
+        /// <param name="text">文本内容</param>
+        /// <param name="filename">写入文件名</param>
+        public void WriteFatal(string keyWord, string text, Exception ex, string filename)
+        {
+            RecordMessage(HslMessageDegree.FATAL, keyWord, LogNetManagment.GetSaveStringFromException(text, ex, HslMessageDegree.FATAL), filename);
         }
 
         /// <summary>
@@ -213,7 +234,7 @@ namespace HslCommunication.LogNet
         /// <param name="filename">写入文件名</param>
         public void WriteException(string keyWord, string text, Exception ex, string filename)
         {
-            RecordMessage(HslMessageDegree.FATAL, keyWord, LogNetManagment.GetSaveStringFromException(text, ex), filename);
+            RecordMessage(HslMessageDegree.EXCEPTION, keyWord, LogNetManagment.GetSaveStringFromException(text, ex, HslMessageDegree.EXCEPTION), filename);
         }
 
         /// <summary>
@@ -372,6 +393,7 @@ namespace HslCommunication.LogNet
             else if (log.Degree == HslMessageDegree.INFO) Console.ForegroundColor = ConsoleColor.White;
             else if (log.Degree == HslMessageDegree.WARN) Console.ForegroundColor = ConsoleColor.Yellow;
             else if (log.Degree == HslMessageDegree.ERROR) Console.ForegroundColor = ConsoleColor.Red;
+            else if (log.Degree == HslMessageDegree.EXCEPTION) Console.ForegroundColor = ConsoleColor.Red;
             else if (log.Degree == HslMessageDegree.FATAL) Console.ForegroundColor = ConsoleColor.DarkRed;
             else Console.ForegroundColor = ConsoleColor.White;
 
@@ -442,7 +464,7 @@ namespace HslCommunication.LogNet
                     AddItemToCache(new HslMessageItem()
                     {
                         Degree = HslMessageDegree.FATAL,
-                        Text = LogNetManagment.GetSaveStringFromException("LogNetSelf", ex),
+                        Text = LogNetManagment.GetSaveStringFromException("LogNetSelf", ex, HslMessageDegree.FATAL),
                     });
                 }
                 finally
@@ -547,7 +569,7 @@ namespace HslCommunication.LogNet
                                     AddItemToCache(new HslMessageItem()
                                     {
                                         Degree = HslMessageDegree.FATAL,
-                                        Text = LogNetManagment.GetSaveStringFromException("LogNetSelf", ex),
+                                        Text = LogNetManagment.GetSaveStringFromException("LogNetSelf", ex, HslMessageDegree.FATAL),
                                     });
                                 }
                                 finally

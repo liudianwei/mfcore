@@ -101,10 +101,27 @@ namespace HslCommunication.LogNet
         /// <summary>
         /// 写入一条致命日志
         /// </summary>
+        /// <param name="text"></param>
+        /// <param name="ex"></param>
+        /// <param name="filename"></param>
+        void WriteFatal(string text, Exception ex, string filename);
+
+        /// <summary>
+        /// 写入一条致命日志
+        /// </summary>
         /// <param name="keyWord"></param>
         /// <param name="text"></param>
         /// <param name="filename"></param>
         void WriteFatal(string keyWord, string text, string filename);
+
+        /// <summary>
+        /// 写入一条致命日志
+        /// </summary>
+        /// <param name="keyWord"></param>
+        /// <param name="text"></param>
+        /// <param name="ex"></param>
+        /// <param name="filename"></param>
+        void WriteFatal(string keyWord, string text, Exception ex, string filename);
 
         /// <summary>
         /// 写入一条信息日志

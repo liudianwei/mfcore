@@ -165,6 +165,7 @@ namespace Common.Communication
                     SystemLog.Error("### MQTT RECONNECTING FAILE,SLEEP 2S,UNTIL CONNECTED ###");
                     Thread.Sleep(2000);
                 }
+                SystemLog.Info($"Mqtt客户端连接成功 ClientId[{options.ClientId}]");
                 await Client.SubscribeAsync(_recvtopic, MQTTnet.Protocol.MqttQualityOfServiceLevel.ExactlyOnce);
             }
             catch (Exception ex)

@@ -45,10 +45,9 @@ namespace Common.Utils
                     config.MoreSettings = new ConnMoreSettings() { DisableNvarchar = true };//添加这一行 ,将参数全部转成varchar模式
                 });
                 IServiceProvider serviceProvider = services.BuildServiceProvider();
-                ServiceResolve.SetServiceResolve(serviceProvider);
-
                 BusinessLog.Path = $"{GetAppseting("Logger:DirPath")}{GetAppseting("Logger:BusinessName")}";
                 SystemLog.Path = $"{GetAppseting("Logger:DirPath")}{GetAppseting("Logger:SystemName")}";
+                ServiceResolve.SetServiceResolve(serviceProvider);
             }
             catch (Exception e)
             {
