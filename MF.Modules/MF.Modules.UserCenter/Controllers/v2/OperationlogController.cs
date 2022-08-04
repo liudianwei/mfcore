@@ -41,7 +41,7 @@ namespace UserCenter.Controllers.v2
         /// /// <param name="command"></param>
         /// <returns></returns>
         [HttpPost("search-result")]
-        public async Task<IActionResult> SearchResult(QueryPageOperationLogCommand command)
+        public async Task<IActionResult> SearchResult(QueryPageOperationLogCommandV2 command)
         {
             var response = await _bus.SendAsync(command);
             return Result(response);
