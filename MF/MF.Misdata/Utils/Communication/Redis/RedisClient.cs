@@ -1,6 +1,8 @@
-﻿using StackExchange.Redis;
+﻿using Common.Utils;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Common.Communication
@@ -93,6 +95,16 @@ namespace Common.Communication
                 redisMulti_SP = ConnectionMultiplexer.Connect(config);
                 redisDb_SP = redisMulti_SP.GetDatabase();
                 redisSub_SP = redisMulti_SP.GetSubscriber();
+                Thread.Sleep(1000);
+                if (redisMulti_RW.IsConnected)
+                {
+                    SystemLog.Info($"Redis客户端连接成功 ServerAddress[{_ip}:{_port}]");
+                }
+                else
+                {
+                    errorMsg = $"Redis客户端连接失败";
+                    return flag;
+                }
                 flag = true;
             }
             catch (Exception ex)

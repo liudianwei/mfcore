@@ -123,22 +123,27 @@ namespace HslCommunication.LogNet
         /// <summary>
         /// 记录异常等级及以上日志的消息
         /// </summary>
-        ERROR = 3,
+        EXCEPTION = 3,
+
+        /// <summary>
+        /// 记录错误等级及以上日志的消息
+        /// </summary>
+        ERROR = 4,
 
         /// <summary>
         /// 记录警告等级及以上日志的消息
         /// </summary>
-        WARN = 4,
+        WARN = 5,
 
         /// <summary>
         /// 记录信息等级及以上日志的消息
         /// </summary>
-        INFO = 5,
+        INFO = 6,
 
         /// <summary>
         /// 记录调试等级及以上日志的信息
         /// </summary>
-        DEBUG = 6
+        DEBUG = 7
     }
 
     #endregion Message Degree

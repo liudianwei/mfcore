@@ -169,12 +169,12 @@ namespace Common.Communication
                                 tag.TagValue = result.Value;
                                 ConvertStringToTagType(ref tag);
                                 TagValue = tag.TagValue;
-                                SystemLog.Debug($"ReadApi:{ tag.OpName }|{tag.TagID }|{ tag.TagDescription }|{ result.Value}", tag.OpName);
+                                SystemLog.Debug($"ReadApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{result.Value}", tag.OpName);
                             }
                             else
                             {
                                 TagValue = null;
-                                SystemLog.Debug($"ReadApiError:{tag.OpName }|{tag.TagID }|{ tag.TagDescription }|Api读取失败|{ result.Message}", tag.OpName);
+                                SystemLog.Debug($"ReadApiError:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|Api读取失败|{result.Message}", tag.OpName);
                             }
                         }
 
@@ -250,12 +250,12 @@ namespace Common.Communication
                     {
                         tag.TagValue = result.Value;
                         ConvertStringToTagType(ref tag);
-                        SystemLog.Debug($"ReadApi:{ tag.OpName }|{ tag.TagID }|{ tag.TagDescription }|{result.Value}", tag.OpName);
+                        SystemLog.Debug($"ReadApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{result.Value}", tag.OpName);
                     }
                     else
                     {
                         tag.TagQuality = "bad";
-                        SystemLog.Debug($"ReadApiError:{ tag.OpName }|{ tag.TagID }|{ tag.TagDescription }|Api读取失败|{result.Message}", tag.OpName);
+                        SystemLog.Debug($"ReadApiError:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|Api读取失败|{result.Message}", tag.OpName);
                     }
                 });
 
@@ -324,12 +324,12 @@ namespace Common.Communication
                     {
                         tagv.TagValue = result.Value;
                         ConvertStringToTagType(ref tagv);
-                        SystemLog.Debug($"ReadApi:{ tag.OpName }|{ tag.TagID }|{ tag.TagDescription }|{result.Value}", tag.OpName);
+                        SystemLog.Debug($"ReadApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{result.Value}", tag.OpName);
                     }
                     else
                     {
                         tagv.TagQuality = "bad";
-                        SystemLog.Debug($"ReadApiError:{ tag.OpName }|{ tag.TagID }|{ tag.TagDescription }|Api读取失败|{result.Message}", tag.OpName);
+                        SystemLog.Debug($"ReadApiError:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|Api读取失败|{result.Message}", tag.OpName);
                     }
                     valueList.Add(tagv);
                 }
@@ -384,11 +384,11 @@ namespace Common.Communication
                         {
                             if (redisClient.Pub(WriteChannel, JsonConvert.SerializeObject(list), out errorMsg))
                             {
-                                SystemLog.Debug($"Write:{tag.OpName}|{tag.TagID}|{ tag.TagDescription }|{tag.TagValue}", tag.OpName);
+                                SystemLog.Debug($"Write:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue}", tag.OpName);
                             }
                             else
                             {
-                                SystemLog.Debug($"WriteError:{tag.OpName}|{tag.TagID}|{ tag.TagDescription }|{tag.TagValue}|到服务端写入失败|{errorMsg}", tag.OpName);
+                                SystemLog.Debug($"WriteError:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue}|到服务端写入失败|{errorMsg}", tag.OpName);
                                 return flag;
                             }
                         }
@@ -402,11 +402,11 @@ namespace Common.Communication
                             var result = RestHelper.Post(ConfigHelper.GetAppseting("HttpServer:Url"), $"/{tag.OpCode}/DeviceWrite", new OperateWriteValue() { TagId = tag.TagID.ToString(), Value = tag.TagValue.ToString() });
                             if (result.IsSuccess)
                             {
-                                SystemLog.Debug($"WriteApi:{tag.OpName}|{tag.TagID}|{ tag.TagDescription }|{tag.TagValue}", tag.OpName);
+                                SystemLog.Debug($"WriteApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue}", tag.OpName);
                             }
                             else
                             {
-                                SystemLog.Debug($"WriteApiError:{tag.OpName}|{tag.TagID}|{ tag.TagDescription }|{tag.TagValue}|到服务端写入失败|{errorMsg}", tag.OpName);
+                                SystemLog.Debug($"WriteApiError:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue}|到服务端写入失败|{errorMsg}", tag.OpName);
                                 return flag;
                             }
                         }

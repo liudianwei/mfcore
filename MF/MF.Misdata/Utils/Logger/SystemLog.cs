@@ -153,7 +153,7 @@ namespace Common.Utils
         /// <param name="filename"></param>
         public static void Fatal(string Fatalmsg, Exception e, string filename = "common")
         {
-            GetLogNet(filename)?.WriteFatal(Fatalmsg, e.ToString(), filename);
+            GetLogNet(filename)?.WriteFatal(Fatalmsg, e, filename);
         }
 
         /// <summary>

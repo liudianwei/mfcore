@@ -33,6 +33,7 @@ namespace Common.DBUtils
                 var strMachineCode = MachineCode.GetMachineCodeString();
                 Console.WriteLine($"机器码:{strMachineCode}");
                 var item = new Esnecil().CheckMisdataCr(strMachineCode);
+                SystemLog.Info($"产品:AMES-Misdata 机器码:{strMachineCode}");
                 if (!item.Item1)
                 {
                     var msg = $"授权失败,请联系管理员进行授权!Warning Message ===>{item.Item2}；机器码为===>{strMachineCode}";
