@@ -184,11 +184,12 @@ namespace MDCenter.CommandHandles
             {
                 var ucI18n = _ucI18nRepository.Queryable()
                     .Where(i => i.Id == cmd.Id)
-                    .Select(i => new { i.Id, i.Category, i.Language, i.Path, i.Code, i.Name, i.Remark })
+                    .Select(i => new { i.Id, i.Context, i.Category, i.Language, i.Path, i.Code, i.Name, i.Remark })
                     .First();
                 cmd = ucI18n.Adapt<QueryI18nCommand>();
-                var json = FileHelper.GetJsonFile(BaseStateConstants.i18nPath + cmd.Path);
-                cmd.Context = json;
+                cmd.Context = ucI18n.Context.IsEmpty() ? "{}" : ucI18n.Context;
+                //var json = FileHelper.GetJsonFile(SystemConstants.i18nPath + cmd.Path);
+                //cmd.Context = json;
             }
             return Succeed(cmd);
         }

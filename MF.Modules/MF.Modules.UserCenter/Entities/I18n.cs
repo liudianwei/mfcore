@@ -54,6 +54,16 @@ namespace DAL.MDCenter.Entities
         [SugarColumn(ColumnName = "path", ColumnDescription = "json路径", IsNullable = true, Length = 100, ColumnDataType = "varchar", DecimalDigits = 0)]
 
         public string Path{ get; set; }
+
+        /// <summary>
+        /// Desc:json路径
+        /// Default:NULL
+        /// Nullable:True
+        /// </summary>
+        [SugarColumn(ColumnName = "context", ColumnDescription = "json脚本", IsNullable = true, ColumnDataType = "longtext,text", DecimalDigits = 0)]
+
+        public string Context { get; set; }
+
         /// <summary>
         /// Desc:json路径
         /// Default:NULL
