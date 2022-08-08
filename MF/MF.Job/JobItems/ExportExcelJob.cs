@@ -74,8 +74,7 @@ namespace MF.Job.JobItems
                         //执行任务
                         resultstr = MRestClient.Post(task.Url, "", JsonConvert.SerializeObject(args), $"Bearer {_token}");
                         //Console.ForegroundColor = ConsoleColor.Red;
-                        //logger.Info($"执行结果：＝＝＝＝＝＝＝{resultstr}");
-                        //Console.WriteLine($"执行结果：＝＝＝＝＝＝＝{resultstr}");
+                        logger.Info($"任务执行结果：＝＝＝＝＝＝＝{resultstr}");
                     }
                 }
 
@@ -83,15 +82,16 @@ namespace MF.Job.JobItems
                 {
                     if (result != null && result.Status.ToLower().Equals("success"))
                     {
-                        logger.Info(head + result);
+                        
                     }
                     else
                     {
-                        logger.Error(head + result);
+                        logger.Error($"未完成的导出任务，返回失败Code:{result.Code},Message:{result.Message}");
                     }
                 }
                 catch (Exception ex)
                 {
+                    logger.Error($"异常：＝＝＝{ex.Message}");
                     Console.WriteLine(ex.StackTrace);
                 }
 
@@ -100,7 +100,8 @@ namespace MF.Job.JobItems
             }
             catch (Exception e)
             {
-                logger.Trace(head + e.StackTrace);
+                logger.Error($"异常：＝＝＝{e.Message}");
+                Console.WriteLine(e.Message);
             }
             finally
             {
@@ -125,7 +126,7 @@ namespace MF.Job.JobItems
 
             public System.DateTime StartTime { get; set; }
 
-            public System.DateTime EndTime { get; set; }
+            public System.DateTime? EndTime { get; set; }
 
             public string DownloadPath { get; set; }
 

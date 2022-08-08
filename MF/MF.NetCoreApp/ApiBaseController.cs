@@ -473,7 +473,6 @@ namespace MF.NetCoreApp
             {
                 var token = token1;
                 var domain = domain1;
-                var startTime = DateTime.Now;
                 var reqparams = new
                 {
                     cmd.ModuleName,
@@ -482,7 +481,6 @@ namespace MF.NetCoreApp
                     Progress = "100",
                     QueryItem = JsonConvert.SerializeObject(cmd),
                     StartTime = DateTime.Now,
-                    EndTime = DateTime.Now,
                     Duration = "-1",
                     DownloadPath = "",
                     Status = "0",
@@ -554,10 +552,10 @@ namespace MF.NetCoreApp
         private (string, string, long) ExportExcelLocal<T>(PubResponse resp, string outpath, Action<int> callback, string fileName = "")
         {
             var list = (IEnumerable<T>)resp.Data;
-            if (list == null || list.Count() == 0)
-            {
-                throw new Exception("没有记录，不能导出");
-            }
+            //if (list == null || list.Count() == 0)
+            //{
+            //    throw new Exception("没有记录，不能导出");
+            //}
 
             fileName = MakeValidFileName(fileName);
             fileName = $"{(fileName == "" ? Guid.NewGuid().ToString() : fileName)}_{DateTime.Now:yyyyMMddHHmmssfff}.xlsx";

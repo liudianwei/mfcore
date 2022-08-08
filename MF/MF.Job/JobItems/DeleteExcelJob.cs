@@ -41,7 +41,7 @@ namespace MF.Job.JobItems
             try
             {
                 //调用删除接口 删除N天之前的Excel和导出记录
-                string resultstr = MRestClient.Post(uri, resource, jobargs);
+                string resultstr = MRestClient.Delete(uri, resource, null);
                 var result = JsonConvert.DeserializeObject<RestResult>(resultstr);
 
                 if (result.Status.ToLower().Equals("success"))

@@ -68,7 +68,7 @@ namespace MF.Rest
         /// <param name="token"></param>
         /// <param name="tokenkey"></param>
         /// <returns></returns>
-        public static string Delete(string uri, string resource, Parameter p, string token = "", string tokenkey = "Authorization")
+        public static string Delete(string uri, string resource, object data = null, string token = "", string tokenkey = "Authorization", string contenttype = "application/json; charset=utf-8")
         {
             var client = new RestClient(uri);
             if (tokenkey != "" && token != "")
@@ -76,7 +76,11 @@ namespace MF.Rest
                 client.AddDefaultHeader(tokenkey, token);
             }
             var request = new RestRequest(resource, Method.DELETE);
-            request.AddParameter(p);
+
+            if (data != null)
+            {
+                request.AddParameter(contenttype, data, ParameterType.RequestBody);
+            }
             IRestResponse response = client.Execute(request);
             return response.Content;
         }

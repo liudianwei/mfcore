@@ -3,7 +3,7 @@
     <PropertyGroup>
 		<TargetFramework>net5</TargetFramework>
 		<IsPackable>true</IsPackable>
-		<Version>1.0.2-rc3.3</Version>
+		<Version>1.0.2-rc3.7</Version>
 		<Description>
 			用户中心
 		</Description>

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 	  <TargetFrameworks>net5</TargetFrameworks>
-	  <Version>1.0.4-rc2</Version>
+	  <Version>1.0.4-rc4.1</Version>
 	  <Description>
 		 Excel任务导出
 	  </Description>
@@ -11,6 +11,8 @@
 		  +修复 Job任务导出数据错误-2022/3/24
 		  +修复 Job任务导出Token失效问题-2022/4/27
 		  +修复 修改获取token方式(目前写死sysytem密码为123456 后期修改密码后将无法进行导出)-2022/7/21
+		  +修复 定期删除Job任务无法执行问题-2022/8/5
+		  +优化 结束时间可空 -2022/8/5
 	  </PackageReleaseNotes>
   </PropertyGroup>
 

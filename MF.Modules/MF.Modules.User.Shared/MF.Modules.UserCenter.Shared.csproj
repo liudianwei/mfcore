@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 	  <TargetFramework>net5</TargetFramework>
-	  <Version>1.0.2-rc3.3</Version>
+	  <Version>1.0.2-rc3.7</Version>
 	  <Description>
 		  模块共享类库
 	  </Description>
