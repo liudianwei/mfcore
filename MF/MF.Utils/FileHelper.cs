@@ -161,6 +161,10 @@ namespace MF.Utils
             if (res.StatusCode == HttpStatusCode.OK)
             {
                 var r1 = res.Content?.ToObj<GofastResult>();
+                if (r1.Status=="")
+                {
+                    throw new Exception($"{r1.Message}");
+                }
                 return r1.Data?.ToJson().ToObj<List<DataResult>>();
             }
             else
@@ -173,7 +177,7 @@ namespace MF.Utils
         /// </summary>
         /// <param name="url"></param>
         /// <param name="md5"></param>
-        static public bool RemoveFile(string url, string md5)
+        static public bool RemoveOnlineFile(string url, string md5)
         {
             bool bl = false;
             var request = new RestRequest($"{url}/delete?md5={md5}", Method.GET);

@@ -67,10 +67,10 @@ namespace MDCenter.CommandHandles
 
             I18n ucI18n = cmd.Adapt<I18n>();
             ucI18n.Id = string.Empty;
-            var obj = cmd.Context?.ToObj<dynamic>() ?? new { };
-            //生成json路径
-            ucI18n.Path = $"{ucI18n.Category}-{ucI18n.Language}.json";
-            FileHelper.WriteJsonFile(BaseStateConstants.i18nPath, ucI18n.Path, JilH.JilToJson(obj));
+            //var obj = cmd.Context?.ToObj<dynamic>() ?? new { };
+            ////生成json路径
+            //ucI18n.Path = $"{ucI18n.Category}-{ucI18n.Language}.json";
+            //FileHelper.WriteJsonFile(BaseStateConstants.i18nPath, ucI18n.Path, JilH.JilToJson(obj));
             ucI18n = _ucI18nRepository.InsertReturnEntity(ucI18n);
             return Succeed(ucI18n.Id);
         }
@@ -142,32 +142,39 @@ namespace MDCenter.CommandHandles
         /// <returns></returns>
         public Task<PubResponse> Handle(PublishI18nCommand cmd, CancellationToken cancellationToken)
         {
-            DirectoryInfo d = new DirectoryInfo(BaseStateConstants.i18nPath);
-            if (Directory.Exists(d.FullName))
-            {
-                FileInfo[] files = d.GetFiles();//文件
-                if (files.Length <= 0)
-                {
-                    return Failed(BaseSystemError.NO_DATA_RELEASE);
-                }
-            }
-            else
+            var i18nList = _ucI18nRepository.Queryable()
+                       .Select(i => new { i.Context, i.Category, i.Language })
+                       .ToList();
+            if (i18nList.IsNull() || i18nList.Count <= 0)
             {
                 return Failed(BaseSystemError.NO_DATA_RELEASE);
             }
-
-            //1先查找文件服务器是否存在文件
-            var cdnlist = FileHelper.List_dir(cmd.NetUrl);
-            //2如果存在调用api 根据md5进行删除
-            if (cdnlist != null && cdnlist.Count > 0)
+            try
             {
-                cdnlist.ForEach(item =>
+                i18nList.ForEach(item =>
                 {
-                    FileHelper.RemoveFile(cmd.NetUrl, item.md5);
+                    var obj = item.Context?.ToObj<dynamic>() ?? new { };
+                    //生成json路径
+                    var path = $"{item.Category}-{item.Language}.json";
+                    FileHelper.WriteJsonFile(BaseStateConstants.i18nPath, path, JilH.JilToJson(obj));
                 });
+                //1先查找文件服务器是否存在文件
+                var cdnlist = FileHelper.List_dir(cmd.NetUrl);
+                //2如果存在调用api 根据md5进行删除
+                if (cdnlist != null && cdnlist.Count > 0)
+                {
+                    cdnlist.ForEach(item =>
+                    {
+                        FileHelper.RemoveOnlineFile(cmd.NetUrl, item.md5);
+                    });
+                }
+                //3将本地文件上传到服务器
+                FileHelper.UploadFile(BaseStateConstants.i18nPath, cmd.NetUrl);
             }
-            //3将本地文件上传到服务器
-            FileHelper.UploadFile(BaseStateConstants.i18nPath, cmd.NetUrl);
+            catch (System.Exception ex)
+            {
+                return Failed(ex.Message);
+            }
 
             return Succeed();
         }
