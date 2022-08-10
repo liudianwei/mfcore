@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using UserCenter.Commands.JobTask;
+using UserCenter.Enums;
 
 namespace UserCenter.CommandHandles
 {
@@ -187,12 +188,13 @@ namespace UserCenter.CommandHandles
             }
 
             // 前端要求停止 设置为5job才情进行停止操作
-            if(cmd.State == 0){
-                cmd.State = 5;
-            }
-            if (cmd.State == 1)
+            if (cmd.State == (int)JobTaskEnum.PopStop)
             {
-                cmd.State = 3;
+                cmd.State = (int)JobTaskEnum.PopProceed;
+            }
+            if (cmd.State == (int)JobTaskEnum.PopFinished)
+            {
+                cmd.State = (int)JobTaskEnum.PopWait;
             }
             if (cmd.BackgroundJobId.NotNull())
             {

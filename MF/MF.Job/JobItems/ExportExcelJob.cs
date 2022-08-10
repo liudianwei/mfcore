@@ -86,7 +86,7 @@ namespace MF.Job.JobItems
                     }
                     else
                     {
-                        logger.Error($"未完成的导出任务，返回失败Code:{result.Code},Message:{result.Message}");
+                        logger.Error($"未完成的导出任务，返回失败Code:{result?.Code},Message:{result?.Message}");
                     }
                 }
                 catch (Exception ex)
