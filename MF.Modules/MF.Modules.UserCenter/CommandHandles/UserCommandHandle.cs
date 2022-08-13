@@ -17,7 +17,7 @@ using MDCenter.Commands.Shift;
 using MDCenter.Commands.WorkStation;
 
 using MediatR;
-
+using MF.Cache;
 using MF.Core.Check;
 using MF.Core.Extensions;
 using MF.Core.Security;
@@ -321,7 +321,14 @@ namespace UserCenter.CommandHandles
             if (user.IsNull())
             {
                 RecordLoginFailed(user);
-                return Failed(BaseSystemError.USERNAME_OR_PASSWORD_ERROR);
+                return Failed(BaseSystemError.USER_NOT_FOUND);
+            }
+
+            // 校验状态
+            if (user.State == BaseStateConstants.DEACTIVE)
+            {
+                RecordLoginFailed(user);
+                return Failed(BaseSystemError.USER_DEACTIVE);
             }
 
             // 校验密码
@@ -329,13 +336,6 @@ namespace UserCenter.CommandHandles
             {
                 RecordLoginFailed(user);
                 return Failed(BaseSystemError.USERNAME_OR_PASSWORD_ERROR);
-            }
-
-            // 校验状态
-            if (user.State == BaseStateConstants.DELETE || user.State == BaseStateConstants.DELETE)
-            {
-                RecordLoginFailed(user);
-                return Failed(BaseSystemError.USER_DEACTIVE);
             }
 
             // 生成jwt
@@ -578,6 +578,7 @@ namespace UserCenter.CommandHandles
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [Transaction]
+        [CacheRemove("uc:userole")]
         public Task<PubResponse> Handle(DeleteUserCommand cmd, CancellationToken cancellationToken)
         {
             //不能删除超级管理员

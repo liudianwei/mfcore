@@ -27,6 +27,11 @@ namespace MF.Utils
         public readonly static string PASSWORD_ERROR = "PASSWORD_ERROR";
 
         /// <summary>
+        /// 用户没有找到
+        /// </summary>
+        public readonly static string USER_NOT_FOUND = "USER_NOT_FOUND";
+
+        /// <summary>
         ///
         /// </summary>
         public readonly static string USERNAME_OR_PASSWORD_ERROR = "USERNAME_OR_PASSWORD_ERROR";

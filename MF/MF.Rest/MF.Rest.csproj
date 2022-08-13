@@ -2,12 +2,13 @@
 
     <PropertyGroup>
 		<TargetFrameworks>net5</TargetFrameworks>
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 		<Description>
 			HTTP(REST)基本操作
 		</Description>
 		<PackageReleaseNotes>
 			+修复 Delete接口参数问题
+			+修复 空参问题
 		</PackageReleaseNotes>
     </PropertyGroup>
 

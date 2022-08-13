@@ -7,4 +7,8 @@ namespace UserCenter.Commands
     {
         public string UserName { get; set; }
     }
+    public class QueryByRoleNameCommand : IRequest<PubResponse>
+    {
+        public string RoleName { get; set; }
+    }
 }

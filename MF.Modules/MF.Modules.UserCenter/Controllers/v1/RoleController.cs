@@ -185,7 +185,7 @@ namespace UserCenter.Controllers.v1
         }
 
         /// <summary>
-        /// 根据用户名称获取用户所有角色
+        /// 根据用户名获取所属角色
         /// </summary>
         /// <param name="userName"></param>
         /// <returns></returns>
@@ -193,6 +193,18 @@ namespace UserCenter.Controllers.v1
         public async Task<IActionResult> FindRoleByUserName(string userName)
         {
             var response = await _bus.SendAsync(new QueryByUserNameRoleCommand() { UserName = userName });
+            return Result(response);
+        }
+
+        /// <summary>
+        /// 根据角色名获取所属用户
+        /// </summary>
+        /// <param name="roleName"></param>
+        /// <returns></returns>
+        [HttpGet("role/{roleName}")]
+        public async Task<IActionResult> FindUserByRole(string roleName)
+        {
+            var response = await _bus.SendAsync(new QueryByRoleNameCommand() { RoleName = roleName });
             return Result(response);
         }
     }

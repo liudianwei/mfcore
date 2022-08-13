@@ -1,5 +1,5 @@
 using System;
-
+using System.Collections.Generic;
 using MF.Orm;
 
 using SqlSugar;
@@ -95,5 +95,8 @@ namespace DAL.UserCenter.Entities
         /// </summary>
         [SugarColumn(ColumnName = "user_type", ColumnDescription = "用户类型", IsNullable = true, Length = 64, ColumnDataType = "varchar", DecimalDigits = 0)]
         public string UserType { get; set; }
+
+        [Navigate(typeof(RoleUser), nameof(RoleUser.UserId), nameof(RoleUser.RoleId))]//注意顺序
+        public List<Role> RoleList { get; set; }//只能是null不能赋默认值
     }
 }

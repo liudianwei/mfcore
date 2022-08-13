@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 using DAL.UserCenter.Entities;
 using DAL.UserCenter.IRepository;
-
+using Mapster;
 using MediatR;
-
+using MF.Cache;
 using MF.Core.Extensions;
 using MF.FluentValidation;
 using MF.NetCoreApp;
@@ -18,6 +18,7 @@ using MF.Utils;
 using SqlSugar;
 
 using UserCenter.Commands;
+using UserCenter.Dtos;
 using UserCenter.Enums;
 using UserCenter.Response;
 
@@ -32,8 +33,9 @@ namespace UserCenter.CommandHandles
         IRequestHandler<AssignUserToRoleRoleCommand, PubResponse>,
         IRequestHandler<QueryAllTreeRoleCommand, PubResponse>,
         IRequestHandler<QueryAllRoleCommand, PubResponse>,
-        IRequestHandler<QueryByNameRoleCommand, PubResponse>,
+        IRequestHandler<QueryByNameRoleCommand, PubResponse>, 
         IRequestHandler<QueryByUserNameRoleCommand, PubResponse>,
+        IRequestHandler<QueryByRoleNameCommand, PubResponse>,
         IRequestHandler<QueryPageRoleCommand, PubResponse>,
         IRequestHandler<QueryPermissionsByRoleIdRoleCommand, PubResponse>,
         IRequestHandler<QueryUsersByRoleIdRoleRoleCommand, PubResponse>
@@ -152,6 +154,7 @@ namespace UserCenter.CommandHandles
         /// <param name="cmd"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [CacheRemove("uc:userole")]
         public Task<PubResponse> Handle(DeleteRoleCommand cmd, CancellationToken cancellationToken)
         {
             List<string> undellist = new List<string>();
@@ -245,6 +248,7 @@ namespace UserCenter.CommandHandles
         /// <param name="cmd"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [CacheRemove("uc:userole")]
         public Task<PubResponse> Handle(AssignUserToRoleRoleCommand cmd, CancellationToken cancellationToken)
         {
             if (cmd.Id.IsNull())
@@ -342,9 +346,40 @@ namespace UserCenter.CommandHandles
             bool flag = list.Count == roleList.Count;
             return SucceedOrFail(flag, list);
         }
-
         /// <summary>
-        /// 根据用户名称查询角色列表
+        /// 用户-角色
+        /// </summary>
+        /// <returns></returns>
+        [Cache("uc:userole")]
+        private List<UserRDto> FindRoleByUser()
+        {
+            var list = _userRepository.Queryable()
+                .Includes(x => x.RoleList
+                                .Where(r => r.State == BaseStateConstants.ACTIVATE)
+                                .ToList())
+                .ToList(i => new UserRDto { UserId = i.Id, UserName = i.Name, FullName = i.FullName, RoleList = i.RoleList });
+
+            //var all = list.Adapt<List<UserRoleDto>>();
+            return list;
+        }
+        /// <summary>
+        /// 角色-用户
+        /// </summary>
+        /// <returns></returns>
+        //[Cache("uc:rolebyuser")]
+        private List<RoleUDto> FindUserByRole()
+        {
+            var list = _roleRepository.Queryable()
+                .Includes(x => x.UserList
+                                .Where(r => r.State == BaseStateConstants.ACTIVATE)
+                                .ToList())
+                .ToList(i => new RoleUDto { RoleId = i.Id, RoleName = i.Name, UserList = i.UserList });
+
+            //var all = list.Adapt<List<UserRoleDto>>();
+            return list;
+        }
+        /// <summary>
+        /// 根据用户名称查询角色列表 用户-角色
         /// </summary>
         /// <param name="cmd"></param>
         /// <param name="cancellationToken"></param>
@@ -356,22 +391,49 @@ namespace UserCenter.CommandHandles
                 return Failed(BaseSystemError.NAME_CANNOT_BE_EMPTY);
             }
 
-            var user = _userRepository.Queryable().First(u => u.Name.Equals(cmd.UserName));
-            if (user.IsNull())
+            var userRoleList = FindRoleByUser();
+
+            var userEnty=userRoleList.Where(i => i.UserName == cmd.UserName).FirstOrDefault();
+            if (userEnty.IsNull())
             {
                 return Failed(BaseSystemError.OBJECT_DOES_NOT_EXIST);
             }
 
-            var links = _roleUserRepository.QueryableToList(ru => ru.UserId.Equals(user.Id));
-            if (links.IsNullT())
+            if (userEnty.RoleList.Count<=0)
             {
                 return Failed(UserCenterError.ASSIGN_USER_NOT_FOUND);
             }
 
-            var roleIds = links.Select(ru => ru.RoleId).ToList();
+            return Succeed(userEnty.RoleList);
+        }
 
-            var roles = _roleRepository.Queryable().In(roleIds).ToList();
-            return SucceedOrFail(roles.Count == roleIds.Count, roles, BaseSystemError.OBJECT_DOES_NOT_EXIST);
+        /// <summary>
+        /// 根据用户名称查询角色列表 角色-用户
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public Task<PubResponse> Handle(QueryByRoleNameCommand cmd, CancellationToken cancellationToken)
+        {
+            if (cmd.RoleName.IsNull())
+            {
+                return Failed(BaseSystemError.NAME_CANNOT_BE_EMPTY);
+            }
+
+            var userRoleList = FindUserByRole();
+
+            var roleEnty = userRoleList.Where(i => i.RoleName == cmd.RoleName).FirstOrDefault();
+            if (roleEnty.IsNull())
+            {
+                return Failed(BaseSystemError.OBJECT_DOES_NOT_EXIST);
+            }
+
+            if (roleEnty.UserList.Count <= 0)
+            {
+                return Failed(UserCenterError.ASSIGN_USER_NOT_FOUND);
+            }
+
+            return Succeed(roleEnty.UserList);
         }
 
         /// <summary>

@@ -1,6 +1,7 @@
 using SqlSugar;
 
 using MF.Orm;
+using System.Collections.Generic;
 
 namespace DAL.UserCenter.Entities
 {
@@ -29,5 +30,8 @@ namespace DAL.UserCenter.Entities
         /// </summary>
         [SugarColumn(ColumnName = "remark", ColumnDescription = "备注", IsNullable = true, Length = 64, ColumnDataType = "varchar", DecimalDigits = 0)]
         public string Remark { get; set; }
+
+        [Navigate(typeof(RoleUser), nameof(RoleUser.RoleId), nameof(RoleUser.UserId))]//注意顺序
+        public List<User> UserList { get; set; }//只能是null不能赋默认值
     }
 }

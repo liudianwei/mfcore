@@ -25,6 +25,7 @@ namespace MF.Rest
             {
                 client.AddDefaultHeader(tokenkey, token);
             }
+            data = data.ToString() == "" ? "{}" : data;
             var request = new RestRequest(resource, Method.POST);
             if (data != null)
             {
@@ -51,6 +52,7 @@ namespace MF.Rest
                 client.AddDefaultHeader(tokenkey, token);
             }
             var request = new RestRequest(resource, Method.POST);
+            data = data.ToString() == "" ? "{}" : data;
             if (data != null)
             {
                 request.AddParameter(contenttype, data, ParameterType.RequestBody);
@@ -76,7 +78,7 @@ namespace MF.Rest
                 client.AddDefaultHeader(tokenkey, token);
             }
             var request = new RestRequest(resource, Method.DELETE);
-
+            data = data.ToString() == "" ? "{}" : data;
             if (data != null)
             {
                 request.AddParameter(contenttype, data, ParameterType.RequestBody);
