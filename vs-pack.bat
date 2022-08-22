@@ -106,4 +106,8 @@ cd ..
 cd MF.CodeGen
 dotnet pack --output ./../../core-nupkgs
 
+cd ..
+cd MF.TTS
+dotnet pack --output ./../../core-nupkgs
+
 pause

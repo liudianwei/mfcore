@@ -151,8 +151,8 @@ namespace MF.MTTS.TTSDotNetLib
             }
             finally
             {
-                ret = TTSDll.QTTSSessionEnd(Ptr2Str(session_ID), "");
-                ret = TTSDll.MSPLogout();//退出登录
+                TTSDll.QTTSSessionEnd(Ptr2Str(session_ID), "");
+                TTSDll.MSPLogout();//退出登录
             }
             return ret;
         }

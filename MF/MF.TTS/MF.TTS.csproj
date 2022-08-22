@@ -1,21 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFrameworks>net5</TargetFrameworks>
+    <TargetFrameworks>net5</TargetFrameworks>
     <RootNamespace>MF.TTS</RootNamespace>
     <AssemblyName>MF.TTS</AssemblyName>
-	  <Version>1.0.0-rc1</Version>
-	  <Description>
+    <Version>1.0.0-rc2</Version>
+    <Description>
       +集成讯飞语音合成
     </Description>
-	  <PackageReleaseNotes>
+    <PackageReleaseNotes>
       +集成讯飞语音合成-2022/8/15
     </PackageReleaseNotes>
+    <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\MF.Log\MF.Log.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <None Update="msc.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -38,5 +38,10 @@
     <None Update="msc_x64.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\MF.TTS\msc.dll" Pack="True" PackagePath="lib\net5.0\msc.dll" />
+    <Content Include="..\MF.TTS\msc_x64.dll" Pack="True" PackagePath="lib\net5.0\msc_x64.dll" />
+    <Content Include="msc\**" Pack="True" PackageCopyToOutput="True" PackagePath="contentFiles\any\any\msc" />
   </ItemGroup>
 </Project>
