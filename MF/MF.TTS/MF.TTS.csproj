@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFrameworks>net5</TargetFrameworks>
+    <RootNamespace>MF.TTS</RootNamespace>
+    <AssemblyName>MF.TTS</AssemblyName>
+	  <Version>1.0.0-rc1</Version>
+	  <Description>
+      +集成讯飞语音合成
+    </Description>
+	  <PackageReleaseNotes>
+      +集成讯飞语音合成-2022/8/15
+    </PackageReleaseNotes>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MF.Log\MF.Log.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="msc.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="msc\del.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="msc\msc.cfg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="msc\res\tts\common.jet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="msc\res\tts\xiaofeng.jet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="msc\res\tts\xiaoyan.jet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="msc_x64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>
