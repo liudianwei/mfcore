@@ -56,10 +56,7 @@ namespace MF.Job.JobItems
                     //没有就取第一个去执行
                     if (status1list.Count == 0)
                     {
-                        var task = result.Data.First();
-                        //Console.WriteLine(task);
-                        var obj = JsonConvert.DeserializeObject<RestQuery>(task.QueryItem);
-                        var args = new { moduleName = task.ModuleName, taskId = task.Id, Condition = obj.Condition, Condition2 = obj.Condition2 };
+                        var list = result.Data;
                         if (DateTime.Now >= _expireTime)
                         {
                             //获取token
@@ -71,10 +68,16 @@ namespace MF.Job.JobItems
                                 _token = results.Data.Token;
                             }
                         }
-                        //执行任务
-                        resultstr = MRestClient.Post(task.Url, "", JsonConvert.SerializeObject(args), $"Bearer {_token}");
-                        //Console.ForegroundColor = ConsoleColor.Red;
-                        logger.Info($"任务执行结果：＝＝＝＝＝＝＝{resultstr}");
+                        logger.Info($"本次执行一共检测到 {list.Count}条 待执行任务");
+                        list.ForEach(task => {
+                            var obj = JsonConvert.DeserializeObject<RestQuery>(task.QueryItem);
+                            var args = new { moduleName = task.ModuleName, taskId = task.Id, Condition = obj.Condition, Condition2 = obj.Condition2 };
+                            //执行任务
+                            resultstr = MRestClient.Post(task.Url, "", JsonConvert.SerializeObject(args), $"Bearer {_token}");
+                            //Console.ForegroundColor = ConsoleColor.Red;
+                            logger.Info($"任务执行结果：＝＝＝＝＝＝＝{resultstr}");
+
+                        });
                     }
                 }
 
@@ -124,7 +127,7 @@ namespace MF.Job.JobItems
 
             public string QueryItem { get; set; }
 
-            public System.DateTime StartTime { get; set; }
+            public System.DateTime? StartTime { get; set; }
 
             public System.DateTime? EndTime { get; set; }
 

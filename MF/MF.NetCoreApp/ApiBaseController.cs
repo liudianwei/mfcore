@@ -3,6 +3,7 @@
 using MF.FluentValidation;
 using MF.Rest;
 using MF.Utils;
+using MF.Utils.Excel;
 using MF.Utils.Json;
 
 using Microsoft.AspNetCore.Authorization;
@@ -459,6 +460,59 @@ namespace MF.NetCoreApp
         }
 
         /// <summary>
+        /// 设备点检 导出
+        /// </summary>
+        /// <param name="fileds"></param>
+        /// <param name="resp"></param>
+        /// <param name="outpath"></param>
+        /// <param name="rowstart"></param>
+        /// <param name="imgs"></param>
+        /// <param name="ExportRecord"></param>
+        /// <param name="sheetname"></param>
+        /// <returns></returns>
+        [NonAction]
+        public async Task<IActionResult> ExportExcel(string checkMonth, PubResponse resp, string outpath, int rowstart = 0, string sheetname = "sheet")
+        {
+            IWorkbook workbook;
+            ResultQueryListData list = ((ResultQueryListData)resp.Data);
+            if (list == null || list.ResultItem == null || list.ResultItem.Count == 0)
+            {
+                throw new Exception("没有记录，不能导出");
+            }
+            workbook = NpoiUtil.ExportToExcel(checkMonth, list, rowstart, sheetname);
+
+            if (false == Directory.Exists(outpath))
+            {
+                Directory.CreateDirectory(outpath);
+            }
+            var OutFullPath = $"{outpath}{Guid.NewGuid()}.xlsx";
+            using (var fs = System.IO.File.OpenWrite(OutFullPath))
+            {
+                workbook.Write(fs);//流会自动关闭
+            }
+
+            MemoryStream memoryStream = new MemoryStream();
+            using (var stream = new FileStream(OutFullPath, FileMode.Open))
+            {
+                await stream.CopyToAsync(memoryStream);
+            }
+            _ = memoryStream.Seek(0, SeekOrigin.Begin);
+
+            // 文件名必须编码，否则会有特殊字符(如中文)无法在此下载。
+            var fileName = DateTime.Now.ToString("yyyyMdHms");
+            string encodeFilename = HttpUtility.UrlEncode($"{fileName}.xlsx", Encoding.GetEncoding("UTF-8"));
+            Response.Headers.Add("Content-Disposition", $"attachment; filename={encodeFilename}");
+            // 完成后删除文件
+            Response.OnCompleted(() =>
+            {
+                return Task.Run(() =>
+                {
+                    System.IO.File.Delete(OutFullPath);
+                });
+            });
+            return GetOctetStream(memoryStream);
+        }
+        /// <summary>
         /// 创建下载任务
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -480,7 +534,7 @@ namespace MF.NetCoreApp
                     FileSize = "-1",
                     Progress = "100",
                     QueryItem = JsonConvert.SerializeObject(cmd),
-                    StartTime = DateTime.Now,
+                    //StartTime = DateTime.Now,
                     Duration = "-1",
                     DownloadPath = "",
                     Status = "0",

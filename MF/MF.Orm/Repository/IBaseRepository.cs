@@ -211,6 +211,14 @@ namespace MF.Orm.Repository
         /// <returns>true 成功，false 失败</returns>
         bool Update(List<T> entity);
 
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="entity">实体对象</param>
+        /// <param name="where">where条件</param>
+        /// <returns>true 成功，false 失败</returns>
+        /// <returns></returns>
+        //bool Update(Expression<Func<T, bool>> updateColumns, Expression<Func<T, bool>> where);
         #endregion 更新
 
         #region 事务

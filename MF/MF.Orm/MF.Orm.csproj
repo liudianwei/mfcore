@@ -2,25 +2,24 @@
 
   <PropertyGroup>
 	  <TargetFramework>net5</TargetFramework>
-	  <Version>1.0.8-rc5.1</Version>
+	  <Version>1.0.8-rc5.2</Version>
 	  <Description>
-		  SqlSugarCore 5.1.1
+		  SqlSugarCore 5.1.2.3
 	  </Description>
 	  <PackageReleaseNotes>
-		  升级netcore5.0.5.4
 		  新增功能－批量插入BulkCopy、批量更新BulkUpdate（SqlSever、MySql、PgSql、Oracle、Sqlite 全支持）
 		  修复 PostgreSQL数据库初始化数据库失败问题
 		  修复 删除操作没有更新时间和用户信息;升级netcore5.0.5.9---2022/3/15
 		  修复 List批量更新,移除IsEnableUpdateVersionValidation(sqlserver会有问题);升级SqlSugarCore5.0.6.4
 		  升级SqlSugarCore 5.0.7.9 内部升级了mysql驱动(修复漏洞)
-		  升级SqlSugarCore 5.1.1---2022/8/4
+		  升级SqlSugarCore 5.1.2.3 ---2022/8/23
 	  </PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
-    <PackageReference Include="SqlSugarCore" Version="5.1.1" />
+    <PackageReference Include="SqlSugarCore" Version="5.1.2.3" />
   </ItemGroup>
 
   <ItemGroup>

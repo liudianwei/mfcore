@@ -113,7 +113,7 @@ namespace ApiJob
                 }
                 else
                 {
-                    logger.Error(result);
+                    logger.Error(result+$"=====>Api执行接口:{uri}/{resource}");
                 }
 
                 await Task.Delay(500);

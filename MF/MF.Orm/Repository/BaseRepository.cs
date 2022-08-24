@@ -449,6 +449,17 @@ namespace MF.Orm.Repository
             return db.Updateable(entitys).ExecuteCommand() > 0;
         }
 
+
+
+        //public bool Update(Expression<Func<T, bool>> updateColumns, Expression<Func<T, bool>> where)
+        //{
+        //    return db.Updateable<T>()
+        //     .IsEnableUpdateVersionValidation()
+        //     .SetColumns(it => it.InnerVersion == it.InnerVersion + 1)
+        //     .SetColumns(updateColumns)
+        //     .Where(where).ExecuteCommand() > 0;
+        //}
+
         #endregion 更新
 
         #region 事务
@@ -867,7 +878,6 @@ namespace MF.Orm.Repository
                 }
             }
         }
-
         #endregion 其它
     }
 }

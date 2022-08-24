@@ -4,7 +4,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-
+using Newtonsoft.Json;
 using NPOI.HPSF;
 using NPOI.HSSF.UserModel;
 using NPOI.HSSF.Util;
@@ -690,6 +690,261 @@ namespace MF.Utils.Excel
                 }
                 AutoSizeColumns(sheet, startRow);
             }
+            return workbook;
+        }
+        /// <summary>
+        /// 设备点检
+        /// </summary>
+        /// <param name="checkMonth"></param>
+        /// <param name="list"></param>
+        /// <param name="startRow"></param>
+        /// <param name="_sheetname"></param>
+        /// <param name="sn"></param>
+        /// <param name="version"></param>
+        /// <param name="ignoreExport"></param>
+        /// <returns></returns>
+        public static IWorkbook ExportToExcel(string checkMonth, ResultQueryListData list, int startRow, string _sheetname = "sheet", bool sn = true, ExcelVersion version = ExcelVersion.V2007, string[] ignoreExport = null)
+        {
+            var arr = checkMonth.Split("-");
+            int days = DateTime.DaysInMonth(Convert.ToInt32(arr[0]), Convert.ToInt32(arr[1]));//总共多少天
+            IWorkbook workbook = new XSSFWorkbook();
+            if (list.ResultItem.Count <= 0)
+            {
+                workbook.CreateSheet("sheet");
+                return workbook;
+            }
+            List<ShiftInfoClass> sc = list.ShiftInfo;
+            List<ResultItemListClass> ri = list.ResultItem;
+            List<ResultUserClass> ru = list.ResultUser;
+            int count = ri.Count;
+            int countLen = sc.Count > 0 ? 3 + sc.Count * days : 3 + days;//获取列数
+            var sheetname = _sheetname + "1";
+            ISheet sheet = workbook.CreateSheet(sheetname);
+
+            #region 单元格样式
+            //标题样式
+            XSSFFont ffont = (XSSFFont)workbook.CreateFont();
+            ffont.Color = HSSFColor.Black.Index;
+            ffont.IsBold = true;
+            ICellStyle style = workbook.CreateCellStyle();
+            style.FillForegroundColor = HSSFColor.Grey25Percent.Index;
+            style.GetFont(workbook).Color = HSSFColor.Black.Index;
+            style.GetFont(workbook).IsBold = true;
+            style.SetFont(ffont);
+            style.FillPattern = FillPattern.SolidForeground;
+            style.BorderBottom = BorderStyle.Thin;//下边框为细线边框
+            style.BorderLeft = BorderStyle.Thin;//左边框
+            style.BorderRight = BorderStyle.Thin;//上边框
+            style.BorderTop = BorderStyle.Thin;//右边框
+            style.VerticalAlignment = VerticalAlignment.Center;
+            style.Alignment = HorizontalAlignment.Center;
+
+            //点检项目 单元格样式
+            XSSFFont ffontU = (XSSFFont)workbook.CreateFont();
+            ffontU.FontName = "宋体";
+            ICellStyle cellStyleU = workbook.CreateCellStyle();
+            cellStyleU.GetFont(workbook).Color = HSSFColor.Black.Index;
+            cellStyleU.GetFont(workbook).IsBold = true;
+            cellStyleU.SetFont(ffont);
+            cellStyleU.BorderBottom = BorderStyle.Thin;//下边框为细线边框
+            cellStyleU.BorderLeft = BorderStyle.Thin;//左边框
+            cellStyleU.BorderRight = BorderStyle.Thin;//上边框
+            cellStyleU.BorderTop = BorderStyle.Thin;//右边框
+            cellStyleU.VerticalAlignment = VerticalAlignment.Center;
+
+            //判定标准 单元格样式
+            XSSFFont ffontU1 = (XSSFFont)workbook.CreateFont();
+            ffontU1.FontName = "宋体";
+            ICellStyle cellStyleU1 = workbook.CreateCellStyle();
+            cellStyleU1.GetFont(workbook).Color = HSSFColor.Black.Index;
+            cellStyleU1.GetFont(workbook).IsBold = true;
+            cellStyleU1.SetFont(ffont);
+            cellStyleU1.BorderBottom = BorderStyle.Thin;//下边框为细线边框
+            cellStyleU1.BorderLeft = BorderStyle.Thin;//左边框
+            cellStyleU1.BorderRight = BorderStyle.Thin;//上边框
+            cellStyleU1.BorderTop = BorderStyle.Thin;//右边框
+            cellStyleU1.VerticalAlignment = VerticalAlignment.Center;
+            cellStyleU1.Alignment = HorizontalAlignment.Center;
+            #endregion
+
+
+            #region 标题配置
+            List<string> str1 = new List<string>();
+            List<string> str2 = new List<string>();
+            List<string> str3 = new List<string>();
+            str1.Add("序号"); str1.Add("点检项目"); str1.Add("判定标准");
+            str2.Add(""); str2.Add(""); str2.Add("");
+            str3.Add(""); str3.Add(""); str3.Add("");
+            for (int i = 1; i <= days; i++)
+            {
+                if (sc.Count > 0)
+                {
+                    for (int j = 0; j < sc.Count; j++)
+                    {
+                        str1.Add("点检日期" + checkMonth);
+                        str2.Add(i.ToString());
+                        str3.Add(sc[j].ShiftName);
+                    }
+                }
+                else
+                {
+                    str1.Add("点检日期" + checkMonth);
+                    str2.Add(i.ToString());
+
+                }
+            }
+
+            IRow row = sheet.CreateRow(0);//第一行
+            row.Height = 30 * 20;
+            for (int i = 0; i < str1.Count; i++)
+            {
+                var cell = row.CreateCell(i);
+                cell.SetCellValue(str1[i]);
+                cell.CellStyle = style;
+            }
+
+            IRow row1 = sheet.CreateRow(1);//第二行
+            row1.Height = 30 * 20;
+            for (int i = 0; i < str2.Count; i++)
+            {
+                var cell = row1.CreateCell(i);
+                if (i == 0)
+                {
+                    cell.Sheet.SetColumnWidth(0, 4 * 256);//每单元格默认0.95cm
+                }
+                cell.SetCellValue(str2[i]);
+                cell.CellStyle = style;
+            }
+            if (sc.Count > 0)
+            {
+                IRow row2 = sheet.CreateRow(2);//第三行
+                row2.Height = 30 * 20;
+                for (int i = 0; i < str3.Count; i++)
+                {
+                    var cell = row2.CreateCell(i);
+                    cell.SetCellValue(str3[i]);
+                    cell.CellStyle = style;
+                }
+                sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(0, 0, 3, days * sc.Count + 2));
+                sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(0, 2, 0, 0));
+                sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(0, 2, 1, 1));
+                sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(0, 2, 2, 2));
+                for (int i = 0; i < days; i++)
+                {
+                    sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(1, 1, 3 + i * sc.Count, 2 + (i + 1) * sc.Count));
+                }
+            }
+            else
+            {
+                sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(0, 0, 3, days + 2));
+                sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(0, 1, 0, 0));
+                sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(0, 1, 1, 1));
+                sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(0, 1, 2, 2));
+            }
+            #endregion
+
+            #region 赋值点检项
+
+            List<string> user = new List<string>();
+            startRow = sc.Count > 0 ? 2 : 1;
+            for (int k = 0; k < ri.Count; k++)
+            {
+                var rowValue = ri[k];
+                var daValue = rowValue.DateList;
+                IRow rowI = sheet.CreateRow(k + 1 + startRow);
+                rowI.Height = 30 * 20;
+                //序号赋值
+                ICell cell1 = rowI.CreateCell(0);
+                cell1.CellStyle = cellStyleU1;
+                cell1.SetCellValue(k + 1);
+
+                //点检项赋值
+                ICell cell2 = rowI.CreateCell(1);
+                cell2.CellStyle = cellStyleU1;
+                cell2.SetCellValue(rowValue.CheckItem);
+
+                //点检标准赋值
+                ICell cell3 = rowI.CreateCell(2);
+                cell3.CellStyle = cellStyleU;
+                cell3.SetCellValue(rowValue.JudgeStandard);
+
+                for (int i = 1; i <= days; i++)
+                {
+                    string dstr = i < 10 ? "0" + i.ToString() + "" : i.ToString();
+                    var obj = daValue.Find(x => x.CheckDate == dstr);
+                    List<CheckValueClass> vc = obj != null ? JsonConvert.DeserializeObject<List<CheckValueClass>>(obj.CheckValue) : new List<CheckValueClass>();
+                    if (sc.Count > 0)//存在班次
+                    {
+                        for (int y = 0; y < sc.Count; y++)
+                        {
+                            int ceN = (i - 1) * sc.Count + y + 3;
+                            ICell cell = rowI.CreateCell(ceN);
+                            var sj = vc.Find(x => x.ShiftCode == sc[y].ShiftCode);
+                            cell.CellStyle = cellStyleU1;
+                            cell.Sheet.SetColumnWidth(ceN, 5 * 256);//每单元格默认0.95cm
+                            cell.SetCellValue(sj != null ? sj.Value : "");
+                            string userName = sj != null ? sj.User : "";
+                            if (user.Count > ceN - 3)
+                            {
+                                userName = !string.IsNullOrWhiteSpace(userName) ? userName : user[ceN - 3];
+                                if (user[ceN - 3] == "")
+                                {
+                                    user[ceN - 3] = userName;
+                                }
+                            }
+                            else
+                            {
+                                user.Add(userName);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ICell cell = rowI.CreateCell(i + 2);
+                        cell.CellStyle = cellStyleU1;
+                        cell.Sheet.SetColumnWidth(i + 2, 4 * 256);//每单元格默认0.95cm
+                        cell.SetCellValue(vc.Count > 0 ? vc[0].Value : "");
+                        string userName = vc.Count > 0 ? vc[0].User : "";
+                        if (user.Count > i - 1)
+                        {
+                            userName = !string.IsNullOrWhiteSpace(userName) ? userName : user[i - 1];
+                            if (user[i - 1] == "")
+                            {
+                                user[i - 1] = userName;
+                            }
+                        }
+                        else
+                        {
+                            user.Add(userName);
+                        }
+
+                    }
+
+                }
+            }
+            #endregion
+
+            #region 用户赋值
+            IRow rowL = sheet.CreateRow(startRow + ri.Count + 1);
+            rowL.Height = 30 * 20;
+            user.Insert(0, ""); user.Insert(0, ""); user.Insert(0, "");
+            for (int i = 0; i < user.Count; i++)
+            {
+                ICell cell = rowL.CreateCell(i);
+                cell.CellStyle = cellStyleU1;//i > 2 ? cellStyleU : style;
+                //cellStyleU1.Rotation= (short)-90;//-90~90
+                cell.SetCellValue(i > 2 ? user[i] : "点检人");
+                if (user[i] != "")
+                {
+                    sheet.AutoSizeColumn(i);//有值的需要自适应，没值的默认
+                }
+
+            }
+            sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(startRow + ri.Count + 1, startRow + ri.Count + 1, 0, 2));
+            #endregion
+            //AutoSizeColumns(sheet, startRow);
+            sheet.AutoSizeColumn(1);//点检项自适应宽度
+            sheet.AutoSizeColumn(2);//点检标准自适应宽度
             return workbook;
         }
         /// <summary>
