@@ -21,9 +21,9 @@ namespace ApiJob
         {
             Version Ver = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute begin Ver." + Ver.ToString());
-            logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute begin Ver." + Ver.ToString());
+            //logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute begin Ver." + Ver.ToString());
             Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Executing ...");
-            logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Executing ...");
+            //logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Executing ...");
 
             var uri = context.JobDetail.JobDataMap.Get("Target").ToString();
             var resource = context.JobDetail.JobDataMap.Get("TargetDetail").ToString();
@@ -113,19 +113,19 @@ namespace ApiJob
                 }
                 else
                 {
-                    logger.Error(result+$"=====>Api执行接口:{uri}/{resource}");
+                    logger.Error(result+$"### Api执行接口:{uri}/{resource}### ");
                 }
 
                 await Task.Delay(500);
             }
             catch (Exception e)
             {
-                logger.Error(head + e.Message);
+                logger.Error(e.Message);
             }
             finally
             {
                 Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute end ");
-                logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute end ");
+                //logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute end ");
             }
         }
         public class HttpResults

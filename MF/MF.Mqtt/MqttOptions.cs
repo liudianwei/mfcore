@@ -1,8 +1,9 @@
 ﻿namespace MF.MQTT
 {
     public class MqttOptions
-    { 
+    {
         public string HostIp { get; set; }
+        public bool Enabled { get; set; } = true;
 
         public int HostPort { get; set; }
 

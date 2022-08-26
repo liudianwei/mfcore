@@ -21,9 +21,9 @@ namespace MF.Job.JobItems
         {
             Version Ver = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute begin Ver." + Ver.ToString());
-            logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute begin Ver." + Ver.ToString());
+            //logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute begin Ver." + Ver.ToString());
             Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Executing ...");
-            logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Executing ...");
+            //logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Executing ...");
 
             var uri = context.JobDetail.JobDataMap.Get("Target").ToString();
             var resource = context.JobDetail.JobDataMap.Get("TargetDetail").ToString();
@@ -46,23 +46,23 @@ namespace MF.Job.JobItems
 
                 if (result.Status.ToLower().Equals("success"))
                 {
-                    logger.Info(head + result);
+                    //logger.Info(head + result);
                 }
                 else
                 {
-                    logger.Error(head + result);
+                    logger.Error(result);
                 }
 
                 await Task.Delay(500);
             }
             catch (Exception e)
             {
-                logger.Trace(head + e.StackTrace);
+                logger.Error(e.StackTrace);
             }
             finally
             {
                 Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute end ");
-                logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute end ");
+                //logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute end ");
             }
         }
 

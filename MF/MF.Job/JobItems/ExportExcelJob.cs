@@ -24,9 +24,9 @@ namespace MF.Job.JobItems
         {
             Version Ver = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute begin Ver." + Ver.ToString());
-            logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute begin Ver." + Ver.ToString());
+            //logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute begin Ver." + Ver.ToString());
             Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Executing ...");
-            logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Executing ...");
+            //logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Executing ...");
 
             var uri = context.JobDetail.JobDataMap.Get("Target").ToString();
             var resource = context.JobDetail.JobDataMap.Get("TargetDetail").ToString();
@@ -68,14 +68,16 @@ namespace MF.Job.JobItems
                                 _token = results.Data.Token;
                             }
                         }
-                        logger.Info($"本次执行一共检测到 {list.Count}条 待执行任务");
+                        Console.WriteLine($"本次执行一共检测到 {list.Count}条 待执行任务");
+                        //logger.Info($"本次执行一共检测到 {list.Count}条 待执行任务");
                         list.ForEach(task => {
                             var obj = JsonConvert.DeserializeObject<RestQuery>(task.QueryItem);
                             var args = new { moduleName = task.ModuleName, taskId = task.Id, Condition = obj.Condition, Condition2 = obj.Condition2 };
                             //执行任务
                             resultstr = MRestClient.Post(task.Url, "", JsonConvert.SerializeObject(args), $"Bearer {_token}");
                             //Console.ForegroundColor = ConsoleColor.Red;
-                            logger.Info($"任务执行结果：＝＝＝＝＝＝＝{resultstr}");
+                            Console.WriteLine($"### 任务执行结果:{resultstr}### ");
+                            //logger.Info($"任务执行结果：＝＝＝＝＝＝＝{resultstr}");
 
                         });
                     }
@@ -83,18 +85,14 @@ namespace MF.Job.JobItems
 
                 try
                 {
-                    if (result != null && result.Status.ToLower().Equals("success"))
+                    if (result?.Code != "200")
                     {
-                        
-                    }
-                    else
-                    {
-                        logger.Error($"未完成的导出任务，返回失败Code:{result?.Code},Message:{result?.Message}");
+                        logger.Error($"### 查询未完成的导出任务失败 Message:{result?.Message} ### ");
                     }
                 }
                 catch (Exception ex)
                 {
-                    logger.Error($"异常：＝＝＝{ex.Message}");
+                    logger.Error($"### 异常：{ex.Message} ### ");
                     Console.WriteLine(ex.StackTrace);
                 }
 
@@ -103,13 +101,13 @@ namespace MF.Job.JobItems
             }
             catch (Exception e)
             {
-                logger.Error($"异常：＝＝＝{e.Message}");
+                logger.Error($"### 异常：{e.Message} ### ");
                 Console.WriteLine(e.Message);
             }
             finally
             {
                 Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute end ");
-                logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute end ");
+                //logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute end ");
             }
         }
 
