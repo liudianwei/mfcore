@@ -13,5 +13,14 @@ namespace MDCenter.Commands.WorkstaionBtfunction
         }
         public string BtfunctionCode { get; set; }
         public string OpName { get; set; }
+        public string LineCode { get; set; }
+    }
+    public class VerifyCommand : IRequest<PubResponse>
+    {
+        public VerifyCommand()
+        {
+        }
+        public string LineCode { get; set; }
+        public string OpName { get; set; }
     }
 }

@@ -407,7 +407,8 @@ namespace UserCenter.Controllers.v1
                 response = await _bus.SendAsync(new MDCenter.Commands.WorkstaionBtfunction.CheckWorkstaionBtfunctionCommand()
                 {
                     BtfunctionCode = cmd.BtfunctionCode,
-                    OpName = cmd.OpName
+                    OpName = cmd.OpName,
+                    LineCode=cmd.LineCode
                 }
              );
             } 
