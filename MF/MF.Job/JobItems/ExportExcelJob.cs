@@ -17,7 +17,8 @@ namespace MF.Job.JobItems
     public sealed class ExportExcelJob : IJob
     {
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
-        private static DateTime _expireTime = DateTime.Now.AddSeconds(-10);
+        private static DateTime _dtNow = DateTime.Now;
+        private static DateTime _expireTime = _dtNow.AddSeconds(-10);
         private static string _token = "";
 
         public async Task Execute(IJobExecutionContext context)
@@ -34,12 +35,12 @@ namespace MF.Job.JobItems
             //var method = context.JobDetail.JobDataMap.Get("Method").ToString();
             //var jobargs = context.JobDetail.JobDataMap.Get("JobArgs").ToString();
             var name = context.JobDetail.JobDataMap.Get("JobName").ToString();
-            string head = $"JobId: {context.JobDetail.Key.Name}" + Environment.NewLine
-                + $"JobName: {name}" + Environment.NewLine
-                + $"TotalSeconds: {context.JobRunTime.TotalSeconds}(s)" + Environment.NewLine
-                + $"FireTime: {TimeZoneInfo.ConvertTimeFromUtc(context.FireTimeUtc.DateTime, TimeZoneInfo.Local)}" + Environment.NewLine
-                + $"NextFireTime: {TimeZoneInfo.ConvertTimeFromUtc(context.NextFireTimeUtc.Value.DateTime, TimeZoneInfo.Local)}" + Environment.NewLine
-                + $"Message: " + Environment.NewLine;
+            //string head = $"JobId: {context.JobDetail.Key.Name}" + Environment.NewLine
+            //    + $"JobName: {name}" + Environment.NewLine
+            //    + $"TotalSeconds: {context.JobRunTime.TotalSeconds}(s)" + Environment.NewLine
+            //    + $"FireTime: {TimeZoneInfo.ConvertTimeFromUtc(context.FireTimeUtc.DateTime, TimeZoneInfo.Local)}" + Environment.NewLine
+            //    + $"NextFireTime: {TimeZoneInfo.ConvertTimeFromUtc(context.NextFireTimeUtc.Value.DateTime, TimeZoneInfo.Local)}" + Environment.NewLine
+            //    + $"Message: " + Environment.NewLine;
 
             try
             {
@@ -57,14 +58,14 @@ namespace MF.Job.JobItems
                     if (status1list.Count == 0)
                     {
                         var list = result.Data;
-                        if (DateTime.Now >= _expireTime)
+                        if (_dtNow >= _expireTime)
                         {
                             //获取token
                             string resultToken = MRestClient.Get(uri, "rest/usercenter/v1/user/getToken");
                             var results = JsonConvert.DeserializeObject<HttpResults>(resultToken);
                             if (results != null && results.Code == 200 && results.Data != null)
                             {
-                                _expireTime = results.Data.ExpireTime;
+                                _expireTime = results.Data.ExpireTime.ToLocalTime();
                                 _token = results.Data.Token;
                             }
                         }
@@ -75,10 +76,10 @@ namespace MF.Job.JobItems
                             var args = new { moduleName = task.ModuleName, taskId = task.Id, Condition = obj.Condition, Condition2 = obj.Condition2 };
                             //执行任务
                             resultstr = MRestClient.Post(task.Url, "", JsonConvert.SerializeObject(args), $"Bearer {_token}");
-                            //Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"### 任务执行结果:{resultstr}### ");
-                            //logger.Info($"任务执行结果：＝＝＝＝＝＝＝{resultstr}");
 
+                            if (!resultstr.Contains("\"status\":\"success\"")){
+                                logger.Error($"### 任务执行结果:{resultstr}### ");
+                            }
                         });
                     }
                 }
@@ -87,13 +88,12 @@ namespace MF.Job.JobItems
                 {
                     if (result?.Code != "200")
                     {
-                        logger.Error($"### 查询未完成的导出任务失败 Message:{result?.Message} ### ");
+                        logger.Error($"### 导出任务查询失败 {uri}/{resource} === {result} ###");
                     }
                 }
                 catch (Exception ex)
                 {
-                    logger.Error($"### 异常：{ex.Message} ### ");
-                    Console.WriteLine(ex.StackTrace);
+                    logger.Error($"### 异常 {ex.Source} === {ex.Message} ###");
                 }
 
 
@@ -101,8 +101,7 @@ namespace MF.Job.JobItems
             }
             catch (Exception e)
             {
-                logger.Error($"### 异常：{e.Message} ### ");
-                Console.WriteLine(e.Message);
+                logger.Error($"### 异常 {e.Source} === {e.Message} ###");
             }
             finally
             {

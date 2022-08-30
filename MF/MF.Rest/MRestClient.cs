@@ -25,10 +25,10 @@ namespace MF.Rest
             {
                 client.AddDefaultHeader(tokenkey, token);
             }
-            data = data.ToString() == "" ? "{}" : data;
             var request = new RestRequest(resource, Method.POST);
             if (data != null)
             {
+                data = data.ToString() == "" ? "{}" : data;
                 request.AddParameter(contenttype, data, ParameterType.RequestBody);
             }
             IRestResponse response = client.Execute(request);
@@ -52,9 +52,9 @@ namespace MF.Rest
                 client.AddDefaultHeader(tokenkey, token);
             }
             var request = new RestRequest(resource, Method.POST);
-            data = data.ToString() == "" ? "{}" : data;
             if (data != null)
             {
+                data = data.ToString() == "" ? "{}" : data;
                 request.AddParameter(contenttype, data, ParameterType.RequestBody);
             }
             IRestResponse response = await client.ExecuteAsync(request);
@@ -78,9 +78,9 @@ namespace MF.Rest
                 client.AddDefaultHeader(tokenkey, token);
             }
             var request = new RestRequest(resource, Method.DELETE);
-            data = data.ToString() == "" ? "{}" : data;
             if (data != null)
             {
+                data = data.ToString() == "" ? "{}" : data;
                 request.AddParameter(contenttype, data, ParameterType.RequestBody);
             }
             IRestResponse response = client.Execute(request);
