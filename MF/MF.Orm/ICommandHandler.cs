@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-using MF.Core.Extensions;
+﻿using MF.Core.Extensions;
 using MF.FluentValidation;
 using MF.Orm.Repository;
 using MF.Utils;
-
-using SqlSugar;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MF.Orm
 {

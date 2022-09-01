@@ -46,7 +46,7 @@ namespace MF.Job.JobItems
 
                 if (!result.Status.ToLower().Equals("success"))
                 {
-                    logger.Error($"### JobName:{name} {uri}/{resource} === {result} ###");
+                    logger.Error($"### JobName:{name} {uri}{resource} === {result} ###");
                 }
                 await Task.Delay(500);
             }

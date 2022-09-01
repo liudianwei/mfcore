@@ -58,14 +58,14 @@ namespace MF.Job.JobItems
                     if (status1list.Count == 0)
                     {
                         var list = result.Data;
-                        if (_dtNow >= _expireTime)
+                        if (DateTime.Now >= _expireTime)
                         {
                             //获取token
                             string resultToken = MRestClient.Get(uri, "rest/usercenter/v1/user/getToken");
                             var results = JsonConvert.DeserializeObject<HttpResults>(resultToken);
                             if (results != null && results.Code == 200 && results.Data != null)
                             {
-                                _expireTime = results.Data.ExpireTime.ToLocalTime();
+                                _expireTime = results.Data.ExpireTime.ToLocalTime().AddSeconds(-10);
                                 _token = results.Data.Token;
                             }
                         }
@@ -88,7 +88,7 @@ namespace MF.Job.JobItems
                 {
                     if (result?.Code != "200")
                     {
-                        logger.Error($"### 导出任务查询失败 {uri}/{resource} === {result} ###");
+                        logger.Error($"### 导出任务查询失败 {uri}{resource} === {result} ###");
                     }
                 }
                 catch (Exception ex)

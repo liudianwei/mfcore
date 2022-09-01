@@ -1,18 +1,12 @@
 ﻿using FluentValidation;
-
+using Folke.Localization.Json;
 using MediatR;
-
+using MF.FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Localization;
-
 using System;
 using System.Linq;
 using System.Reflection;
-
-using MF.FluentValidation;
-using MF.Utils;
-using Folke.Localization.Json;
 
 namespace MF.Extensions.DependencyInjection
 {

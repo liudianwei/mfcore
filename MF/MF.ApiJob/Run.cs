@@ -75,14 +75,15 @@ namespace ApiJob
                 {
                     _token = _tokenT;
                 }
-                if (_dtNow >= _expireTime)
+                if (DateTime.Now >= _expireTime)
                 {
                     //获取token
                     string resultToken = MRestClient.Get(uri, "rest/usercenter/v1/user/getToken");
                     var results = JsonConvert.DeserializeObject<HttpResults>(resultToken);
                     if (results != null && results.Code == 200 && results.Data != null)
                     {
-                        _expireTime = results.Data.ExpireTime.ToLocalTime();
+                        _expireTime = results.Data.ExpireTime.ToLocalTime().AddSeconds(-10);
+                        //Console.WriteLine($"过期时间{_expireTime}");
                         _token=_tokenT = $"Bearer {results.Data.Token}";
                     }
                 }
@@ -110,7 +111,7 @@ namespace ApiJob
 
                 if (!result.Contains("\"status\":\"success\""))
                 {
-                    logger.Error($"### JobName:{name} {uri}/{resource} === {result} ###");
+                    logger.Error($"### JobName:{name} {uri}{resource} === {result} ###");
                 }
                 await Task.Delay(500);
             }
