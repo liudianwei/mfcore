@@ -17,16 +17,17 @@ namespace MF.Job.JobItems
     public sealed class ExportExcelJob : IJob
     {
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
-        private static DateTime _expireTime = DateTime.Now.AddSeconds(-10);
+        private static DateTime _dtNow = DateTime.Now;
+        private static DateTime _expireTime = _dtNow.AddSeconds(-10);
         private static string _token = "";
 
         public async Task Execute(IJobExecutionContext context)
         {
             Version Ver = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute begin Ver." + Ver.ToString());
-            logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute begin Ver." + Ver.ToString());
+            //logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute begin Ver." + Ver.ToString());
             Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Executing ...");
-            logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Executing ...");
+            //logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Executing ...");
 
             var uri = context.JobDetail.JobDataMap.Get("Target").ToString();
             var resource = context.JobDetail.JobDataMap.Get("TargetDetail").ToString();
@@ -34,12 +35,12 @@ namespace MF.Job.JobItems
             //var method = context.JobDetail.JobDataMap.Get("Method").ToString();
             //var jobargs = context.JobDetail.JobDataMap.Get("JobArgs").ToString();
             var name = context.JobDetail.JobDataMap.Get("JobName").ToString();
-            string head = $"JobId: {context.JobDetail.Key.Name}" + Environment.NewLine
-                + $"JobName: {name}" + Environment.NewLine
-                + $"TotalSeconds: {context.JobRunTime.TotalSeconds}(s)" + Environment.NewLine
-                + $"FireTime: {TimeZoneInfo.ConvertTimeFromUtc(context.FireTimeUtc.DateTime, TimeZoneInfo.Local)}" + Environment.NewLine
-                + $"NextFireTime: {TimeZoneInfo.ConvertTimeFromUtc(context.NextFireTimeUtc.Value.DateTime, TimeZoneInfo.Local)}" + Environment.NewLine
-                + $"Message: " + Environment.NewLine;
+            //string head = $"JobId: {context.JobDetail.Key.Name}" + Environment.NewLine
+            //    + $"JobName: {name}" + Environment.NewLine
+            //    + $"TotalSeconds: {context.JobRunTime.TotalSeconds}(s)" + Environment.NewLine
+            //    + $"FireTime: {TimeZoneInfo.ConvertTimeFromUtc(context.FireTimeUtc.DateTime, TimeZoneInfo.Local)}" + Environment.NewLine
+            //    + $"NextFireTime: {TimeZoneInfo.ConvertTimeFromUtc(context.NextFireTimeUtc.Value.DateTime, TimeZoneInfo.Local)}" + Environment.NewLine
+            //    + $"Message: " + Environment.NewLine;
 
             try
             {
@@ -64,38 +65,35 @@ namespace MF.Job.JobItems
                             var results = JsonConvert.DeserializeObject<HttpResults>(resultToken);
                             if (results != null && results.Code == 200 && results.Data != null)
                             {
-                                _expireTime = results.Data.ExpireTime;
+                                _expireTime = results.Data.ExpireTime.ToLocalTime().AddSeconds(-10);
                                 _token = results.Data.Token;
                             }
                         }
-                        logger.Info($"本次执行一共检测到 {list.Count}条 待执行任务");
+                        Console.WriteLine($"本次执行一共检测到 {list.Count}条 待执行任务");
+                        //logger.Info($"本次执行一共检测到 {list.Count}条 待执行任务");
                         list.ForEach(task => {
                             var obj = JsonConvert.DeserializeObject<RestQuery>(task.QueryItem);
                             var args = new { moduleName = task.ModuleName, taskId = task.Id, Condition = obj.Condition, Condition2 = obj.Condition2 };
                             //执行任务
                             resultstr = MRestClient.Post(task.Url, "", JsonConvert.SerializeObject(args), $"Bearer {_token}");
-                            //Console.ForegroundColor = ConsoleColor.Red;
-                            logger.Info($"任务执行结果：＝＝＝＝＝＝＝{resultstr}");
 
+                            if (!resultstr.Contains("\"status\":\"success\"")){
+                                logger.Error($"### 任务执行结果:{resultstr}### ");
+                            }
                         });
                     }
                 }
 
                 try
                 {
-                    if (result != null && result.Status.ToLower().Equals("success"))
+                    if (result?.Code != "200")
                     {
-                        
-                    }
-                    else
-                    {
-                        logger.Error($"未完成的导出任务，返回失败Code:{result?.Code},Message:{result?.Message}");
+                        logger.Error($"### 导出任务查询失败 {uri}{resource} === {result} ###");
                     }
                 }
                 catch (Exception ex)
                 {
-                    logger.Error($"异常：＝＝＝{ex.Message}");
-                    Console.WriteLine(ex.StackTrace);
+                    logger.Error($"### 异常 {ex.Source} === {ex.Message} ###");
                 }
 
 
@@ -103,13 +101,12 @@ namespace MF.Job.JobItems
             }
             catch (Exception e)
             {
-                logger.Error($"异常：＝＝＝{e.Message}");
-                Console.WriteLine(e.Message);
+                logger.Error($"### 异常 {e.Source} === {e.Message} ###");
             }
             finally
             {
                 Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute end ");
-                logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute end ");
+                //logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute end ");
             }
         }
 

@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFramework>net5</TargetFramework>
-		<Version>1.0.8-rc8.9</Version>
+		<Version>1.0.8-rc9.2</Version>
 		<Description>
 			工具类
 		</Description>
@@ -26,7 +26,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\MF.Core\MF.Core.csproj" />
       <ProjectReference Include="..\MF.Localization.Json\MF.Localization.Json.csproj" />
+      <ProjectReference Include="..\MF.Rest\MF.Rest.csproj" />
     </ItemGroup>
 </Project>

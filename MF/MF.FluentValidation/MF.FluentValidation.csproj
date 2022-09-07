@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 	  <TargetFramework>net5</TargetFramework>
-	  <Version>1.0.1-rc8.0</Version>
+	  <Version>1.0.1-rc8.3</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MF.Localization.Json\MF.Localization.Json.csproj" />
     <ProjectReference Include="..\MF.MediatR\MF.MediatR.csproj" />
-    <ProjectReference Include="..\MF.Utils\MF.Utils.csproj" />
   </ItemGroup>
 </Project>

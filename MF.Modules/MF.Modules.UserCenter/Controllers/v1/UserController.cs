@@ -68,28 +68,8 @@ namespace UserCenter.Controllers.v1
         [AllowAnonymous]
         public async Task<IActionResult> TestToken()
         {
-            var ex = DateTime.Now.AddDays(1);
-            var token = getToken(ex);
-            UserLoginResp data = new UserLoginResp();
-            data.Token = token;
-            data.ExpireTime = ex;
-            return Result(PubResponse.Succeed(data));
-        }
-        private string getToken(DateTime exTime)
-        {
-            // 生成jwt
-            JwtConfig jwt = _configuration?.GetSection("Jwt")?.Get<JwtConfig>();
-            var claims = new List<Claim>()
-                        {
-                           new Claim("loginType","WEB"),
-                           new Claim("userFullName","system"),
-                           new Claim("userName","sysytem"),
-                           new Claim("userId","00000000-0000-0000-0000-000000000000"),
-                           new Claim("jti",Guid.NewGuid().ToString()),
-                           new Claim("enabled","true")
-                        };
-
-            return jwt.CreateToken(claims, exTime);
+            var response = await _bus.SendAsync(new FindUserTokenCommand());
+            return Result(response);
         }
 
         /// <summary>
@@ -407,7 +387,8 @@ namespace UserCenter.Controllers.v1
                 response = await _bus.SendAsync(new MDCenter.Commands.WorkstaionBtfunction.CheckWorkstaionBtfunctionCommand()
                 {
                     BtfunctionCode = cmd.BtfunctionCode,
-                    OpName = cmd.OpName
+                    OpName = cmd.OpName,
+                    LineCode=cmd.LineCode
                 }
              );
             } 

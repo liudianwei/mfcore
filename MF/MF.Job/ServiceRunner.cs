@@ -70,7 +70,7 @@ namespace MF.Job
             catch (Exception e)
             {
                 Console.WriteLine("Jobs配置不正确: " + e.Message);
-                logger.Trace("Jobs配置不正确: " + e.StackTrace);
+                logger.Error("Jobs配置不正确: " + e.StackTrace);
                 return false;
             }
             return true;

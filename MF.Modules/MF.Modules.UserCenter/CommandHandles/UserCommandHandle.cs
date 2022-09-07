@@ -72,9 +72,10 @@ namespace UserCenter.CommandHandles
         IRequestHandler<StoreExportUserCommand, PubResponse>,
         IRequestHandler<StoreQueryPageUserCommand, PubResponse>,
         IRequestHandler<StoreUpdateStatusUserCommand, PubResponse>,
-        IRequestHandler<StoreBatchResetPasswordUserCommand, PubResponse>,
+        IRequestHandler<StoreBatchResetPasswordUserCommand, PubResponse>, 
         IRequestHandler<IPCCheckBindUserCommand, PubResponse>,
-        IRequestHandler<IPCCheckBtnUserCommand, PubResponse>
+        IRequestHandler<IPCCheckBtnUserCommand, PubResponse>,
+        IRequestHandler<FindUserTokenCommand, PubResponse>
     {
         private readonly IUserRepository _userRepository;
         private readonly IAccesslogRepository _accesslogRepository;
@@ -968,9 +969,11 @@ namespace UserCenter.CommandHandles
                     Tel = u.Tel,
                     Theme = u.Theme,
                     State = u.State,
-                    CreateTime = u.CreateTime
-                })
-                .Distinct();
+                    CreateTime = u.CreateTime,
+                    UpdateTime=u.UpdateTime,
+                    Creator=u.Creator,
+                    Updator=u.Updator
+                });
         }
 
         /// <summary>
@@ -1481,6 +1484,32 @@ namespace UserCenter.CommandHandles
         }
         public class btnGloabl { 
             public List<string> roles { get; set; }
+        }
+        public Task<PubResponse> Handle(FindUserTokenCommand cmd, CancellationToken cancellationToken)
+        {
+            var ex = DateTime.Now.AddDays(1);
+            var token = getToken(ex);
+            UserLoginResp data = new UserLoginResp();
+            data.Token = token;
+            data.ExpireTime = ex;
+            return Succeed(data);
+        }
+
+        private string getToken(DateTime exTime)
+        {
+            // 生成jwt
+            JwtConfig jwt = _configuration?.GetSection("Jwt")?.Get<JwtConfig>();
+            var claims = new List<Claim>()
+                        {
+                           new Claim("loginType","WEB"),
+                           new Claim("userFullName","system"),
+                           new Claim("userName","sysytem"),
+                           new Claim("userId","00000000-0000-0000-0000-000000000000"),
+                           new Claim("jti",Guid.NewGuid().ToString()),
+                           new Claim("enabled","true")
+                        };
+
+            return jwt.CreateToken(claims, exTime);
         }
     }
 }

@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-
-using System.Runtime.InteropServices;
-
-using MF.Core.Extensions;
+﻿using LicenseGen;
 using MF.Utils;
-using Microsoft.Win32;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using LicenseGen;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace MF.NetCoreApp
 {

@@ -16,5 +16,6 @@ namespace UserCenter.Commands
         public string Password { get; set; }
         public string BtfunctionCode { get; set; }
         public string OpName { get; set; }
+        public string LineCode { get; set; }
     }
 }

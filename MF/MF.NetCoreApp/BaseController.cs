@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Http.Extensions;
-using System.Linq;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Hosting;
-using System.Collections.Generic;
-using System.Reflection;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace MF.NetCoreApp
 {

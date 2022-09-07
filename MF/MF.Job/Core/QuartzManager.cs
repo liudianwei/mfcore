@@ -138,13 +138,13 @@ namespace MF.Job.Core
                 {
                     //TODO 执行其他时效的job
                     Console.WriteLine($"[{DateTime.Now}]" + jobInfo.Name + ": " + jobInfo.CronExpression + "不是正确的Cron表达式,无法启动该任务");
-                    logger.Warn(jobInfo.BackgroundJobId + ": " + jobInfo.Name + ": " + jobInfo.CronExpression + "不是正确的Cron表达式,无法启动该任务");
+                    logger.Error(jobInfo.BackgroundJobId + ": " + jobInfo.Name + ": " + jobInfo.CronExpression + "不是正确的Cron表达式,无法启动该任务");
                 }
             }
             else
             {
                 Console.WriteLine($"[{DateTime.Now}]" + jobInfo.Name + ": 没有找到Job dll");
-                logger.Warn(jobInfo.BackgroundJobId + ": " + jobInfo.Name + ": 没有找到Job dll");
+                logger.Error(jobInfo.BackgroundJobId + ": " + jobInfo.Name + ": 没有找到Job dll");
             }
         }
 

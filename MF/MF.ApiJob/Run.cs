@@ -14,16 +14,17 @@ namespace ApiJob
     public sealed class Run : IJob
     {
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
-        private static DateTime _expireTime = DateTime.Now.AddSeconds(-10);
+        private static DateTime _dtNow = DateTime.Now;
+        private static DateTime _expireTime = _dtNow.AddSeconds(-10);
         private static string _tokenT = "";
 
         public async Task Execute(IJobExecutionContext context)
         {
             Version Ver = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute begin Ver." + Ver.ToString());
-            logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute begin Ver." + Ver.ToString());
+            //logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute begin Ver." + Ver.ToString());
             Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Executing ...");
-            logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Executing ...");
+            //logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Executing ...");
 
             var uri = context.JobDetail.JobDataMap.Get("Target").ToString();
             var resource = context.JobDetail.JobDataMap.Get("TargetDetail").ToString();
@@ -61,12 +62,12 @@ namespace ApiJob
             var method = context.JobDetail.JobDataMap.Get("Method").ToString();
             var jobargs = context.JobDetail.JobDataMap.Get("JobArgs").ToString();
             var name = context.JobDetail.JobDataMap.Get("JobName").ToString();
-            string head = $"JobId: {context.JobDetail.Key.Name}" + Environment.NewLine
-                + $"JobName: {name}" + Environment.NewLine
-                + $"TotalSeconds: {context.JobRunTime.TotalSeconds}(s)" + Environment.NewLine
-                + $"FireTime: {TimeZoneInfo.ConvertTimeFromUtc(context.FireTimeUtc.DateTime, TimeZoneInfo.Local)}" + Environment.NewLine
-                + $"NextFireTime: {TimeZoneInfo.ConvertTimeFromUtc(context.NextFireTimeUtc.Value.DateTime, TimeZoneInfo.Local)}" + Environment.NewLine
-                + $"Message: " + Environment.NewLine;
+            //string head = $"JobId: {context.JobDetail.Key.Name}" + Environment.NewLine
+            //    + $"JobName: {name}" + Environment.NewLine
+            //    + $"TotalSeconds: {context.JobRunTime.TotalSeconds}(s)" + Environment.NewLine
+            //    + $"FireTime: {TimeZoneInfo.ConvertTimeFromUtc(context.FireTimeUtc.DateTime, TimeZoneInfo.Local)}" + Environment.NewLine
+            //    + $"NextFireTime: {TimeZoneInfo.ConvertTimeFromUtc(context.NextFireTimeUtc.Value.DateTime, TimeZoneInfo.Local)}" + Environment.NewLine
+            //    + $"Message: " + Environment.NewLine;
 
             if (_apiSource == "private")
             {
@@ -81,8 +82,9 @@ namespace ApiJob
                     var results = JsonConvert.DeserializeObject<HttpResults>(resultToken);
                     if (results != null && results.Code == 200 && results.Data != null)
                     {
-                        _expireTime = results.Data.ExpireTime;
-                        _tokenT = $"Bearer {results.Data.Token}";
+                        _expireTime = results.Data.ExpireTime.ToLocalTime().AddSeconds(-10);
+                        //Console.WriteLine($"过期时间{_expireTime}");
+                        _token=_tokenT = $"Bearer {results.Data.Token}";
                     }
                 }
             }
@@ -107,25 +109,20 @@ namespace ApiJob
                         break;
                 }
 
-                if (result.Contains("\"status\":\"success\""))
+                if (!result.Contains("\"status\":\"success\""))
                 {
-                    //logger.Info(head + result);
+                    logger.Error($"### JobName:{name} {uri}{resource} === {result} ###");
                 }
-                else
-                {
-                    logger.Error(result+$"=====>Api执行接口:{uri}/{resource}");
-                }
-
                 await Task.Delay(500);
             }
             catch (Exception e)
             {
-                logger.Error(head + e.Message);
+                logger.Error($"### 异常 {e.Source} === {e.Message} ###");
             }
             finally
             {
                 Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute end ");
-                logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute end ");
+                //logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute end ");
             }
         }
         public class HttpResults

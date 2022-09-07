@@ -3,7 +3,7 @@
     <PropertyGroup>
 		<TargetFramework>net5</TargetFramework>
 		<IsPackable>true</IsPackable>
-		<Version>1.0.2-rc4.2</Version>
+		<Version>1.0.2-rc4.9.1</Version>
 		<Description>
 			用户中心
 		</Description>
@@ -12,6 +12,7 @@
 			+修复 权限验证-菜单标识验重问题---2022/5/2
 			+优化 权限规则-新增字段IframeUrl内嵌第三方地址(报表平台)---2022/5/11
 			+新增 实现多语言在线修改---2022/8/8
+			+优化 IPC物料重码验证记录问题---2022/8/29
 		</PackageReleaseNotes>
     </PropertyGroup>
 
@@ -29,6 +30,7 @@
     <ItemGroup>
 		<PackageReference Include="Ardalis.SmartEnum" Version="2.1.0" />
       <ProjectReference Include="..\..\MF\MF.Cache\MF.Cache.csproj" />
+      <ProjectReference Include="..\..\MF\MF.Job.Core\MF.Job.Core.csproj" />
       <ProjectReference Include="..\..\MF\MF.Mapster\MF.Mapster.csproj" />
       <ProjectReference Include="..\..\MF\MF.Masuit\MF.Masuit.csproj" />
       <ProjectReference Include="..\..\MF\SimplCommerce.Modules\SimplCommerce.Modules.csproj" />

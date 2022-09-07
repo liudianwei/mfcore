@@ -10,4 +10,7 @@ namespace UserCenter.Commands
         public string LoginType { get; set; }
         public bool LoginFalse { get; set; } = false;
     }
+    public class FindUserTokenCommand : IRequest<PubResponse>
+    {
+    }
 }
