@@ -1210,8 +1210,8 @@ namespace MF.Utils.Excel
                 row1.CreateCell(2); row1.GetCell(2).SetCellValue(""); row1.GetCell(2).CellStyle = style1;
                 row1.CreateCell(3); row1.GetCell(3).SetCellValue("上线时间"); row1.GetCell(3).CellStyle = style1_title;
                 row1.CreateCell(4); row1.GetCell(4).SetCellValue(list[j].OnlineTime?.ToString() ?? ""); row1.GetCell(4).CellStyle = style1;
-                row1.CreateCell(5); row1.GetCell(5).SetCellValue("完整性"); row1.GetCell(5).CellStyle = style1_title;
-                row1.CreateCell(6); row1.GetCell(6).SetCellValue(list[j].VerifyState); row1.GetCell(6).CellStyle = list[j].VerifyState == "YES" ? style1_title_OK : style1_title_NG;
+                row1.CreateCell(5); row1.GetCell(5).SetCellValue("数据条目"); row1.GetCell(5).CellStyle = style1_title;
+                row1.CreateCell(6); row1.GetCell(6).SetCellValue(list[j].VerifyState); row1.GetCell(6).CellStyle = list[j].VerifyState == "完整" ? style1_title_OK : style1_title_NG;
                 sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(startRow, startRow, 1, 2));
                 #endregion
 
@@ -1255,7 +1255,7 @@ namespace MF.Utils.Excel
                         startRow = startRow + 1;
                         IRow rowP1 = sheet.CreateRow(startRow);
                         rowP1.Height = 32 * 20;
-                        rowP1.CreateCell(0); rowP1.GetCell(0).SetCellValue("【产品数据】"); rowP1.GetCell(0).CellStyle = style0;
+                        rowP1.CreateCell(0); rowP1.GetCell(0).SetCellValue("【质量数据】"); rowP1.GetCell(0).CellStyle = style0;
                         rowP1.CreateCell(1); rowP1.GetCell(1).SetCellValue(""); rowP1.GetCell(1).CellStyle = style1;
                         rowP1.CreateCell(2); rowP1.GetCell(2).SetCellValue(""); rowP1.GetCell(2).CellStyle = style1;
                         rowP1.CreateCell(3); rowP1.GetCell(3).SetCellValue(""); rowP1.GetCell(3).CellStyle = style1;
@@ -1375,7 +1375,7 @@ namespace MF.Utils.Excel
         }
         public static string sheetName(string str1, string str2)
         {
-            string str = "";
+            string str = str2;
             if (str1 != string.Empty && str1 != null)
             {
                 str = str1;
@@ -1387,13 +1387,9 @@ namespace MF.Utils.Excel
                 str = str.Replace(@"\", "");
                 str = str.Replace(":", "");
             }
-            if (str2 != string.Empty && str2 != null)
+            if (str.Length > 31)
             {
-                if (str.Length > 31)
-                {
-                    str = str2 + "_" + str;
-                }
-
+                str = str.Substring(str.Length - 31, 31);
             }
             return str;
         }
