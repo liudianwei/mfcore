@@ -4,12 +4,13 @@
     <TargetFrameworks>net5</TargetFrameworks>
     <RootNamespace>MF.TTS</RootNamespace>
     <AssemblyName>MF.TTS</AssemblyName>
-    <Version>1.0.0-rc2</Version>
+    <Version>1.0.0-rc3</Version>
     <Description>
-      +集成讯飞语音合成
+      +优化变量引用
     </Description>
     <PackageReleaseNotes>
       +集成讯飞语音合成-2022/8/15
+      +优化变量引用-2022/9/8
     </PackageReleaseNotes>
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
   </PropertyGroup>

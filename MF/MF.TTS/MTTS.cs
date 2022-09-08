@@ -44,7 +44,7 @@ namespace MF.MTTS.TTSDotNetLib
         /// <summary>
         /// 编码格式
         /// </summary>
-        public string encoding_name { get; set; } = "GB2312";
+        public Encoding encoding { get; set; }
 
         /// <summary>
         ///
@@ -52,10 +52,9 @@ namespace MF.MTTS.TTSDotNetLib
         /// <param name="appid">调用id</param>
         /// <param name="speed">语速</param>
         /// <param name="volume">音量</param>
-        public MTTS(string appid = "macroinf", int speed = 30, int volume = 60, string encodingname = "GB2312")
+        public MTTS(string appid = "macroinf", int speed = 30, int volume = 60, string encoding_name = "GB2312")
         {
             if (appid == "macroinf") appid = "581d2eaf";
-            encoding_name = encodingname;
             synth_status = SynthStatus.MSP_TTS_FLAG_STILL_HAVE_DATA;
             login_configs = $"appid = {appid}, work_dir = . ";//581d2eaf
             _params = $"engine_type = local," +
@@ -68,6 +67,8 @@ namespace MF.MTTS.TTSDotNetLib
                 $"pitch = 50," +
                 $"rdn = 2";
             ret = 0;
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            encoding = Encoding.GetEncoding(encoding_name);
         }
 
         /// <summary>
@@ -83,8 +84,6 @@ namespace MF.MTTS.TTSDotNetLib
             filePath = "";
             try
             {
-                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-                Encoding encoding = Encoding.GetEncoding(encoding_name);
                 //待合成的文本
                 string text = content.Trim();
                 if (string.IsNullOrEmpty(text))
@@ -240,7 +239,7 @@ namespace MF.MTTS.TTSDotNetLib
                 p = p + 1;
             }
             byte[] bs = lb.ToArray();
-            return Encoding.Default.GetString(lb.ToArray());
+            return encoding.GetString(lb.ToArray());
         }
 
         /// <summary>
