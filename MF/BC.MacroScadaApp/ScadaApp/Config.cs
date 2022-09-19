@@ -348,6 +348,16 @@ namespace ScadaAppCore
             /// <summary>
             ///
             /// </summary>
+            _double = 7,
+
+            /// <summary>
+            ///
+            /// </summary>
+            _doubleArray = 7,
+
+            /// <summary>
+            ///
+            /// </summary>
             _string = 8,
 
             /// <summary>
