@@ -24,7 +24,7 @@ namespace MF.ClickHouse
             {
                 if (_clickHouseConnection == null)
                 {
-                    var chConnectionString = configuration["Orm:chConnectionString"];
+                    var chConnectionString = configuration["Orm:ChConnectionString"];
                     if (!string.IsNullOrWhiteSpace(chConnectionString))
                     {
                         using (var cnn = new ClickHouseConnection(chConnectionString))
