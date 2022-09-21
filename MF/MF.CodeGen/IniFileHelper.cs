@@ -1,5 +1,6 @@
 ﻿using MF.Authorization;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -46,7 +47,7 @@ namespace CodeGen
             {
                 var strMachineCode = MachineCode.GetMachineCodeString();
                 Console.WriteLine($"机器码:{strMachineCode}");
-                var item = new Esnecil().CheckCodeGenCr(strMachineCode);
+                var item = CheckCodeGenCr(strMachineCode);
                 if (!item.Item1)
                 {
                     var msg = $"授权失败,请联系管理员进行授权!Warning Message ===>{item.Item2}；机器码为===>{strMachineCode}";
@@ -111,6 +112,133 @@ namespace CodeGen
         public bool WriteIniInt(string section, string key, int val)
         {
             return WriteIniString(section, key, val.ToString());
+        }
+
+        /// <summary>
+        /// 代码生成器授权
+        /// </summary>
+        /// <param name="strMachineCode"></param>
+        /// <returns></returns>
+        public (bool, string) CheckCodeGenCr(string strMachineCode)
+        {
+            var templicense = Environment.CurrentDirectory + "\\license.lic";
+            var tempPath = Environment.CurrentDirectory + "\\abcd.data";
+            string expiredTime = "";
+            if (File.Exists(templicense))
+            {
+                string pubkey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDa4loF1nxk1lWPbvCllU10XB3d"
+                                + "CNtY5GgxMLKbEO2O18PeQrPRzfit8lokPvC/2D4CFG7OqqVzdMKj1DzZYsy+4Y3o"
+                                + "ACx8q9iCiyFIsDlYBOs9a/Zi6ViPRltHyHjhAgT8LilrKhRBsmATKwqNhqw2QBks"
+                                + "wCFG0zt5Y2HSJ51NdwIDAQAB";
+
+                string datetimeFormat = "yyyyMMdd HH:mm:ss";
+
+                DateTime StartDateTime;
+
+                //AES_EnorDecrypt.AESDecryptFile(templicense, tempPath, "TEST_PASSWORD_~!@#");
+                CryptoHelp.DecryptFile(templicense, tempPath, "TEST_PASSWORD_~!@#");//net6有问题
+                FileStream fileStream = new FileStream(tempPath, FileMode.OpenOrCreate, FileAccess.Read);
+
+                //创建二进制写入流的实例
+                BinaryReader br = new BinaryReader(fileStream);
+
+                //向文件中写入
+                var info = new LicenseInfo
+                {
+                    Product = br.ReadString(),
+                    MachineId = br.ReadString(),
+                    StartDateTime = br.ReadString(),
+                    EndDateTime = br.ReadString(),
+                    Company = br.ReadString(),
+                    Sig = br.ReadString()
+                };
+                br.Close();
+                fileStream.Close();
+
+                File.Delete(tempPath);
+
+
+                if (info.Product != null && info.Product != "AMES-CodeGen")
+                {
+                    return (false, "invalid product");
+                }
+
+                if (info.MachineId != null && info.MachineId != strMachineCode)
+                {
+                    return (false, "invalid machine code");
+                }
+
+                if (info.Company != null && info.Company == "")
+                {
+                    return (false, "invalid company code");
+                }
+
+                if (info.StartDateTime != null && info.StartDateTime != "")
+                {
+                    try
+                    {
+                        StartDateTime = DateTime.ParseExact(info.StartDateTime, datetimeFormat, CultureInfo.CurrentCulture);
+                    }
+                    catch
+                    {
+                        return (false, "invalid start time");
+                    }
+                }
+                else
+                {
+                    return (false, "start time  cannot be empty");
+                }
+
+                if (info.EndDateTime != null && info.EndDateTime != "")
+                {
+                    try
+                    {
+                        var EndDateTime = DateTime.ParseExact(info.EndDateTime, datetimeFormat, CultureInfo.CurrentCulture);
+
+                        if (DateTime.Compare(StartDateTime, EndDateTime) > 0)
+                        {
+                            return (false, "authorization has expired");
+                        }
+
+                        if (DateTime.Compare(DateTime.Now, EndDateTime) > 0)
+                        {
+                            return (false, "authorization has expired");
+                        }
+                    }
+                    catch
+                    {
+                        return (false, "authorization has expired");
+                    }
+                }
+                else
+                {
+                    return (false, "authorization has expired");
+                }
+
+                if (info.Sig != null && info.Sig != "")
+                {
+                    string str = $"Product={info.Product}";
+                    str += $"MachineId={info.MachineId}";
+                    str += $"StartDateTime={info.StartDateTime}";
+                    str += $"EndDateTime={info.EndDateTime}";
+                    str += $"Company={info.Company}";
+
+                    if (!RSAUtils.Verify(str, info.Sig, pubkey, "UTF-8"))
+                    {
+                        return (false, "signature expired");
+                    }
+                }
+                else
+                {
+                    return (false, "signature cannot be empty");
+                }
+                expiredTime = info.EndDateTime;
+            }
+            else
+            {
+                return (false, "authorization file does not exist");
+            }
+            return (true, $"authorization expiration time: {expiredTime}");
         }
     }
 }
