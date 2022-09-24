@@ -25,22 +25,30 @@ namespace MF.ClickHouse
                 if (_clickHouseConnection == null)
                 {
                     var chConnectionString = configuration["Orm:ChConnectionString"];
-                    if (!string.IsNullOrWhiteSpace(chConnectionString))
+                    var chEnabled = configuration["Orm:ChEnabled"];
+                    if (chEnabled=="true")
                     {
-                        using (var cnn = new ClickHouseConnection(chConnectionString))
+                        if (!string.IsNullOrWhiteSpace(chConnectionString))
                         {
-                            if (cnn.State != ConnectionState.Open)
+                            using (var cnn = new ClickHouseConnection(chConnectionString))
                             {
-                                cnn.Open();
+                                if (cnn.State != ConnectionState.Open)
+                                {
+                                    cnn.Open();
+                                }
+                                _clickHouseConnection = cnn;
+                                Console.WriteLine("### ClickHouse 连接成功 ###");
                             }
-                            _clickHouseConnection = cnn;
-                            Console.WriteLine("### ClickHouse 连接成功 ###");
+                        }
+                        else
+                        {
+                            _clickHouseConnection = new ClickHouseConnection();
+                            Console.WriteLine("### [Orm:chConnectionString] is missing in appsettings.json ###");
                         }
                     }
                     else
                     {
                         _clickHouseConnection = new ClickHouseConnection();
-                        Console.WriteLine("### [Orm:chConnectionString] is missing in appsettings.json ###");
                     }
                 }
             }
