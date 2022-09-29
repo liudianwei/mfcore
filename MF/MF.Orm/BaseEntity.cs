@@ -87,11 +87,8 @@ namespace MF.Orm
                 Creator = nickName;
                 CreateTime = DateTime.Now;
             }
-            else
-            {
-                Updator = nickName;
-                UpdateTime = DateTime.Now;
-            }
+            Updator = nickName;
+            UpdateTime = DateTime.Now;
         }
 
         public void Copy(BaseEntity oldEntity)

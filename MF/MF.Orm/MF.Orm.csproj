@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 	  <TargetFramework>net5</TargetFramework>
-	  <Version>1.0.8-rc5.6.3</Version>
+	  <Version>1.0.8-rc5.6.7</Version>
 	  <Description>
 		  SqlSugarCore 5.1.2.6
 	  </Description>
