@@ -10,3 +10,4 @@
       v1.2.3  稳定版
       v1.2.4-rc2  优化授权bug
       v1.2.4  优化授权bug;优化授权界面
+      v1.2.5-rc1 升级SqlSugar,打包SQLite.Interop.dll,授权加资源锁

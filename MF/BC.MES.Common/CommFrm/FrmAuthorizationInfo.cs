@@ -54,9 +54,9 @@ namespace Common.Frm
                 label_endtime.Text = DateTime.ParseExact(info?.EndDateTime, "yyyyMMdd HH:mm:ss", CultureInfo.CurrentCulture).ToString("yyyy-MM-dd HH:mm");
                 label_endtime.ForeColor = Color.Black;
                 label_company.Text = info?.Company;
-                Icon = System.Drawing.Icon.FromHandle(Resources.已授权.GetHicon());
+                Icon = Icon.FromHandle(Resources.已授权.GetHicon());
                 button_upload.Visible = false;
-                button_close.Location = new System.Drawing.Point(592, 440);
+                button_close.Location = new Point(592, 440);
             }
             else
             {
@@ -81,10 +81,10 @@ namespace Common.Frm
                         break;
                 }
 
-                Icon = Icon = System.Drawing.Icon.FromHandle(Resources.授权警告.GetHicon());
+                Icon = Icon = Icon.FromHandle(Resources.授权警告.GetHicon());
                 button_upload.Visible = true;
-                button_upload.Location = new System.Drawing.Point(499, 440);
-                button_close.Location = new System.Drawing.Point(592, 440);
+                button_upload.Location = new Point(499, 440);
+                button_close.Location = new Point(592, 440);
             }
         }
     }

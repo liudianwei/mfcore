@@ -2,14 +2,14 @@
 <package>
   <metadata>
     <id>MES.Common</id>
-    <version>1.2.4</version>
+    <version>1.2.5-rc1</version>
     <title>MES.Common</title>
     <authors>corbin chen</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
     <!-- <icon>icon.png</icon> -->
     <projectUrl>http://192.168.0.111:9009/v3/index.json</projectUrl>
-    <description>优化授权bug;优化授权界面</description>
+    <description>升级SqlSugar,打包SQLite.Interop.dll,授权加资源锁</description>
     <releaseNotes>
       v1.0.0  基础版本
       v1.1.0  新增netmq断线重连机制
@@ -23,6 +23,7 @@
       v1.2.3  稳定版
       v1.2.4-rc2  优化授权bug
       v1.2.4  优化授权bug;优化授权界面
+      v1.2.5-rc1 升级SqlSugar,打包SQLite.Interop.dll,授权加资源锁
     </releaseNotes>
     <copyright>Copyright ©2022 Macroinf Corporation</copyright>
     <tags>MES.Common</tags>
@@ -44,6 +45,8 @@
       <files include="Npgsql.dll" buildAction="lib" copyToOutput="true" />
       <files include="Oracle.ManagedDataAccess.dll" buildAction="lib" copyToOutput="true" />
       <files include="System.Data.SQLite.dll" buildAction="lib" copyToOutput="true" />
+      <files include="any/any/x64/SQLite.Interop.dll" buildAction="Content" copyToOutput="true" />
+      <files include="any/any/x86/SQLite.Interop.dll" buildAction="Content" copyToOutput="true" />
     </contentFiles>
   </metadata>
   <files>
@@ -54,5 +57,7 @@
     <file src="Npgsql.dll" target="lib\net461\Npgsql.dll" />
     <file src="Oracle.ManagedDataAccess.dll" target="lib\net461\Oracle.ManagedDataAccess.dll" />
     <file src="System.Data.SQLite.dll" target="lib\net461\System.Data.SQLite.dll" />
+    <file src="x64/SQLite.Interop.dll" target="contentFiles\any\any\x64\SQLite.Interop.dll" />
+    <file src="x86/SQLite.Interop.dll" target="contentFiles\any\any\x86\SQLite.Interop.dll" />
   </files>
 </package>

@@ -40,7 +40,7 @@ namespace HslCommunication.LogNet
 
         private readonly string m_filePath = string.Empty;
 
-        private readonly int m_fileMaxSize = 2 * 1024 * 1024; //2M
+        //private readonly int m_fileMaxSize = 2 * 1024 * 1024; //2M
 
         /// <summary>
         /// 获取需要保存的日志文件
