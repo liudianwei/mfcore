@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 
 using DAL.UserCenter.Entities;
 using DAL.UserCenter.IRepository;
-using Mapster;
 using MediatR;
 using MF.Cache;
 using MF.Core.Extensions;
@@ -203,7 +202,7 @@ namespace UserCenter.CommandHandles
             }
             if (cmd.List.IsNullT())
             {
-                _rolePermissionRepository.Delete(rp => rp.RoleId.Equals(cmd.Id), false);
+                _rolePermissionRepository.Delete(rp => rp.RoleId == cmd.Id, false);
                 return Succeed();
             }
             var roleObj = _roleRepository.Queryable().InSingle(cmd.Id);
@@ -222,21 +221,65 @@ namespace UserCenter.CommandHandles
             var db = _unitOfWork.GetDbClient();
             var flag = db.UseTran(() =>
             {
-                //删除
-                db.Deleteable<RolePermission>().Where(rp => rp.RoleId.Equals(cmd.Id)).ExecuteCommand();
-                List<RolePermission> addItemList = new List<RolePermission>();
-                foreach (var pid in cmd.List)
+                var uid = _globalCore.UserId;
+                if (uid.Equals(SystemConstants.superId))//注意：system 先删除所有，再重新创建 
                 {
-                    RolePermission rp = new RolePermission
+                    db.Deleteable<RolePermission>().Where(rp => rp.RoleId == cmd.Id).ExecuteCommand();
+                    List<RolePermission> addItemList = new List<RolePermission>();
+                    foreach (var pid in cmd.List)
                     {
-                        PermissionId = pid,
-                        RoleId = cmd.Id,
-                        InnerVersion = 0
-                    };
-                    rp.ChangeBaseInfo(_globalCore.UserName);
-                    addItemList.Add(rp);
+                        RolePermission rp = new RolePermission
+                        {
+                            PermissionId = pid,
+                            RoleId = cmd.Id,
+                            InnerVersion = 0
+                        };
+                        rp.ChangeBaseInfo(_globalCore.UserName);
+                        addItemList.Add(rp);
+                    }
+                    db.Insertable(addItemList).ExecuteCommand();
                 }
-                db.Insertable(addItemList).ExecuteCommand();
+                //除system分配权限之外的其它角色 都是禁用、启用操作 而非删除再插入  防止去掉勾选项后 就看不到之前system分配的权限了
+                else
+                {
+                    //针对已分配给权限操作
+                    var list = db.Queryable<RolePermission>().Where(i => i.RoleId.Equals(cmd.Id)).ToList();
+                    //禁用
+                    var disList = list.Where(i => !cmd.List.Contains(i.PermissionId)).Select(i => i.Id).ToArray();
+                    //更新
+                    var updateList = list.Where(i => cmd.List.Contains(i.PermissionId)).Select(i => i.Id).ToArray();
+
+                    db.Updateable<RolePermission>()
+                    .SetColumns(it => it.State == BaseStateConstants.DEACTIVE)
+                    .Where(it => disList.Contains(it.Id))
+                    .ExecuteCommand();
+
+                    db.Updateable<RolePermission>()
+                    .SetColumns(it => it.State == BaseStateConstants.ACTIVATE)
+                    .Where(it => updateList.Contains(it.Id))
+                    .ExecuteCommand();
+
+                    //未分配 但属于自己创建的按钮、菜单
+                    var allPermList=list.Select(i => i.PermissionId).ToArray();
+                    var selfList = cmd.List.Except(allPermList).ToList();
+
+                    if (selfList.Count > 0)
+                    {
+                        List<RolePermission> addItemList = new List<RolePermission>();
+                        foreach (var pid in selfList)
+                        {
+                            RolePermission rp = new RolePermission
+                            {
+                                PermissionId = pid,
+                                RoleId = cmd.Id,
+                                InnerVersion = 0
+                            };
+                            rp.ChangeBaseInfo(_globalCore.UserName);
+                            addItemList.Add(rp);
+                        }
+                        db.Insertable(addItemList).ExecuteCommand();
+                    }
+                }
             });
 
             return SucceedOrFail(flag.IsSuccess);
@@ -482,7 +525,7 @@ namespace UserCenter.CommandHandles
                ))
                .Where((p, rolePermissionLink, r) => r.Id.Equals(cmd.Id)
                        && p.State != BaseStateConstants.DELETE
-                       && rolePermissionLink.State != BaseStateConstants.DELETE
+                       && rolePermissionLink.State == BaseStateConstants.ACTIVATE
                        && r.State != BaseStateConstants.DELETE)
                .OrderBy((p, rolePermissionLink, r) => p.CreateTime, OrderByType.Desc)
                .Select((p, rolePermissionLink, r) => new Permission
