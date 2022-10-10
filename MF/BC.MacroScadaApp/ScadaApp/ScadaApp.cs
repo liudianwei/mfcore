@@ -329,6 +329,12 @@ namespace ScadaAppCore
                             e.TagValue = string.Join(",", (DateTime[])e.TagValue);
                         }
                         break;
+                    case "doubleArray":
+                        if (e.TagValue is float[])
+                        {
+                            e.TagValue = string.Join(",", (double[])e.TagValue);
+                        }
+                        break;
 
                     case "boolArray":
                         if (e.TagValue is bool[])
@@ -486,6 +492,33 @@ namespace ScadaAppCore
                                 for (int i = 0; i < strvaule.Length; i++)
                                 {
                                     vaule[i] = DateTime.Parse(strvaule[i]);
+                                }
+                                TagValue = vaule;
+                            }
+                            else
+                            {
+                                TagValue = e.TagValue;
+                            }
+                        }
+                        else
+                        {
+                            TagValue = e.TagValue;
+                        }
+                        break;
+                    case "double":
+                        TagValue = double.Parse(Convert.ToString(e.TagValue == null || e.TagValue.ToString() == "" ? "-1" : e.TagValue));
+                        break;
+
+                    case "doubleArray":
+                        if (e.TagValue != null && e.TagValue.ToString() != "")
+                        {
+                            string[] strvaule = e.TagValue.ToString().Split(',');
+                            if (strvaule.Length <= e.TagTypeLength)
+                            {
+                                double[] vaule = Enumerable.Repeat(double.Parse("0"), e.TagTypeLength).ToArray();
+                                for (int i = 0; i < strvaule.Length; i++)
+                                {
+                                    vaule[i] = double.Parse(strvaule[i]);
                                 }
                                 TagValue = vaule;
                             }

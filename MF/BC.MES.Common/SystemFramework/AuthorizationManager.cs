@@ -45,6 +45,11 @@ namespace SystemFramework
         }
 
         /// <summary>
+        /// 锁
+        /// </summary>
+        private static readonly object _lock = new object();
+
+        /// <summary>
         /// 检查授权
         /// </summary>
         /// <param name="strMachineCode"></param>
@@ -67,28 +72,29 @@ namespace SystemFramework
                     Msg = "ProductKey unknown";
                     return flag;
                 }
-
-                DecryptFile(templicense, tempPath, "TEST_PASSWORD_~!@#");
-                FileStream fileStream = new FileStream(tempPath, FileMode.OpenOrCreate, FileAccess.Read);
-
-                //创建二进制写入流的实例
-                BinaryReader br = new BinaryReader(fileStream);
-
-                //向文件中写入
-                info = new LicenseInfo
+                lock (_lock)
                 {
-                    Product = br.ReadString(),
-                    MachineId = br.ReadString(),
-                    StartDateTime = br.ReadString(),
-                    EndDateTime = br.ReadString(),
-                    Company = br.ReadString(),
-                    Sig = br.ReadString()
-                };
-                br.Close();
-                fileStream.Close();
+                    DecryptFile(templicense, tempPath, "TEST_PASSWORD_~!@#");
+                    FileStream fileStream = new FileStream(tempPath, FileMode.OpenOrCreate, FileAccess.Read);
 
-                File.Delete(tempPath);
+                    //创建二进制写入流的实例
+                    BinaryReader br = new BinaryReader(fileStream);
 
+                    //向文件中写入
+                    info = new LicenseInfo
+                    {
+                        Product = br.ReadString(),
+                        MachineId = br.ReadString(),
+                        StartDateTime = br.ReadString(),
+                        EndDateTime = br.ReadString(),
+                        Company = br.ReadString(),
+                        Sig = br.ReadString()
+                    };
+                    br.Close();
+                    fileStream.Close();
+
+                    File.Delete(tempPath);
+                }
                 if (info.Product != null && info.Product != Product)
                 {
                     Msg = "Product invalid";
