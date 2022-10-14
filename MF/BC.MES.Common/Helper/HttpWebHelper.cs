@@ -82,7 +82,7 @@ namespace Common.Helper
             }
             catch (Exception e)
             {
-                return e.Message;
+                throw new Exception(e.ToString());
             }
         }
     }
