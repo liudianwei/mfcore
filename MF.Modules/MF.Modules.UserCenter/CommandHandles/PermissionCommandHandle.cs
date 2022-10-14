@@ -716,6 +716,7 @@ namespace UserCenter.CommandHandles
                     JoinType.Left, gp.Id.Equals(pgp.PermissiongroupId)
                 ))
                 .Where((p, rp, r, ru, u, pgp, gp) => p.State != BaseStateConstants.DELETE)
+                .WhereIF(!_globalCore.UserId.Equals(SystemConstants.superId), (p, rp, r, ru, u, pgp, gp) => rp.State == BaseStateConstants.ACTIVATE)
                 .WhereIF(!_globalCore.UserId.Equals(SystemConstants.superId), (p, rp, r, ru, u, pgp, gp) => u.Id.Equals(_globalCore.UserId))
                 .Where((p, rp, r, ru, u, pgp, gp) => p.Type.Equals(PermissionType.BUTTON))
                 .Where((p, rp, r, ru, u, pgp, gp) => gp.Name.Equals(cmd.PermissionGroupName))
