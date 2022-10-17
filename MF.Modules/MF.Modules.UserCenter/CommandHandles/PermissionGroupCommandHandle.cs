@@ -154,7 +154,6 @@ namespace UserCenter.CommandHandles
                 Failed(BaseSystemError.ID_CANNOT_BE_EMPTY);
             }
             var permissionGroup = GetExistPermissionGroup(cmd.Id);
-            bool flag = permissionGroup.NotNull();
             return Succeed(permissionGroup);
         }
 
@@ -278,6 +277,7 @@ namespace UserCenter.CommandHandles
             int totalNumber = 0;
             List<Permissiongroup> result = _permissiongroupRepository.Queryable()
                 .WhereIF(cmd.Condition.NotNull(), cmd.Condition)
+                .OrderBy(x=>x.CreateTime,SqlSugar.OrderByType.Desc)
                 .ToPageList(cmd.PageNum, cmd.PageSize, ref totalNumber);
             return Succeed(new { list = result, total = totalNumber });
         }
