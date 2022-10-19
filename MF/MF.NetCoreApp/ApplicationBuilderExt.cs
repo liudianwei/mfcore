@@ -99,5 +99,14 @@ namespace MF.Extensions.DependencyInjection
         {
             return app.UseMiddleware<ExceptionHandlingMiddleware>();
         }
+
+        public static IApplicationBuilder UseDefaultFilesIndex(this IApplicationBuilder app)
+        {
+            DefaultFilesOptions defaultFilesOptions = new DefaultFilesOptions();
+            defaultFilesOptions.DefaultFileNames.Clear();
+            defaultFilesOptions.DefaultFileNames.Add("index.html");
+            app.UseDefaultFiles(defaultFilesOptions);
+            return app;
+        }
     }
 }
