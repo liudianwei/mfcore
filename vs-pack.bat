@@ -19,10 +19,6 @@ cd MF.Core
 dotnet pack --output ./../../core-nupkgs
 
 cd ..
-cd MF.ExportTask 
-dotnet pack --output ./../../core-nupkgs
-
-cd ..
 cd MF.FluentValidation
 dotnet pack --output ./../../core-nupkgs
 

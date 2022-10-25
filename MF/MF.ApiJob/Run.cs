@@ -29,6 +29,13 @@ namespace ApiJob
             var uri = context.JobDetail.JobDataMap.Get("Target").ToString();
             var resource = context.JobDetail.JobDataMap.Get("TargetDetail").ToString();
             var token = context.JobDetail.JobDataMap.Get("Token").ToString();
+            var method = context.JobDetail.JobDataMap.Get("Method").ToString();
+            var name = context.JobDetail.JobDataMap.Get("JobName").ToString();
+            if (string.IsNullOrWhiteSpace(method))
+            {
+                logger.Error($"### JobName:{name} 未指定请求方式(get?post?) 请至任务管理界面进行配置 ###");
+                return;
+            }
 
             var _token = "";
             var _contenttype = "application/json;charset=UTF-8";
@@ -59,9 +66,7 @@ namespace ApiJob
                     }
                 }
             }
-            var method = context.JobDetail.JobDataMap.Get("Method").ToString();
             var jobargs = context.JobDetail.JobDataMap.Get("JobArgs").ToString();
-            var name = context.JobDetail.JobDataMap.Get("JobName").ToString();
             //string head = $"JobId: {context.JobDetail.Key.Name}" + Environment.NewLine
             //    + $"JobName: {name}" + Environment.NewLine
             //    + $"TotalSeconds: {context.JobRunTime.TotalSeconds}(s)" + Environment.NewLine
