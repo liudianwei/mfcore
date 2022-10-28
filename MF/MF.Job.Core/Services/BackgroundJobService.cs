@@ -159,5 +159,15 @@ namespace MF.Job.Core.Services
         {
             UpdateBackgroundJobStatus(BackgroundJobId, LastRunTime, NextRunTime);
         }
+
+        /// <summary>
+        /// 根据name检查重复项
+        /// </summary>
+        /// <returns></returns>
+        public bool IsExistByName(string name)
+        {
+            return new BackgroundJobManager().IsExistByName(name);
+        }
+
     }
 }

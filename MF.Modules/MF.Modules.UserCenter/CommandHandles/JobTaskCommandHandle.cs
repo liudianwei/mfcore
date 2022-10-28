@@ -64,6 +64,16 @@ namespace UserCenter.CommandHandles
         /// <returns></returns>
         public Task<PubResponse> Handle(CreateJobTaskCommand cmd, CancellationToken cancellationToken)
         {
+            if (cmd.Name.IsNull() || cmd.Target.IsNull() || cmd.TargetDetail.IsNull() || cmd.Method.IsNull() || cmd.CronExpression.IsNull())
+            {
+                return Failed(BaseSystemError.PARAM_IS_ERROR);
+            }
+            // Name 不能重复
+            if (_backgroundJobService.IsExistByName(cmd.Name))
+            {
+                return Failed(BaseSystemError.DATA_ALREAD_EXISTS);
+            }
+
             JobTask jobTask = cmd.Adapt<JobTask>();
             jobTask.State = 0;
             jobTask.CreatedByUserId = _globalCore.UserId;
@@ -97,6 +107,15 @@ namespace UserCenter.CommandHandles
         /// <returns></returns>
         public Task<PubResponse> Handle(UpdateJobTaskCommand cmd, CancellationToken cancellationToken)
         {
+            if (cmd.Name.IsNull() || cmd.Target.IsNull() || cmd.TargetDetail.IsNull() || cmd.Method.IsNull() || cmd.CronExpression.IsNull())
+            {
+                return Failed(BaseSystemError.PARAM_IS_ERROR);
+            }
+            // Name 不能重复
+            if (_backgroundJobService.IsExistByName(cmd.Name))
+            {
+                return Failed(BaseSystemError.DATA_ALREAD_EXISTS);
+            }
             JobTask jobTask = _backgroundJobService.GetBackgroundJobInfo(cmd.BackgroundJobId);
 
             // 对象没有找到
