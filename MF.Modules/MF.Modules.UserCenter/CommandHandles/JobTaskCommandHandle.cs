@@ -112,7 +112,7 @@ namespace UserCenter.CommandHandles
                 return Failed(BaseSystemError.PARAM_IS_ERROR);
             }
             // Name 不能重复
-            if (_backgroundJobService.IsExistByName(cmd.Name))
+            if (_backgroundJobService.IsExistByName(cmd.Name, cmd.BackgroundJobId))
             {
                 return Failed(BaseSystemError.DATA_ALREAD_EXISTS);
             }

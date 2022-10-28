@@ -163,11 +163,12 @@ namespace MF.Job.Core.Services
         /// <summary>
         /// 根据name检查重复项
         /// </summary>
+        /// <param name="name"></param>
+        /// <param name="backgroundJobId"></param>
         /// <returns></returns>
-        public bool IsExistByName(string name)
+        public bool IsExistByName(string name, string backgroundJobId = "")
         {
-            return new BackgroundJobManager().IsExistByName(name);
+            return new BackgroundJobManager().IsExistByName(name, backgroundJobId);
         }
-
     }
 }

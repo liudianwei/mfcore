@@ -172,10 +172,12 @@ namespace MF.Job.Core.Business.Manager
         /// </summary>
         /// <param name="jobName"></param>
         /// <returns></returns>
-        public bool IsExistByName(string jobName)
+        public bool IsExistByName(string jobName, string backgroundJobId = "")
         {
-            var blFlag= db.Queryable<JobTask>().Any(it => it.State != 2 && it.Name.Contains(jobName));
-
+            var blFlag = db.Queryable<JobTask>()
+                .Where(it => it.State != 2 && it.Name.Contains(jobName))
+                .WhereIF(backgroundJobId != "", it => it.BackgroundJobId!= backgroundJobId)
+                .Any();
             return blFlag;
         }
 
