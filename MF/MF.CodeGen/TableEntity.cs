@@ -467,19 +467,20 @@ namespace CodeGen
                     sb.Append($"ColumnName = \"{columnEntity.ColumnName}\"");
                     sb.Append($", ColumnDescription = \"{columnEntity.ColumnComment.Replace("'", "''")}\"");
                     sb.Append($", IsNullable = {(columnEntity.IsNull ? "true" : "false")}");
-                    if (columnEntity.DefaultValue != "NULL")
+                    if (columnEntity.DefaultValue != "NULL"&& columnEntity.DefaultValue != "")
                     {
                         sb.Append($", DefaultValue = \"{columnEntity.DefaultValue.Replace("'", "")}\"");
                     }
-                    if (columnEntity.ColumnType != "int")
+                    if (columnEntity.ColumnType != "int"&& columnEntity.ColumnType != "datetime")
                     {
                         sb.Append($", Length = {columnEntity.ColumnTypeLength}");
                     }
                     if (columnEntity.ColumnType != "datetime")
                     {
                         sb.Append($", ColumnDataType = \"{columnEntity.ColumnType}\"");
+                        sb.Append($", DecimalDigits = {columnEntity.DecimalDigits}");
                     }
-                    sb.AppendLine($", DecimalDigits = {columnEntity.DecimalDigits})]");
+                    sb.AppendLine($")]");
                     sb.AppendLine($"        public {columnEntity.FieldType}{(columnEntity.IsNull && columnEntity.FieldType != "string" ? "? " : " ")}{columnEntity.FieldName}{{ get; set; }}");
                 }
 
