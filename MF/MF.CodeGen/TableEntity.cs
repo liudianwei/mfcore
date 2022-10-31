@@ -440,18 +440,24 @@ namespace CodeGen
 
                     sb.AppendLine();
                     sb.AppendLine($"        /// <summary>");
-                    sb.AppendLine($"        /// Desc:{columnEntity.ColumnComment}");
-
-                    if (columnEntity.IsNull)
+                    if (!string.IsNullOrWhiteSpace(columnEntity.ColumnComment))
                     {
-                        sb.AppendLine("        /// Default:NULL");
-                        sb.AppendLine("        /// Nullable:True");
+                        sb.AppendLine($"        /// Desc:{columnEntity.ColumnComment}");
                     }
                     else
                     {
-                        sb.AppendLine("        /// Default:");
-                        sb.AppendLine("        /// Nullable:False)");
+                        sb.AppendLine($"        /// ");
                     }
+                    //if (columnEntity.IsNull)
+                    //{
+                    //    sb.AppendLine("        /// Default:NULL");
+                    //    sb.AppendLine("        /// Nullable:True");
+                    //}
+                    //else
+                    //{
+                    //    sb.AppendLine("        /// Default:");
+                    //    sb.AppendLine("        /// Nullable:False)");
+                    //}
 
                     sb.AppendLine("        /// </summary>");
 
