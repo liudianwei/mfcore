@@ -152,6 +152,20 @@ namespace MF.Job.Core.Business.Manager
         }
 
         /// <summary>
+        /// 更新Job状态 批量
+        /// </summary>
+        /// <param name="BackgroundJobIds"></param>
+        /// <param name="State"></param>
+        /// <returns></returns>
+        public bool UpdateJobStateByIds(List<string> BackgroundJobIds, int State)
+        {
+            var rows = db.Updateable<JobTask>().SetColumns(it => it.State == State)
+           .Where(it => BackgroundJobIds.Contains(it.BackgroundJobId))
+           .ExecuteCommand();
+            return rows > 0 ? true : false;
+        }
+
+        /// <summary>
         /// 更新Job运行信息
         /// </summary>
         /// <param name="BackgroundJobId">Job ID</param>
