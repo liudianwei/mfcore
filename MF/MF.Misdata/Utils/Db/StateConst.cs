@@ -21,4 +21,5 @@ namespace Common.Utils
         /// </summary>
         public static readonly string DELETE = "2";
     }
+    
 }

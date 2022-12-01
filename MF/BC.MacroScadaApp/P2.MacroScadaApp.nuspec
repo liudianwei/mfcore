@@ -2,14 +2,14 @@
 <package>
   <metadata>
     <id>MacroScadaApp</id>
-    <version>9.5.6</version>
+    <version>9.5.7-rc1</version>
     <title>MacroScadaApp</title>
     <authors>corbin chen</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
     <!-- <icon>icon.png</icon> -->
     <projectUrl>http://192.168.0.111:9009/v3/index.json</projectUrl>
-    <description>新增double、doubleArray</description>
+    <description>优化日志输出</description>
     <releaseNotes>
       v9.3.0  基础版
       v9.3.1  Redis AbortOnConnectFail=false
@@ -38,6 +38,7 @@
       v9.5.4-rc2 屏蔽授权
       v9.5.4 优化授权bug
       v9.5.6 新增double、doubleArray
+      v9.5.7-rc1 优化日志输出
     </releaseNotes>
     <copyright>Copyright ©2022 Macroinf Corporation</copyright>
     <tags>MacroScadaApp</tags>

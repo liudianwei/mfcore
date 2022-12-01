@@ -8,6 +8,8 @@ using Mes.Exe.Driver.Rest;
 using System.Collections.Concurrent;
 using System.Threading;
 using RestSharp;
+using SqlSugar;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace ScadaAppCore
 {
@@ -38,11 +40,16 @@ namespace ScadaAppCore
                             tag.TagValue = MesVal;
                             tag.TagValue = ScadaApp.ConvertStringToTagType(tag);
                             TagValue = tag.TagValue;
-                            ApplicationLog.BusinessLog(tag.OpName, $"Read:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{MesVal}");
+                            if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
+                            {
+                                ApplicationLog.BusinessLog(tag.OpName, $"【读取数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{MesVal}");
+                            }
+                            ApplicationLog.SystemLog(tag.OpName, $"Read:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{MesVal}");
                         }
                         else
                         {
                             TagValue = null;
+                            ApplicationLog.BusinessLog(tag.OpName, $"【读取数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|缓存读取失败{errorMsg}");
                             ApplicationLog.WriteLog($"Read:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|缓存读取失败{errorMsg}");
                         }
                     }
@@ -54,19 +61,28 @@ namespace ScadaAppCore
                             tag.TagValue = result.Value;
                             tag.TagValue = ScadaApp.ConvertStringToTagType(tag);
                             TagValue = tag.TagValue;
-                            ApplicationLog.BusinessLog(tag.OpName, $"ReadApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{result.Value}");
+                            if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
+                            {
+                                ApplicationLog.BusinessLog(tag.OpName, $"【读取数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{result.Value}");
+                            }
+                            ApplicationLog.SystemLog(tag.OpName, $"ReadApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{result.Value}");
                         }
                         else
                         {
                             TagValue = null;
-                            ApplicationLog.WriteLog($"Read:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|Api读取失败{result.Message}");
+                            ApplicationLog.BusinessLog(tag.OpName, $"【读取数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|Api读取失败{result.Message}");
+                            ApplicationLog.SystemLog(tag.OpName, $"ReadApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|Api读取失败{result.Message}");
                         }
                     }
                 }
                 else
                 {
                     TagValue = null;
-                    ApplicationLog.BusinessLog(tag.OpName, $"Read:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
+                    if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
+                    {
+                        ApplicationLog.BusinessLog(tag.OpName, $"【读取数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
+                    }
+                    ApplicationLog.SystemLog(tag.OpName, $"Read:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
                 }
             }
             catch (Exception err)
@@ -104,14 +120,16 @@ namespace ScadaAppCore
                     }
                     if (keys.Length > 0)
                     {
-                        ApplicationLog.BusinessLog(tags.FirstOrDefault().OpName, $"Read:{string.Join("$", keys)}|{string.Join("$", vals)}");
+                        ApplicationLog.BusinessLog(tags.FirstOrDefault().OpName, $"【批量读取】{string.Join("$", keys)}|{string.Join("$", vals)}");
+                        ApplicationLog.SystemLog(tags.FirstOrDefault().OpName, $"Read:{string.Join("$", keys)}|{string.Join("$", vals)}");
                     }
                 }
                 else
                 {
                     if (keys.Length > 0)
                     {
-                        ApplicationLog.WriteLog($"Read:{string.Join(",", keys)}|缓存读取失败" + errorMsg);
+                        ApplicationLog.BusinessLog(tags.FirstOrDefault().OpName, $"【批量读取】{string.Join("$", keys)}|缓存读取失败" + errorMsg);
+                        ApplicationLog.SystemLog(tags.FirstOrDefault().OpName, $"Read:{string.Join("$", keys)}|缓存读取失败" + errorMsg);
                     }
                 }
 
@@ -127,12 +145,14 @@ namespace ScadaAppCore
                     {
                         tag.TagValue = result.Value;
                         tag.TagValue = ScadaApp.ConvertStringToTagType(tag);
-                        ApplicationLog.BusinessLog(tag.OpName, $"ReadApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{result.Value}");
+                        ApplicationLog.BusinessLog(tag.OpName, $"【批量读取】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{result.Value}");
+                        ApplicationLog.SystemLog(tag.OpName, $"ReadApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{result.Value}");
                     }
                     else
                     {
                         tag.TagQuality = 0;
-                        ApplicationLog.WriteLog($"Read:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|Api读取失败{result.Message}");
+                        ApplicationLog.BusinessLog(tags.FirstOrDefault().OpName, $"【批量读取】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|Api读取失败{result.Message}");
+                        ApplicationLog.SystemLog(tags.FirstOrDefault().OpName, $"ReadApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|Api读取失败{result.Message}");
                     }
                 });
 
@@ -188,14 +208,16 @@ namespace ScadaAppCore
                     }
                     if (keys.Length > 0)
                     {
-                        ApplicationLog.BusinessLog(tags.FirstOrDefault().OpName, $"Read:{string.Join("$", keys)}|{string.Join("$", vals)}");
+                        ApplicationLog.BusinessLog(tags.FirstOrDefault().OpName, $"【批量读取】{string.Join("$", keys)}|{string.Join("$", vals)}");
+                        ApplicationLog.SystemLog(tags.FirstOrDefault().OpName, $"Read:{string.Join("$", keys)}|{string.Join("$", vals)}");
                     }
                 }
                 else
                 {
                     if (keys.Length > 0)
                     {
-                        ApplicationLog.WriteLog($"Read:{string.Join(",", keys)}|缓存读取失败" + errorMsg);
+                        ApplicationLog.BusinessLog(tags.FirstOrDefault().OpName, $"【批量读取】{string.Join("$", keys)}|缓存读取失败" + errorMsg);
+                        ApplicationLog.SystemLog(tags.FirstOrDefault().OpName, $"Read:{string.Join("$", keys)}|缓存读取失败" + errorMsg);
                     }
                 }
 
@@ -212,12 +234,14 @@ namespace ScadaAppCore
                     {
                         tagv.TagValue = result.Value;
                         tagv.TagValue = ScadaApp.ConvertStringToTagType(tagv);
-                        ApplicationLog.BusinessLog(tag.OpName, $"ReadApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{result.Value}");
+                        ApplicationLog.BusinessLog(tag.OpName, $"【批量读取】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{result.Value}");
+                        ApplicationLog.SystemLog(tag.OpName, $"ReadApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{result.Value}");
                     }
                     else
                     {
                         tagv.TagQuality = 0;
-                        ApplicationLog.WriteLog($"Read:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|Api读取失败{result.Message}");
+                        ApplicationLog.BusinessLog(tag.OpName, $"【批量读取】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|Api读取失败{result.Message}");
+                        ApplicationLog.SystemLog(tag.OpName, $"ReadApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|Api读取失败{result.Message}");
                     }
                     valueList.Add(tagv);
                 }
@@ -264,24 +288,37 @@ namespace ScadaAppCore
                             TagQuality = "good",
                             TagValue = tag.TagValue.ToString()
                         });
-                        ApplicationLog.BusinessLog(tag.OpName, $"Write队列:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue.ToString()}");
+                        if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
+                        {
+                            ApplicationLog.BusinessLog(tag.OpName, $"【写入数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue.ToString()}");
+                        }
+                        ApplicationLog.SystemLog(tag.OpName, $"Write队列:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue.ToString()}");
                     }
                     else
                     {
                         var result = MesRestClient.Post(ScadaApp.HttpUri, $"/{tag.OpCode}/DeviceWrite", new OperateWriteValue() { TagId = tag.TagID.ToString(), Value = tag.TagValue.ToString() });
                         if (result.IsSuccess)
                         {
-                            ApplicationLog.BusinessLog(tag.OpName, $"WriteApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue.ToString()}");
+                            if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
+                            {
+                                ApplicationLog.BusinessLog(tag.OpName, $"【写入数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue.ToString()}");
+                            }
+                            ApplicationLog.SystemLog(tag.OpName, $"WriteApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue.ToString()}");
                         }
                         else
                         {
-                            ApplicationLog.WriteLog($"WriteApi {tag.TagID } 值为{tag.TagValue.ToString()}到服务端写入失败|{result.Message}");
+                            ApplicationLog.BusinessLog(tag.OpName, $"【写入数据】{tag.OpName}|{tag.TagID}|{tag.TagValue.ToString()}到服务端写入失败|{result.Message}");
+                            ApplicationLog.SystemLog(tag.OpName, $"WriteApi:{tag.OpName}|{tag.TagID}|{tag.TagValue.ToString()}到服务端写入失败|{result.Message}");
                         }
                     }
                 }
                 else
                 {
-                    ApplicationLog.BusinessLog(tag.OpName, $"Write:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
+                    if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
+                    {
+                        ApplicationLog.BusinessLog(tag.OpName, $"【写入数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
+                    }
+                    ApplicationLog.SystemLog(tag.OpName, $"Write:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
                 }
 
                 flag = true;
@@ -323,17 +360,20 @@ namespace ScadaAppCore
                     }
                     else
                     {
-                        ApplicationLog.BusinessLog(tag.OpName, $"Write:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
+                        ApplicationLog.BusinessLog(tag.OpName, $"【批量写入】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
+                        ApplicationLog.SystemLog(tag.OpName, $"Write:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
                     }
                 }
                 if (!ScadaApp.mesRedisClient.Pub(ScadaApp.WriteTagNodeValue, SimpleJson.SerializeObject(tagMsgs), out errorMsg))
                 {
-                    ApplicationLog.WriteLog($"发送值为{SimpleJson.SerializeObject(tagMsgs)}到服务端写入失败|{errorMsg}");
+                    ApplicationLog.BusinessLog(List.FirstOrDefault().OpName, $"【批量写入】发送值为{SimpleJson.SerializeObject(tagMsgs)}到服务端写入失败|{errorMsg}");
+                    ApplicationLog.SystemLog(List.FirstOrDefault().OpName, $"Write:WritePLC_Sync_DataList|发送值为{SimpleJson.SerializeObject(tagMsgs)}到服务端写入失败|{errorMsg}");
                     return flag;
                 }
                 else
                 {
-                    ApplicationLog.BusinessLog("WritePLC_Sync_DataList", $"Write:WritePLC_Sync_DataList|{SimpleJson.SerializeObject(tagMsgs)}");
+                    ApplicationLog.BusinessLog(List.FirstOrDefault().OpName, $"【批量写入】WritePLC_Sync_DataList|{SimpleJson.SerializeObject(tagMsgs)}");
+                    ApplicationLog.SystemLog(List.FirstOrDefault().OpName, $"Write:WritePLC_Sync_DataList|{SimpleJson.SerializeObject(tagMsgs)}");
                 }
 
                 flag = true;
@@ -364,17 +404,23 @@ namespace ScadaAppCore
 
                     if (ScadaApp.mesRedisClient.Write($"{tag.OpCode}:{tag.TagID}", tag.TagValue.ToString(), out var errorMsg))
                     {
-                        ApplicationLog.BusinessLog(tag.OpName, $"Write:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue}");
+                        ApplicationLog.BusinessLog(tag.OpName, $"【Redis写入】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue}");
+                        ApplicationLog.SystemLog(tag.OpName, $"RedisWrite:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue}");
                     }
                     else
                     {
-                        ApplicationLog.WriteLog($"Write:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue} 到服务端写入失败|{errorMsg}");
+                        ApplicationLog.BusinessLog(tag.OpName, $"【Redis写入】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue} 到服务端写入失败|{errorMsg}");
+                        ApplicationLog.SystemLog(tag.OpName, $"RedisWrite:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue} 到服务端写入失败|{errorMsg}");
                         return flag;
                     }
                 }
                 else
                 {
-                    ApplicationLog.BusinessLog(tag.OpName, $"Write:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
+                    if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
+                    {
+                        ApplicationLog.BusinessLog(tag.OpName, $"【Redis写入】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
+                    }
+                    ApplicationLog.SystemLog(tag.OpName, $"RedisWrite:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
                 }
 
                 flag = true;
@@ -411,17 +457,20 @@ namespace ScadaAppCore
                     }
                     else
                     {
-                        ApplicationLog.BusinessLog(tag.OpName, $"Write:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
+                        ApplicationLog.BusinessLog(tag.OpName, $"【Redis批量写入】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
+                        ApplicationLog.SystemLog(tag.OpName, $"RedisWrite:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
                     }
                 }
                 if (!ScadaApp.mesRedisClient.Write(Keys.ToArray(), Values.ToArray(), out errorMsg))
                 {
-                    ApplicationLog.WriteLog($"发送值为Key:{SimpleJson.SerializeObject(Keys)},Value:{SimpleJson.SerializeObject(Values)}到服务端写入失败|{errorMsg}");
+                    ApplicationLog.BusinessLog(List.FirstOrDefault().OpName, $"【Redis批量写入】Key:{SimpleJson.SerializeObject(Keys)},Value:{SimpleJson.SerializeObject(Values)}到服务端写入失败|{errorMsg}");
+                    ApplicationLog.SystemLog(List.FirstOrDefault().OpName, $"发送值为Key:{SimpleJson.SerializeObject(Keys)},Value:{SimpleJson.SerializeObject(Values)}到服务端写入失败|{errorMsg}");
                     return flag;
                 }
                 else
                 {
-                    ApplicationLog.BusinessLog("WritePLC_Sync_DataList_Direct", $"Write:WritePLC_Sync_DataList_Direct|Key:{SimpleJson.SerializeObject(Keys)},Value:{SimpleJson.SerializeObject(Values)}");
+                    ApplicationLog.BusinessLog(List.FirstOrDefault().OpName, $"【Redis批量写入】WritePLC_Sync_DataList_Direct|Key:{SimpleJson.SerializeObject(Keys)},Value:{SimpleJson.SerializeObject(Values)}");
+                    ApplicationLog.SystemLog(List.FirstOrDefault().OpName, $"Write:WritePLC_Sync_DataList_Direct|Key:{SimpleJson.SerializeObject(Keys)},Value:{SimpleJson.SerializeObject(Values)}");
                 }
 
                 flag = true;

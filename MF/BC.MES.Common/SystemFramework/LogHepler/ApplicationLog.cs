@@ -81,6 +81,7 @@ namespace SystemFramework
         public static void IntLogThread(List<string> filenames, string degree = "DEBUG")
         {
             Common.Utils.BusinessLog.Init(filenames, (HslMessageDegree)Enum.Parse(typeof(HslMessageDegree), degree));
+            Common.Utils.SystemLog.Init(filenames, (HslMessageDegree)Enum.Parse(typeof(HslMessageDegree), degree));
         }
 
         /// <summary>

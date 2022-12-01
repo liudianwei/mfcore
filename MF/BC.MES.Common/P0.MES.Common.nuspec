@@ -2,14 +2,14 @@
 <package>
   <metadata>
     <id>MES.Common</id>
-    <version>1.2.5-rc2</version>
+    <version>1.2.5-rc3</version>
     <title>MES.Common</title>
     <authors>corbin chen</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
     <!-- <icon>icon.png</icon> -->
     <projectUrl>http://192.168.0.111:9009/v3/index.json</projectUrl>
-    <description>升级SqlSugar</description>
+    <description>优化日志输出</description>
     <releaseNotes>
       v1.0.0  基础版本
       v1.1.0  新增netmq断线重连机制
@@ -25,6 +25,7 @@
       v1.2.4  优化授权bug;优化授权界面
       v1.2.5-rc1 打包SQLite.Interop.dll,授权加资源锁
       v1.2.5-rc2 升级SqlSugar
+      v1.2.5-rc3 优化日志输出
     </releaseNotes>
     <copyright>Copyright ©2022 Macroinf Corporation</copyright>
     <tags>MES.Common</tags>

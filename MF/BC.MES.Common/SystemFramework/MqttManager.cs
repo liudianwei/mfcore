@@ -85,7 +85,11 @@ namespace SystemFramework
 
             if (message.Split('|').Length > 3)
             {
-                ApplicationLog.BusinessLog(message.Split('|')[2], "SendMsg:" + message);
+                if (message.Split('|')[1] != "HeartBeatPLC" && message.Split('|')[1] != "HeartBeatMIS")
+                {
+                    ApplicationLog.BusinessLog(message.Split('|')[2], "【数据转发】" + message);
+                }
+                ApplicationLog.SystemLog(message.Split('|')[2], "SendMsg:" + message);
             }
 
             #endregion 逻辑日志记录

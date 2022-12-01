@@ -8,6 +8,7 @@ using BasicData;
 using EvetnArgData;
 using System.Collections.Concurrent;
 using RestSharp;
+using System.Runtime.Remoting.Lifetime;
 
 namespace ScadaAppCore
 {
@@ -197,18 +198,12 @@ namespace ScadaAppCore
 
                             if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
                             {
-                                if (ChangeTagNames != null)
+                                if (ChangeTagNames != null && ChangeTagNames.Contains(tag.TagName))
                                 {
-                                    if (ChangeTagNames.Contains(tag.TagName))
-                                    {
-                                        ApplicationLog.BusinessLog(tag.OpName, "ValueChange:" + tag.TagDescription + "|" + tag.TagValue.ToString());
-                                    }
-                                }
-                                else
-                                {
-                                    ApplicationLog.BusinessLog(tag.OpName, "ValueChange:" + tag.TagDescription + "|" + tag.TagValue.ToString());
+                                    ApplicationLog.BusinessLog(tag.OpName, $"【信号跳变】{tag.TagDescription}|{tag.TagValue.ToString()}");
                                 }
                             }
+                            ApplicationLog.SystemLog(tag.OpName, "ValueChange:" + tag.TagDescription + "|" + tag.TagValue.ToString());
 
                             #endregion 逻辑日志
                         }
@@ -329,6 +324,7 @@ namespace ScadaAppCore
                             e.TagValue = string.Join(",", (DateTime[])e.TagValue);
                         }
                         break;
+
                     case "doubleArray":
                         if (e.TagValue is float[])
                         {
@@ -505,6 +501,7 @@ namespace ScadaAppCore
                             TagValue = e.TagValue;
                         }
                         break;
+
                     case "double":
                         TagValue = double.Parse(Convert.ToString(e.TagValue == null || e.TagValue.ToString() == "" ? "-1" : e.TagValue));
                         break;

@@ -25,3 +25,4 @@
       v9.5.4-rc2 屏蔽授权
       v9.5.4 优化授权bug
       v9.5.6 新增double、doubleArray
+      v9.5.7-rc1 优化日志输出
