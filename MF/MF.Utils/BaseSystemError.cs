@@ -176,6 +176,7 @@ namespace MF.Utils
         public readonly static string NO_DATA_RELEASE = "NO_DATA_RELEASE";
         public readonly static string CONNECTION_FAILED = "Connection Failed";
         public readonly static string STATE_UPDATE_ERROR = "STATE_UPDATE_ERROR";
+        public readonly static string DATA_ALREAD_EXISTS = "DATA_ALREAD_EXISTS"; 
 
         #endregion 通用操作
     }

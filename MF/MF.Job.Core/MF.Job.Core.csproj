@@ -2,17 +2,19 @@
 
   <PropertyGroup>
 	  <TargetFramework>net5</TargetFramework>
-	  <Version>1.0.4-rc4</Version>
+	  <Version>1.0.4-rc5.1.2</Version>
 	  <Description>
 		  +修复 调度任务界面无法带参查询
 	  </Description>
 	  <PackageReleaseNotes>
-		  1.修复 任务调度界面无法带参查询-2022/3/2
+		  1.修复 任务调度界面无法带参查询 -2022/3/2
+		  2.修复 任务名称不可重复添加以及关键的参数不允许为空 -2022/10/27
+		  3.优化批量启动和暂停 -2022/11/3
 	  </PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SqlSugarCore" Version="5.1.2.4" />
+    <PackageReference Include="SqlSugarCore" Version="5.1.3.29" />
   </ItemGroup>
 
 </Project>

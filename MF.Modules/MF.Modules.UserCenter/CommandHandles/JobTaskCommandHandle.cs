@@ -1,7 +1,7 @@
 using Mapster;
 
 using MediatR;
-
+using MF.Core.Check;
 using MF.Core.Extensions;
 using MF.FluentValidation;
 using MF.Job.Core.Business.Info;
@@ -64,6 +64,16 @@ namespace UserCenter.CommandHandles
         /// <returns></returns>
         public Task<PubResponse> Handle(CreateJobTaskCommand cmd, CancellationToken cancellationToken)
         {
+            if (cmd.Name.IsNull() || cmd.Target.IsNull() || cmd.TargetDetail.IsNull() || cmd.Method.IsNull() || cmd.CronExpression.IsNull())
+            {
+                return Failed(BaseSystemError.PARAM_IS_ERROR);
+            }
+            // Name 不能重复
+            if (_backgroundJobService.IsExistByName(cmd.Name))
+            {
+                return Failed(BaseSystemError.DATA_ALREAD_EXISTS);
+            }
+
             JobTask jobTask = cmd.Adapt<JobTask>();
             jobTask.State = 0;
             jobTask.CreatedByUserId = _globalCore.UserId;
@@ -97,6 +107,15 @@ namespace UserCenter.CommandHandles
         /// <returns></returns>
         public Task<PubResponse> Handle(UpdateJobTaskCommand cmd, CancellationToken cancellationToken)
         {
+            if (cmd.Name.IsNull() || cmd.Target.IsNull() || cmd.TargetDetail.IsNull() || cmd.Method.IsNull() || cmd.CronExpression.IsNull())
+            {
+                return Failed(BaseSystemError.PARAM_IS_ERROR);
+            }
+            // Name 不能重复
+            if (_backgroundJobService.IsExistByName(cmd.Name, cmd.BackgroundJobId))
+            {
+                return Failed(BaseSystemError.DATA_ALREAD_EXISTS);
+            }
             JobTask jobTask = _backgroundJobService.GetBackgroundJobInfo(cmd.BackgroundJobId);
 
             // 对象没有找到
@@ -224,26 +243,28 @@ namespace UserCenter.CommandHandles
         [Transaction]
         public Task<PubResponse> Handle(BatchSetStateJobTaskCommand cmd, CancellationToken cancellationToken)
         {
+            // 前端要求停止 设置为5job才情进行停止操作
+            if (cmd.State == (int)JobTaskEnum.PopStop)
+            {
+                cmd.State = (int)JobTaskEnum.PopProceed;
+            }
+            if (cmd.State == (int)JobTaskEnum.PopFinished)
+            {
+                cmd.State = (int)JobTaskEnum.PopWait;
+            }
             if (cmd.List.NotNullT())
             {
                 cmd.List = cmd.List.Distinct().ToList();
                 var jobTasks = _backgroundJobService.GeByIDsScheduleJobInfoList(cmd.List);
-                if (jobTasks.Count != cmd.List.Count)
+                if (jobTasks.Count != cmd.List.Count|| jobTasks.IsNull())
                 {
                     ThrowError(BaseSystemError.OBJECT_DOES_NOT_EXIST);
                 }
-
-                if (jobTasks.NotNullT())
-                {
-                    foreach (var item in jobTasks)
-                    {
-                        _backgroundJobService.UpdateBackgroundJobState(item.BackgroundJobId, cmd.State);
-                    }
-                }
-                else
-                {
-                    ThrowError(BaseSystemError.OBJECT_DOES_NOT_EXIST);
-                }
+                CheckNull.BusinessException(!_backgroundJobService.UpdateJobStateByIds(cmd.List, cmd.State), BaseSystemError.FAILED);
+            }
+            else
+            {
+                ThrowError(BaseSystemError.PARAM_IS_BLANK);
             }
             return Succeed();
         }

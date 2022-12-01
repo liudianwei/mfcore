@@ -48,7 +48,10 @@ namespace MF.Job.Core.Business.Manager
                 State = 2,
                 LastUpdatedDateTime = DateTime.Now
             };
-            db.Updateable(backgroundJobInfo).UpdateColumns(it => new { it.State, it.LastUpdatedDateTime }).Where(it => it.BackgroundJobId == BackgroundJobId.ToString()).ExecuteCommand();
+            db.Updateable(backgroundJobInfo).UpdateColumns(it => new { it.State, it.LastUpdatedDateTime })
+                .Where(it => it.BackgroundJobId == BackgroundJobId.ToString())
+                .Where(it => it.Name != "ExportExcel" && it.Name != "DeleteExcel")
+                .ExecuteCommand();
             return true;
         }
 
@@ -149,6 +152,20 @@ namespace MF.Job.Core.Business.Manager
         }
 
         /// <summary>
+        /// 更新Job状态 批量
+        /// </summary>
+        /// <param name="BackgroundJobIds"></param>
+        /// <param name="State"></param>
+        /// <returns></returns>
+        public bool UpdateJobStateByIds(List<string> BackgroundJobIds, int State)
+        {
+            var rows = db.Updateable<JobTask>().SetColumns(it => it.State == State)
+           .Where(it => BackgroundJobIds.Contains(it.BackgroundJobId))
+           .ExecuteCommand();
+            return rows > 0 ? true : false;
+        }
+
+        /// <summary>
         /// 更新Job运行信息
         /// </summary>
         /// <param name="BackgroundJobId">Job ID</param>
@@ -162,6 +179,20 @@ namespace MF.Job.Core.Business.Manager
                 .SetColumns(it => it.NextRunTime == NextRunTime)
                 .Where(it => it.BackgroundJobId == BackgroundJobId)
                 .ExecuteCommand();
+        }
+
+        /// <summary>
+        /// 根据name检查重复项
+        /// </summary>
+        /// <param name="jobName"></param>
+        /// <returns></returns>
+        public bool IsExistByName(string jobName, string backgroundJobId = "")
+        {
+            var blFlag = db.Queryable<JobTask>()
+                .Where(it => it.State != 2 && it.Name.Contains(jobName))
+                .WhereIF(backgroundJobId != "", it => it.BackgroundJobId!= backgroundJobId)
+                .Any();
+            return blFlag;
         }
 
         #endregion BackgroundJobInfo

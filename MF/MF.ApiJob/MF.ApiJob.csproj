@@ -4,7 +4,7 @@
 	  <TargetFrameworks>net5</TargetFrameworks>
     <RootNamespace>MF.ApiJob</RootNamespace>
     <AssemblyName>MF.ApiJob</AssemblyName>
-	  <Version>1.0.5-rc7.1</Version>
+	  <Version>1.0.5-rc7.3.3</Version>
 	  <Description>
 		  +更新MF.Job.Core引用
 	  </Description>

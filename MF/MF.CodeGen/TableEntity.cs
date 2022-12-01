@@ -440,18 +440,24 @@ namespace CodeGen
 
                     sb.AppendLine();
                     sb.AppendLine($"        /// <summary>");
-                    sb.AppendLine($"        /// Desc:{columnEntity.ColumnComment}");
-
-                    if (columnEntity.IsNull)
+                    if (!string.IsNullOrWhiteSpace(columnEntity.ColumnComment))
                     {
-                        sb.AppendLine("        /// Default:NULL");
-                        sb.AppendLine("        /// Nullable:True");
+                        sb.AppendLine($"        /// Desc:{columnEntity.ColumnComment}");
                     }
                     else
                     {
-                        sb.AppendLine("        /// Default:");
-                        sb.AppendLine("        /// Nullable:False)");
+                        sb.AppendLine($"        /// ");
                     }
+                    //if (columnEntity.IsNull)
+                    //{
+                    //    sb.AppendLine("        /// Default:NULL");
+                    //    sb.AppendLine("        /// Nullable:True");
+                    //}
+                    //else
+                    //{
+                    //    sb.AppendLine("        /// Default:");
+                    //    sb.AppendLine("        /// Nullable:False)");
+                    //}
 
                     sb.AppendLine("        /// </summary>");
 
@@ -467,19 +473,20 @@ namespace CodeGen
                     sb.Append($"ColumnName = \"{columnEntity.ColumnName}\"");
                     sb.Append($", ColumnDescription = \"{columnEntity.ColumnComment.Replace("'", "''")}\"");
                     sb.Append($", IsNullable = {(columnEntity.IsNull ? "true" : "false")}");
-                    if (columnEntity.DefaultValue != "NULL")
+                    if (columnEntity.DefaultValue != "NULL"&& columnEntity.DefaultValue != "")
                     {
                         sb.Append($", DefaultValue = \"{columnEntity.DefaultValue.Replace("'", "")}\"");
                     }
-                    if (columnEntity.ColumnType != "int")
+                    if (columnEntity.ColumnType != "int"&& columnEntity.ColumnType != "datetime")
                     {
                         sb.Append($", Length = {columnEntity.ColumnTypeLength}");
                     }
                     if (columnEntity.ColumnType != "datetime")
                     {
                         sb.Append($", ColumnDataType = \"{columnEntity.ColumnType}\"");
+                        sb.Append($", DecimalDigits = {columnEntity.DecimalDigits}");
                     }
-                    sb.AppendLine($", DecimalDigits = {columnEntity.DecimalDigits})]");
+                    sb.AppendLine($")]");
                     sb.AppendLine($"        public {columnEntity.FieldType}{(columnEntity.IsNull && columnEntity.FieldType != "string" ? "? " : " ")}{columnEntity.FieldName}{{ get; set; }}");
                 }
 

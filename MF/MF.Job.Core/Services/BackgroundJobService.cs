@@ -131,9 +131,19 @@ namespace MF.Job.Core.Services
         /// <returns></returns>
         public bool UpdateBackgroundJobState(string BackgroundJobId, int State)
         {
-            return new BackgroundJobManager().UpdateBackgroundJobState(BackgroundJobId, State);
+            return new BackgroundJobManager().UpdateBackgroundJobState(BackgroundJobId, State); 
         }
 
+        /// <summary>
+        /// 更新Job状态 批量
+        /// </summary>
+        /// <param name="BackgroundJobIds"></param>
+        /// <param name="State"></param>
+        /// <returns></returns>
+        public bool UpdateJobStateByIds(List<string> BackgroundJobIds, int State)
+        {
+            return new BackgroundJobManager().UpdateJobStateByIds(BackgroundJobIds, State);
+        }
 
         /// <summary>
         /// 更新Job运行信息
@@ -158,6 +168,17 @@ namespace MF.Job.Core.Services
         public void UpdateBackgroundJobStatus(string BackgroundJobId, string JobName, DateTime LastRunTime, DateTime NextRunTime, double ExecutionDuration, string RunLog)
         {
             UpdateBackgroundJobStatus(BackgroundJobId, LastRunTime, NextRunTime);
+        }
+
+        /// <summary>
+        /// 根据name检查重复项
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="backgroundJobId"></param>
+        /// <returns></returns>
+        public bool IsExistByName(string name, string backgroundJobId = "")
+        {
+            return new BackgroundJobManager().IsExistByName(name, backgroundJobId);
         }
     }
 }
