@@ -185,7 +185,15 @@ namespace Common.DBUtils
                                     Rule.CurrentNo += Convert.ToInt32(rule["value"]["uper"].Value);
                                 }
                                 int len = Convert.ToInt32(rule["value"]["length"].Value);
-                                serinalno += Rule.CurrentNo.ToString().PadLeft(len, '0');
+                                if (Rule.CurrentNo.ToString().Length <= len)
+                                {
+                                    serinalno += Rule.CurrentNo.ToString().PadLeft(len, '0');
+                                }
+                                else
+                                {
+                                    serinalno = "流水号超位数上限,创建失败";
+                                    return flag;
+                                }
                                 break;
                         }
                         flag = true;
