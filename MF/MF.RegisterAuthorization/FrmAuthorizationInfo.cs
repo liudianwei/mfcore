@@ -1,5 +1,5 @@
 ﻿using LicenseCore;
-using RegisterAuthorization.Properties;
+using MF.RegisterAuthorization.Properties;
 using System;
 using System.Drawing;
 using System.Globalization;

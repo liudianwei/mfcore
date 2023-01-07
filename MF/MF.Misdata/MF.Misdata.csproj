@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFrameworks>net5.0</TargetFrameworks>
     <Platforms>AnyCPU;ARM64</Platforms>
-    <Version>1.1.1</Version>
-    <Description>修复创建流水号已知的bug(例如,流水号限定3位,当流水号为1000时,仍然能创建成功)</Description>
+    <Version>1.1.2-rc1</Version>
+    <Description>创建流水号移除ref用法</Description>
     <PackageReleaseNotes>
       1、机器码记录到日志
       2、优化日志组件
@@ -22,6 +22,7 @@
       14、CustomeEventArgs对象新增TagDescription字段
       15、优化异常致命等级的日志记录格式
       16、修复创建流水号已知的bug(例如,流水号限定3位,当流水号为1000时,仍然能创建成功)
+      17、创建流水号移除ref用法
     </PackageReleaseNotes>
     
   </PropertyGroup>

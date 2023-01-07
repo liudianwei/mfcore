@@ -18,7 +18,7 @@ namespace Common.DBUtils
         /// <param name="Rule"></param>
         /// <param name="serinalno"></param>
         /// <returns></returns>
-        public static bool RuleEngine(ref Serialno Rule, out string serinalno)
+        public static (bool flag, Serialno Rule) RuleEngine(Serialno Rule, out string serinalno)
         {
             bool flag = false;
             serinalno = "";
@@ -192,7 +192,7 @@ namespace Common.DBUtils
                                 else
                                 {
                                     serinalno = "流水号超位数上限,创建失败";
-                                    return flag;
+                                    return (flag, Rule);
                                 }
                                 break;
                         }
@@ -209,7 +209,7 @@ namespace Common.DBUtils
                 Console.WriteLine(ex.Message);
             }
 
-            return flag;
+            return (flag, Rule);
         }
 
         private static string GetYearCode(dynamic rule, string currentyear)

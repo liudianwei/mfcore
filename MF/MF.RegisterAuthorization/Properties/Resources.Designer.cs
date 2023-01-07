@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace RegisterAuthorization.Properties {
+namespace MF.RegisterAuthorization.Properties {
     using System;
     
     
