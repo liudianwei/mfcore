@@ -4,7 +4,6 @@ using MF.FluentValidation;
 using MF.MediatR;
 using MF.NetCoreApp;
 using MF.NetCoreApp.Attributes;
-using MF.Swagger;
 using MF.Utils;
 using MF.Utils.Excel;
 using Microsoft.AspNetCore.Authorization;
@@ -15,13 +14,11 @@ using Microsoft.Extensions.Logging;
 using ProductCenter.Commands.ProduceMonitor;
 using System;
 using System.Collections.Generic;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using UserCenter.Commands;
 using UserCenter.Dtos;
 using UserCenter.Enums;
 using UserCenter.Response;
-using UserCenter.Response.User;
 
 namespace UserCenter.Controllers.v1
 {
