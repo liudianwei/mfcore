@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
     <TargetFrameworks>net5.0</TargetFrameworks>
-		<Version>1.0.4-rc7.6.2</Version>
+		<Version>1.0.4-rc7.6.4</Version>
 		<Description>缓存工具</Description>
 		<PackageReleaseNotes>
 			升级ORM:SqlSugarCore
