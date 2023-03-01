@@ -690,8 +690,9 @@ namespace Common.DBUtils
         /// 更新多条记录
         /// </summary>
         /// <param name="entitys">实体对象列表</param>
+        /// <param name="isEnableUpdateVersion">是否校验InnerVersion字段进行内部乐观锁,默认不校验</param>
         /// <returns>true 成功，false 失败</returns>
-        public static bool Update<T>(List<T> entitys) where T : BaseEntity, new()
+        public static bool Update<T>(List<T> entitys, bool isEnableUpdateVersion = false) where T : BaseEntity, new()
         {
             if (entitys == null || entitys.Count <= 0)
             {
@@ -702,7 +703,14 @@ namespace Common.DBUtils
             {
                 PreUpdate(i);
             });
-            return Getdb().Updateable(entitys).IsEnableUpdateVersionValidation().ExecuteCommand() > 0;
+            if (isEnableUpdateVersion)
+            {
+                return Getdb().Updateable(entitys).IsEnableUpdateVersionValidation().ExecuteCommand() > 0;
+            }
+            else
+            {
+                return Getdb().Updateable(entitys).ExecuteCommand() > 0;
+            }
         }
 
         #endregion 更新

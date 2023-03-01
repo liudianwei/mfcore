@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFrameworks>net5.0</TargetFrameworks>
     <Platforms>AnyCPU;ARM64</Platforms>
-    <Version>1.1.2-rc1</Version>
-    <Description>创建流水号移除ref用法</Description>
+    <Version>1.1.2-rc2</Version>
+    <Description>ORM使用Update更新时,新增是否校验InnerVersion字段进行内部乐观锁,默认不校验</Description>
     <PackageReleaseNotes>
       1、机器码记录到日志
       2、优化日志组件
@@ -23,6 +23,7 @@
       15、优化异常致命等级的日志记录格式
       16、修复创建流水号已知的bug(例如,流水号限定3位,当流水号为1000时,仍然能创建成功)
       17、创建流水号移除ref用法
+      18、ORM使用Update更新时,新增是否校验InnerVersion字段进行内部乐观锁,默认不校验
     </PackageReleaseNotes>
     
   </PropertyGroup>
