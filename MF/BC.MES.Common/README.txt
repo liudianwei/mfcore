@@ -13,3 +13,4 @@
       v1.2.5-rc1 打包SQLite.Interop.dll,授权加资源锁
       v1.2.5-rc2 升级SqlSugar
       v1.2.5-rc3 优化日志输出
+      v1.2.5-rc4 升级SqlSugar 5.1.4.58
