@@ -9,7 +9,11 @@ namespace MF.Orm.UnitOfWork
     public interface IUnitOfWork
     {
         SqlSugarClient GetDbClient();
-
+        /// <summary>
+        /// ClickHouse
+        /// </summary>
+        /// <returns></returns>
+        SqlSugarClient GetCHDbClient();
         SqlSugarClient GetCustomerDbClient(string connstr, DbType type);
 
         DbResult<bool> UseTran(Action action, Action<Exception> ex = null);

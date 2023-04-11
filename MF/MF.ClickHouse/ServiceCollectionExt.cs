@@ -1,6 +1,7 @@
 ﻿using ClickHouse.Client.ADO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NLog;
 using System;
 using System.Data;
 
@@ -10,6 +11,7 @@ namespace MF.ClickHouse
     {
         private static ClickHouseConnection _clickHouseConnection = null;
         public static Feature SupportedFeatures;
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
 
         public static IServiceCollection AddClickHouseClient(this IServiceCollection services, IConfiguration configuration)
@@ -44,6 +46,7 @@ namespace MF.ClickHouse
                         {
                             _clickHouseConnection = new ClickHouseConnection();
                             Console.WriteLine("### [Orm:chConnectionString] is missing in appsettings.json ###");
+                            logger.Error("### [Orm:chConnectionString] is missing in appsettings.json ###");
                         }
                     }
                     else
@@ -55,7 +58,8 @@ namespace MF.ClickHouse
             catch (Exception)
             {
                 _clickHouseConnection=new ClickHouseConnection();
-                Console.WriteLine("### ClickHouse not connected ###");
+                Console.WriteLine("### clickhouse not connected ###");
+                logger.Error("### clickhouse not connected ###");
             } 
             return _clickHouseConnection;
         }

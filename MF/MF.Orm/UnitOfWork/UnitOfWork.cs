@@ -5,6 +5,7 @@ using MF.Ioc;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace MF.Orm.UnitOfWork
 {
@@ -13,17 +14,19 @@ namespace MF.Orm.UnitOfWork
     {
         private readonly SqlSugarClient _client;
         private SqlSugarClient _Customerclient;
+        private SqlSugarClient _CHclient; 
+        private static IConfiguration _configuration;
 
-        public UnitOfWork(SqlSugarClient client)
+        public UnitOfWork(SqlSugarClient client, IConfiguration configuration)
         {
             _client = client;
+            _configuration = configuration;
         }
 
         public SqlSugarClient GetDbClient()
         {
             return _client as SqlSugarClient;
         }
-
         public SqlSugarClient GetCustomerDbClient(string connstr, DbType type)
         {
             _Customerclient = new SqlSugarClient(new ConnectionConfig()
@@ -34,6 +37,52 @@ namespace MF.Orm.UnitOfWork
                 InitKeyType = InitKeyType.Attribute
             });
             return _Customerclient;
+        }
+        /// <summary>
+        /// ClickHouse
+        /// </summary>
+        /// <returns></returns>
+        public SqlSugarClient GetCHDbClient()
+        {
+            var chConnectionString = _configuration["Orm:ChConnectionString"];
+            bool.TryParse(_configuration["Log:SqlLog"], out bool flag);
+            _CHclient = new SqlSugarClient(new ConnectionConfig()
+            {
+                DbType = DbType.ClickHouse,
+                ConnectionString = chConnectionString,
+                IsAutoCloseConnection = true,
+                InitKeyType = InitKeyType.Attribute
+            }, db => {
+                if (flag)
+                {                   
+                    //SQL执行完
+                    db.Aop.OnLogExecuted = (sql, pars) =>
+                    {
+                        foreach (var item in pars)
+                        {
+                            sql = sql.Replace(item.ParameterName.ToString(), $"'{item.Value?.ToString()}'");
+                        }
+                        sql = PretySql(sql);
+                        Console.WriteLine($"");
+                        Console.WriteLine($"ClickHouse--- 执行后SQL==>\r\n{sql}");
+                        Console.WriteLine($"执行时间: {db.Ado.SqlExecutionTime.TotalSeconds}");
+                    };
+                }
+            });
+            return _CHclient;
+        }
+
+        private static string PretySql(string sql)
+        {
+            return sql.Replace("SELECT", "SELECT\r\n")
+                       .Replace(",", ",\r\n")
+                       .Replace("FROM", "\r\nFROM")
+                       .Replace("WHERE", "\r\nWHERE")
+                       .Replace("ORDER", "\r\nORDER")
+                       .Replace("LIMIT", "\r\nLIMIT")
+                       .Replace("Left JOIN", "\r\nLeft JOIN")
+                       .Replace(")  AND  (", ")\r\nAND (")
+                       .Replace(")   AND (", ")\r\nAND (");
         }
         /// <summary>
         /// 大数据写入 bulk插入

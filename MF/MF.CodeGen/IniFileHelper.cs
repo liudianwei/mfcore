@@ -50,7 +50,7 @@ namespace CodeGen
                 var item = CheckCodeGenCr(strMachineCode);
                 if (!item.Item1)
                 {
-                    var msg = $"授权失败,请联系管理员进行授权!Warning Message ===>{item.Item2}；机器码为===>{strMachineCode}";
+                    var msg = $"授权失败,请联系管理员进行授权!Warning Message ===>{item.Item2}；机器码为===>AMES-CodeGen:{strMachineCode}";
                     Console.WriteLine(msg);
                     throw new Exception(msg);
                 }

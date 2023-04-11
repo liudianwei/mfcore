@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <TargetFrameworks>net5.0</TargetFrameworks>
-	  <Version>1.0.1.4</Version>
+	  <Version>1.0.1.5</Version>
 	  <Description>代码生成器</Description>
 	  <PackageReleaseNotes>
-		  代码生成器
+		  修改注册码授权提示信息 ---2023/4/11
 	  </PackageReleaseNotes>
 	  <AssemblyName>MF.CodeGen</AssemblyName>
 	  <RootNamespace>MF.CodeGen</RootNamespace>
