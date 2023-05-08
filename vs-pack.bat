@@ -110,4 +110,8 @@ cd ..
 cd MF.TTS
 dotnet pack --output ./../../core-nupkgs
 
+cd ..
+cd MF.ClickHouse
+dotnet pack --output ./../../core-nupkgs
+
 pause
