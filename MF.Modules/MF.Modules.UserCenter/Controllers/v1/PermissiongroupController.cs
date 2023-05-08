@@ -30,7 +30,7 @@ namespace UserCenter.Controllers.v1
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, ActionLog("创建权限组")]
+        [HttpPost, ActionLog("【权限组】创建")]
         public async Task<IActionResult> Post(PermissionGroupDto dto)
         {
             var response = await _bus.SendAsync(new CreatePermissionGroupCommand() { Dto = dto });
@@ -43,7 +43,7 @@ namespace UserCenter.Controllers.v1
         /// <param name="id"></param>
         /// <param name="command"></param>
         /// <returns></returns>
-        [HttpPut("{id}"), ActionLog("更新权限组")]
+        [HttpPut("{id}"), ActionLog("【权限组】更新")]
         public async Task<IActionResult> Put(string id, UpdatePermissionGroupCommand command)
         {
             command.Id = id;
@@ -56,7 +56,7 @@ namespace UserCenter.Controllers.v1
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete("{id}"), ActionLog("删除权限组")]
+        [HttpDelete("{id}"), ActionLog("【权限组】删除权")]
         public async Task<IActionResult> Delete(string id)
         {
             var response = await _bus.SendAsync(new DeletePermissionGroupCommand(new List<string>() { id }));
@@ -67,7 +67,7 @@ namespace UserCenter.Controllers.v1
         /// 批量删除permissionGroup
         /// </summary>
         /// <returns></returns>
-        [HttpPost("batch-delete-request"), ActionLog("批量删除权限组")]
+        [HttpPost("batch-delete-request"), ActionLog("【权限组】批量删除")]
         public async Task<IActionResult> BatchDelete([FromBody] List<string> ids)
         {
             var response = await _bus.SendAsync(new DeletePermissionGroupCommand(ids));
@@ -116,7 +116,7 @@ namespace UserCenter.Controllers.v1
         /// <param name="id"></param>
         /// <param name="command"></param>
         /// <returns></returns>
-        [HttpPost("{id}/permission"), ActionLog("给权限分配权限组")]
+        [HttpPost("{id}/permission"), ActionLog("【权限组】给菜单分配权限组")]
         public async Task<IActionResult> AssignPermissionToPermissionGroup(string id, AssignPermissionPermissionGroupCommand command)
         {
             command.Id = id;

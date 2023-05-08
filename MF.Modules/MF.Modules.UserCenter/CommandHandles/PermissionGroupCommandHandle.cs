@@ -79,7 +79,7 @@ namespace UserCenter.CommandHandles
 
         private Permissiongroup FindModelByName(string name)
         {
-            Permissiongroup permissionGroup = _permissiongroupRepository.Queryable().First(pg => pg.Name.Equals(name));
+            Permissiongroup permissionGroup = _permissiongroupRepository.Queryable().First(pg => pg.Name== name);
             if (permissionGroup != null)
             {
                 return permissionGroup;
@@ -137,7 +137,7 @@ namespace UserCenter.CommandHandles
             {
                 return null;
             }
-            Permissiongroup permissionGroup = _permissiongroupRepository.QueryableToEntity(pg => pg.Id.Equals(id));
+            Permissiongroup permissionGroup = _permissiongroupRepository.QueryableToEntity(pg => pg.Id== id);
             return permissionGroup;
         }
 
@@ -182,7 +182,7 @@ namespace UserCenter.CommandHandles
                     }
                     else
                     {
-                        if (!_permissiongroupRepository.Delete(pg => pg.Id.Equals(id)))
+                        if (!_permissiongroupRepository.Delete(pg => pg.Id == id))
                         {
                             ubdellist.Add(id);
                         }
@@ -219,7 +219,7 @@ namespace UserCenter.CommandHandles
                 return Failed(BaseSystemError.OBJECT_DOES_NOT_EXIST);
             }
             List<PermissionPermissiongroup> links = new List<PermissionPermissiongroup>();
-            if (_permissionPermissiongroupRepository.Delete(pgp => pgp.PermissiongroupId.Equals(cmd.Id)))
+            if (_permissionPermissiongroupRepository.Delete(pgp => pgp.PermissiongroupId== cmd.Id))
             {
                 foreach (var pgId in cmd.plist)
                 {
@@ -261,7 +261,7 @@ namespace UserCenter.CommandHandles
         /// <returns></returns>
         public Task<PubResponse> Handle(QueryByNamePermissionGroupCommand cmd, CancellationToken cancellationToken)
         {
-            var permissionGroup = _permissiongroupRepository.Queryable().First(pg => pg.Name.Equals(cmd.Name));
+            var permissionGroup = _permissiongroupRepository.Queryable().First(pg => pg.Name== cmd.Name);
             bool flag = permissionGroup.NotNull();
             return SucceedOrFail(flag, permissionGroup);
         }
@@ -290,8 +290,7 @@ namespace UserCenter.CommandHandles
         /// <returns></returns>
         public Task<PubResponse> Handle(QueryPermissionByIdPermissionGroupCommand cmd, CancellationToken cancellationToken)
         {
-            var pgps = _permissionPermissiongroupRepository.QueryableToList(pgp => pgp.Id.Equals(cmd.Id));
-            var pids = pgps.Select(pgp => pgp.PermissionId).ToList();
+            var pids = _permissionPermissiongroupRepository.Queryable().Where(pgp => pgp.Id == cmd.Id).Select(pgp => pgp.PermissionId).ToList();
             var permissions = _permissionRepository.QueryableToList(p => pids.Contains(p.Id));
             bool flag = permissions.Count == pids.Count;
             return SucceedOrFail(flag, permissions);

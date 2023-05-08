@@ -29,7 +29,7 @@ namespace UserCenter.Controllers.v1
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, ActionLog("添加权限")]
+        [HttpPost, ActionLog("【权限规则】添加权限")]
         public async Task<IActionResult> Post(PermissionDto dto)
         {
             var response = await _bus.SendAsync(new CreatePermissionCommand { Dto = dto });
@@ -42,7 +42,7 @@ namespace UserCenter.Controllers.v1
         /// <param name="id"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut("{id}"), ActionLog("更新权限")]
+        [HttpPut("{id}"), ActionLog("【权限规则】更新权限")]
         public async Task<IActionResult> Put(string id, PermissionDto dto)
         {
             UpdatePermissionCommand command = new UpdatePermissionCommand
@@ -59,7 +59,7 @@ namespace UserCenter.Controllers.v1
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete("{id}"), ActionLog("删除权限")]
+        [HttpDelete("{id}"), ActionLog("【权限规则】删除权限")]
         public async Task<IActionResult> Delete(string id)
         {
             var response = await _bus.SendAsync(new DeletePermissionCommand() { Id = id });
@@ -118,7 +118,7 @@ namespace UserCenter.Controllers.v1
         /// <param name="id"></param>
         /// <param name="command"></param>
         /// <returns></returns>
-        [HttpPost("{id}/batch-request"), ActionLog("批量操作权限")]
+        [HttpPost("{id}/batch-request"), ActionLog("【权限规则】更新下层按钮")]
         public async Task<IActionResult> BatchPermission(string id, BatchPermissionCommand command)
         {
             command.Id = id;

@@ -149,16 +149,16 @@ namespace UserCenter.Controllers.v2
             return Result(response);
         }
 
-        /// <summary>
-        /// 获取所有role树形的列表
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("tree")]
-        public async Task<IActionResult> AllTree()
-        {
-            var response = await _bus.SendAsync(new QueryAllTreeRoleCommand());
-            return Result(response);
-        }
+        ///// <summary>
+        ///// 获取所有role树形的列表
+        ///// </summary>
+        ///// <returns></returns>
+        //[HttpGet("tree")]
+        //public async Task<IActionResult> AllTree()
+        //{
+        //    var response = await _bus.SendAsync(new QueryAllTreeRoleCommand());
+        //    return Result(response);
+        //}
 
         /// <summary>
         /// 根据role-id获取role

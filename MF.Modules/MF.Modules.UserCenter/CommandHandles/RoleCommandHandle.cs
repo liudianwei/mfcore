@@ -32,7 +32,7 @@ namespace UserCenter.CommandHandles
         IRequestHandler<AssignUserToRoleRoleCommand, PubResponse>,
         IRequestHandler<QueryAllTreeRoleCommand, PubResponse>,
         IRequestHandler<QueryAllRoleCommand, PubResponse>,
-        IRequestHandler<QueryByNameRoleCommand, PubResponse>, 
+        IRequestHandler<QueryByNameRoleCommand, PubResponse>,
         IRequestHandler<QueryByUserNameRoleCommand, PubResponse>,
         IRequestHandler<QueryByRoleNameCommand, PubResponse>,
         IRequestHandler<QueryPageRoleCommand, PubResponse>,
@@ -76,8 +76,8 @@ namespace UserCenter.CommandHandles
             {
                 return Failed(BaseSystemError.NAME_CANNOT_BE_EMPTY);
             }
-            var roleByName = _roleRepository.QueryableToEntity(u => u.Name.Equals(cmd.Name));
-            if (roleByName.NotNull())
+            var roleByName = _roleRepository.Queryable().Any(u => u.Name == cmd.Name);
+            if (roleByName)
             {
                 return Failed(BaseSystemError.OBJECT_ALREADY_EXIST);
             }
@@ -113,6 +113,8 @@ namespace UserCenter.CommandHandles
             }
 
             var roleById = _roleRepository.Queryable().InSingle(cmd.Id);
+            var beforeName = roleById.Name;
+            var beforeRemark = roleById.Remark;
             if (roleById.IsNull())
             {
                 return Failed(BaseSystemError.OBJECT_DOES_NOT_EXIST);
@@ -120,8 +122,8 @@ namespace UserCenter.CommandHandles
 
             if (!roleById.Name.Equals(cmd.Name))
             {
-                var roleByName = _roleRepository.QueryableToEntity(u => u.Name.Equals(cmd.Name));
-                if (roleByName.NotNull())
+                var roleByName = _roleRepository.Queryable().Any(u => u.Name == cmd.Name);
+                if (roleByName)
                 {
                     return Failed(BaseSystemError.OBJECT_ALREADY_EXIST);
                 }
@@ -131,7 +133,7 @@ namespace UserCenter.CommandHandles
             roleById.Updator = cmd.Updator;
 
             bool flag = _roleRepository.UpdateEntity(roleById);
-            return SucceedOrFail(flag, roleById.Id);
+            return SucceedOrFail(flag, $"修改前:角色-{beforeName},备注-{beforeRemark}");
         }
 
         /// <summary>
@@ -165,16 +167,16 @@ namespace UserCenter.CommandHandles
             foreach (var role in roles)
             {
                 // 查询角色权限关联
-                var rpLink = _rolePermissionRepository.QueryableToList(rp => rp.RoleId.Equals(role.Id));
-                if (rpLink.NotNullT())
+                var rpLink = _rolePermissionRepository.Queryable().Any(rp => rp.RoleId == role.Id);
+                if (rpLink)
                 {
                     undellist.Add(role.Id);
                     continue;
                 }
 
                 // 角色用户关联
-                var ruLink = _roleUserRepository.QueryableToList(ru => ru.RoleId.Equals(role.Id));
-                if (ruLink.NotNullT())
+                var ruLink = _roleUserRepository.Queryable().Any(ru => ru.RoleId == role.Id);
+                if (ruLink)
                 {
                     undellist.Add(role.Id);
                     continue;
@@ -185,7 +187,7 @@ namespace UserCenter.CommandHandles
                 return Failed(BaseSystemError.RELATION_EXIST);
             }
             bool _flag = _roleRepository.Delete(r => cmd.List.Contains(r.Id));
-            return SucceedOrFail(_flag);
+            return SucceedOrFail(_flag, $"删除角色为:{string.Join(",", roles.Select(a => a.Name).ToList())}");
         }
 
         /// <summary>
@@ -243,7 +245,7 @@ namespace UserCenter.CommandHandles
                 else
                 {
                     //针对已分配给权限操作
-                    var list = db.Queryable<RolePermission>().Where(i => i.RoleId.Equals(cmd.Id)).ToList();
+                    var list = db.Queryable<RolePermission>().Where(i => i.RoleId == cmd.Id).ToList();
                     //禁用
                     var disList = list.Where(i => !cmd.List.Contains(i.PermissionId)).Select(i => i.Id).ToArray();
                     //更新
@@ -260,7 +262,7 @@ namespace UserCenter.CommandHandles
                     .ExecuteCommand();
 
                     //未分配 但属于自己创建的按钮、菜单
-                    var allPermList=list.Select(i => i.PermissionId).ToArray();
+                    var allPermList = list.Select(i => i.PermissionId).ToArray();
                     var selfList = cmd.List.Except(allPermList).ToList();
 
                     if (selfList.Count > 0)
@@ -282,7 +284,7 @@ namespace UserCenter.CommandHandles
                 }
             });
 
-            return SucceedOrFail(flag.IsSuccess);
+            return SucceedOrFail(flag.IsSuccess, $"分配角色:{roleObj.Name}");
         }
 
         /// <summary>
@@ -300,7 +302,7 @@ namespace UserCenter.CommandHandles
             }
             if (cmd.List.IsNullT())
             {
-                _roleUserRepository.Delete(rp => rp.RoleId.Equals(cmd.Id), false);
+                _roleUserRepository.Delete(rp => rp.RoleId == cmd.Id, false);
                 return Succeed();
             }
 
@@ -322,7 +324,7 @@ namespace UserCenter.CommandHandles
             var flag = db.UseTran(() =>
             {
                 //删除
-                db.Deleteable<RoleUser>().Where(rp => rp.RoleId.Equals(cmd.Id)).ExecuteCommand();
+                db.Deleteable<RoleUser>().Where(rp => rp.RoleId == cmd.Id).ExecuteCommand();
                 List<RoleUser> addItemList = new List<RoleUser>();
                 foreach (var uid in cmd.List)
                 {
@@ -338,7 +340,7 @@ namespace UserCenter.CommandHandles
                 db.Insertable(addItemList).ExecuteCommand();
             });
 
-            return SucceedOrFail(flag.IsSuccess);
+            return SucceedOrFail(flag.IsSuccess, $"分配角色:{role.Name}");
         }
 
         /// <summary>
@@ -368,14 +370,18 @@ namespace UserCenter.CommandHandles
             }
             List<RoleTreeResp> list = new List<RoleTreeResp>();
 
+            var linkList = _roleUserRepository.Queryable().Select(l => new { l.UserId, l.RoleId }).ToList();
+            var userList = _userRepository.Queryable().ToList();
+
             foreach (var role in roleList)
             {
-                // 查询关联表
-                var links = _roleUserRepository.QueryableToList(ru => ru.RoleId.Equals(role.Id));
-                // 获取用户id列表
-                var uids = links.Select(l => l.UserId).ToList();
+                //// 查询关联表
+                //var links = _roleUserRepository.QueryableToList(ru => ru.RoleId== role.Id);
+                //// 获取用户id列表
+                //var uids = links.Select(l => l.UserId).ToList();
+                var uids = linkList.Where(ru => ru.RoleId == role.Id).Select(l => l.UserId).ToList();
                 // 查询用户列表
-                var users = _userRepository.Queryable().In(uids).ToList();
+                var users = userList.Where(i => uids.Contains(i.Id)).ToList();//_userRepository.Queryable().In(uids).ToList();
 
                 //查询角色用户关联表
                 RoleTreeResp rtd = new RoleTreeResp
@@ -436,13 +442,13 @@ namespace UserCenter.CommandHandles
 
             var userRoleList = FindRoleByUser();
 
-            var userEnty=userRoleList.Where(i => i.UserName == cmd.UserName).FirstOrDefault();
+            var userEnty = userRoleList.Where(i => i.UserName == cmd.UserName).FirstOrDefault();
             if (userEnty.IsNull())
             {
                 return Failed(BaseSystemError.OBJECT_DOES_NOT_EXIST);
             }
 
-            if (userEnty.RoleList.Count<=0)
+            if (userEnty.RoleList.Count <= 0)
             {
                 return Failed(UserCenterError.ASSIGN_USER_NOT_FOUND);
             }
@@ -487,7 +493,7 @@ namespace UserCenter.CommandHandles
         /// <returns></returns>
         public Task<PubResponse> Handle(QueryByNameRoleCommand cmd, CancellationToken cancellationToken)
         {
-            var role = _roleRepository.QueryableToEntity(r => r.Name.Equals(cmd.Name));
+            var role = _roleRepository.QueryableToEntity(r => r.Name == cmd.Name);
             bool flag = role.NotNull();
             return SucceedOrFail(flag, role);
         }
@@ -520,10 +526,10 @@ namespace UserCenter.CommandHandles
             var db = _unitOfWork.GetDbClient();
             var list = db.Queryable<Permission, RolePermission, Role>
                ((p, rolePermissionLink, r) => new JoinQueryInfos(
-                   JoinType.Left, rolePermissionLink.PermissionId.Equals(p.Id),
-                   JoinType.Left, r.Id.Equals(rolePermissionLink.RoleId)
+                   JoinType.Left, rolePermissionLink.PermissionId == p.Id,
+                   JoinType.Left, r.Id == rolePermissionLink.RoleId
                ))
-               .Where((p, rolePermissionLink, r) => r.Id.Equals(cmd.Id)
+               .Where((p, rolePermissionLink, r) => r.Id == cmd.Id
                        && p.State != BaseStateConstants.DELETE
                        && rolePermissionLink.State == BaseStateConstants.ACTIVATE
                        && r.State != BaseStateConstants.DELETE)
@@ -567,7 +573,7 @@ namespace UserCenter.CommandHandles
             }
 
             //查询关联表
-            var links = _roleUserRepository.QueryableToList(rp => rp.RoleId.Equals(cmd.Id)); 
+            var links = _roleUserRepository.QueryableToList(rp => rp.RoleId == cmd.Id);
             if (links.IsNullT())
             {
                 return Failed(UserCenterError.ASSIGN_PERMISSION_NOT_FOUND);

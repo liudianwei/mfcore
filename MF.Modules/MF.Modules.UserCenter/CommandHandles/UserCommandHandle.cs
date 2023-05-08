@@ -72,7 +72,7 @@ namespace UserCenter.CommandHandles
         IRequestHandler<StoreExportUserCommand, PubResponse>,
         IRequestHandler<StoreQueryPageUserCommand, PubResponse>,
         IRequestHandler<StoreUpdateStatusUserCommand, PubResponse>,
-        IRequestHandler<StoreBatchResetPasswordUserCommand, PubResponse>, 
+        IRequestHandler<StoreBatchResetPasswordUserCommand, PubResponse>,
         IRequestHandler<IPCCheckBindUserCommand, PubResponse>,
         IRequestHandler<IPCCheckBtnUserCommand, PubResponse>,
         IRequestHandler<FindUserTokenCommand, PubResponse>
@@ -318,7 +318,7 @@ namespace UserCenter.CommandHandles
         public Task<PubResponse> Handle(LoginUserCommand cmd, CancellationToken cancellationToken)
         {
             // 查询用户是否存在
-            var user = _userRepository.QueryableToEntity(u => u.Name.Equals(cmd.Name));
+            var user = _userRepository.QueryableToEntity(u => u.Name == cmd.Name);
             if (user.IsNull())
             {
                 RecordLoginFailed(user);
@@ -357,16 +357,16 @@ namespace UserCenter.CommandHandles
                 Token = jwtobj.Item1,
                 ExpireTime = jwtobj.Item2,
                 Username = user.Name,
-                UserFullName=user.FullName,
+                UserFullName = user.FullName,
                 UserId = user.Id,
                 LoginType = cmd.LoginType,
                 Enable = user.State.Equals(BaseStateConstants.ACTIVATE),
                 AdditionalInformation = new Additionalinformation()
             };
             if (!cmd.LoginFalse)
-            {                
+            {
                 RecordLoginSuccess(user);//记录访问日志
-            }            
+            }
             return Succeed(data);
         }
 
@@ -412,7 +412,7 @@ namespace UserCenter.CommandHandles
 
             if (dto.Name.NotNull() && !dto.Name.Equals(user.Name))
             {
-                if (_userRepository.Queryable().Any(u => u.Name.Equals(dto.Name) && !u.Id.Equals(dto.Id)))
+                if (_userRepository.Queryable().Any(u => u.Name == dto.Name && u.Id != dto.Id))
                 {
                     return Failed(BaseSystemError.OBJECT_ALREADY_EXIST);
                 }
@@ -460,7 +460,7 @@ namespace UserCenter.CommandHandles
 
             if (dto.Name.NotNull() && !dto.Name.Equals(user.Name))
             {
-                if (_userRepository.Queryable().Any(u => u.Name.Equals(dto.Name) && !u.Id.Equals(dto.Id)))
+                if (_userRepository.Queryable().Any(u => u.Name == dto.Name && u.Id != dto.Id))
                 {
                     return Failed(BaseSystemError.OBJECT_ALREADY_EXIST);
                 }
@@ -625,9 +625,9 @@ namespace UserCenter.CommandHandles
         public Task<PubResponse> Handle(AssignFavoriteUserCommand cmd, CancellationToken cancellationToken)
         {
             //User user = _userRepository.Queryable().InSingle(cmd.OwnerId);
-            List<UserFavorite> list = _userFavoriteRepository.QueryableToList(uf => uf.OwnerId.Equals(_globalCore.UserId));
+            List<UserFavorite> list = _userFavoriteRepository.QueryableToList(uf => uf.OwnerId == _globalCore.UserId);
 
-            _userFavoriteRepository.Delete(i => i.OwnerId.Equals(_globalCore.UserId), false);
+            _userFavoriteRepository.Delete(i => i.OwnerId == _globalCore.UserId, false);
 
             var newArr = cmd.List.Select(i => i.Id).ToArray();
             var oldArr = list.Select(i => i.Id).ToArray();
@@ -657,7 +657,8 @@ namespace UserCenter.CommandHandles
                 e.OwnerId = _globalCore.UserId;
                 addList.Add(e);
             }
-            if (addList.Count > 0) {
+            if (addList.Count > 0)
+            {
                 CheckNull.BusinessException(!_userFavoriteRepository.Insert(addList), BaseSystemError.FAILED);
             }
             return Succeed(cmd.List.Count);
@@ -675,7 +676,7 @@ namespace UserCenter.CommandHandles
             List<UserFavorite> list = new List<UserFavorite>();
             //if (user.NotNull())
             //{
-            list = _userFavoriteRepository.QueryableToList(uf => uf.OwnerId.Equals(_globalCore.UserId));
+            list = _userFavoriteRepository.QueryableToList(uf => uf.OwnerId == _globalCore.UserId);
             if (list.NotNullT())
             {
                 list = list.OrderBy(x => x.DisplayIndex).ToList();
@@ -828,7 +829,7 @@ namespace UserCenter.CommandHandles
         /// <returns></returns>
         public Task<PubResponse> Handle(QueryAllUserCommand cmd, CancellationToken cancellationToken)
         {
-            List<User> users = _userRepository.QueryableToList(u => !u.Id.Equals(SystemConstants.superId));//过滤超级管理员
+            List<User> users = _userRepository.QueryableToList(u => u.Id != SystemConstants.superId);//过滤超级管理员
 
             return Succeed(users);
         }
@@ -844,7 +845,7 @@ namespace UserCenter.CommandHandles
             User user = null;
             if (!cmd.Name.Equals(SystemConstants.superName))
             {
-                user = _userRepository.QueryableToEntity(u => u.Name.Equals(cmd.Name));
+                user = _userRepository.QueryableToEntity(u => u.Name == cmd.Name);
             }
 
             return Succeed(user);
@@ -956,7 +957,7 @@ namespace UserCenter.CommandHandles
             //切换成sql server之后，不能使用 text字段
 
             return db.Queryable<User>("u")
-                .Where(u => u.State != BaseStateConstants.DELETE && !u.Id.Equals(SystemConstants.superId))
+                .Where(u => u.State != BaseStateConstants.DELETE && u.Id != SystemConstants.superId)
                 .WhereIF(strCondition.NotNull(), strCondition)
                 .OrderByIF(strOrder.NotNull(), strOrder)
                 .OrderBy(u => u.CreateTime, OrderByType.Desc)
@@ -970,9 +971,9 @@ namespace UserCenter.CommandHandles
                     Theme = u.Theme,
                     State = u.State,
                     CreateTime = u.CreateTime,
-                    UpdateTime=u.UpdateTime,
-                    Creator=u.Creator,
-                    Updator=u.Updator
+                    UpdateTime = u.UpdateTime,
+                    Creator = u.Creator,
+                    Updator = u.Updator
                 });
         }
 
@@ -1023,7 +1024,7 @@ namespace UserCenter.CommandHandles
             var list = db
                 .Queryable<RoleUser, Role>
                 ((ru, r) => new JoinQueryInfos(
-                    JoinType.Left, r.Id.Equals(ru.RoleId)
+                    JoinType.Left, r.Id == ru.RoleId
                 ))
                 .Where((ru, r) => ids.Contains(ru.UserId) && r.State != BaseStateConstants.DELETE)
                 .Select((ru, r) => new RoleDto
@@ -1245,7 +1246,7 @@ namespace UserCenter.CommandHandles
         /// <returns></returns>
         public Task<PubResponse> Handle(QueryUserListByNameCommand cmd, CancellationToken cancellationToken)
         {
-            User user = _userRepository.QueryableToEntity(u => u.Name.Equals(cmd.Name));
+            User user = _userRepository.QueryableToEntity(u => u.Name == cmd.Name);
             return GetUserGroupByUser(user);
         }
 
@@ -1339,7 +1340,7 @@ namespace UserCenter.CommandHandles
             }
 
             // 查询工位是否存在
-            Task<PubResponse> _task2 = _bus.SendAsync(new QueryExistByNameWorkStationCommand() { Name = cmd.OpName,LineCode=cmd.LineCode });
+            Task<PubResponse> _task2 = _bus.SendAsync(new QueryExistByNameWorkStationCommand() { Name = cmd.OpName, LineCode = cmd.LineCode });
             if (_task2.Result.Status == ResultStatusConstants.SUCCESS)
             {
                 if (!(bool)_task2.Result.Data)
@@ -1384,7 +1385,7 @@ namespace UserCenter.CommandHandles
         public Task<PubResponse> Handle(IPCCheckBindUserCommand cmd, CancellationToken cancellationToken)
         {
             // 查询用户是否存在
-            var user = _userRepository.QueryableToEntity(u => u.Name.Equals(cmd.Name));
+            var user = _userRepository.QueryableToEntity(u => u.Name == cmd.Name);
             if (user.IsNull())
             {
                 //RecordLoginFailed(user);
@@ -1406,8 +1407,8 @@ namespace UserCenter.CommandHandles
             }
             //校验角色
             var db = _unitOfWork.GetDbClient();
-            var list = db.Queryable<RoleUser, Role>((ru, r) => new JoinQueryInfos(JoinType.Left, r.Id.Equals(ru.RoleId)))
-                .Where((ru, r) => ru.UserId.Equals(user.Id) && r.State != BaseStateConstants.DELETE && r.Name.Equals(UserConstants.BIND_ROLE))
+            var list = db.Queryable<RoleUser, Role>((ru, r) => new JoinQueryInfos(JoinType.Left, r.Id == ru.RoleId))
+                .Where((ru, r) => ru.UserId == user.Id && r.State != BaseStateConstants.DELETE && r.Name == UserConstants.BIND_ROLE)
                 .ToList();
             if (list.Count > 0)
             {
@@ -1427,7 +1428,7 @@ namespace UserCenter.CommandHandles
         public Task<PubResponse> Handle(IPCCheckBtnUserCommand cmd, CancellationToken cancellationToken)
         {
             // 查询用户是否存在
-            var user = _userRepository.QueryableToEntity(u => u.Name.Equals(cmd.Name));
+            var user = _userRepository.QueryableToEntity(u => u.Name == cmd.Name);
             if (user.IsNull())
             {
                 //RecordLoginFailed(user);
@@ -1470,8 +1471,8 @@ namespace UserCenter.CommandHandles
 
             //校验角色
             var db = _unitOfWork.GetDbClient();
-            var list = db.Queryable<RoleUser, Role>((ru, r) => new JoinQueryInfos(JoinType.Left, r.Id.Equals(ru.RoleId)))
-                .Where((ru, r) => ru.UserId.Equals(user.Id) && r.State != BaseStateConstants.DELETE&& roles.Contains(r.Id))
+            var list = db.Queryable<RoleUser, Role>((ru, r) => new JoinQueryInfos(JoinType.Left, r.Id == ru.RoleId))
+                .Where((ru, r) => ru.UserId == user.Id && r.State != BaseStateConstants.DELETE && roles.Contains(r.Id))
                 .ToList();
             if (list.Count > 0)
             {
@@ -1482,7 +1483,8 @@ namespace UserCenter.CommandHandles
                 return Failed(UserCenterError.PERMISSION_NOT_FOUND);
             }
         }
-        public class btnGloabl { 
+        public class btnGloabl
+        {
             public List<string> roles { get; set; }
         }
         public Task<PubResponse> Handle(FindUserTokenCommand cmd, CancellationToken cancellationToken)

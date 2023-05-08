@@ -102,7 +102,7 @@ namespace UserCenter.Controllers.v1
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost, ActionLog("创建用户")]
+        [HttpPost, ActionLog("【管理人员】创建用户")]
         public async Task<IActionResult> Post(UserDto dto)
         {
             var response = await _bus.SendAsync(new CreateUserCommand { Dto = dto });
@@ -115,7 +115,7 @@ namespace UserCenter.Controllers.v1
         /// <param name="id"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut("{id}"), ActionLog("更新用户")]
+        [HttpPut("{id}"), ActionLog("【管理人员】更新用户")]
         public async Task<IActionResult> Put(string id, UserDto dto)
         {
             dto.Id = id;
@@ -152,7 +152,7 @@ namespace UserCenter.Controllers.v1
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete("{id}"), ActionLog("删除用户")]
+        [HttpDelete("{id}"), ActionLog("【管理人员】删除用户")]
         public async Task<IActionResult> Delete(string id)
         {
             var response = await _bus.SendAsync(new DeleteUserCommand() { List = new List<string>() { id } });
@@ -164,7 +164,7 @@ namespace UserCenter.Controllers.v1
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpPost("batch-delete-request"), ActionLog("批量删除用户")]
+        [HttpPost("batch-delete-request"), ActionLog("【管理人员】批量删除")]
         public async Task<IActionResult> BatchDelete(List<string> ids)
         {
             var response = await _bus.SendAsync(new DeleteUserCommand() { List = ids });
@@ -188,7 +188,7 @@ namespace UserCenter.Controllers.v1
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        [HttpPut("resetpassword"), ActionLog("重置用户密码")]
+        [HttpPut("resetpassword"), ActionLog("【管理人员】重置密码")]
         public async Task<IActionResult> ResetPassword(ResetPasswordUserCommand command)
         {
             var response = await _bus.SendAsync(command);
@@ -200,7 +200,7 @@ namespace UserCenter.Controllers.v1
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        [HttpPut("resetpassword/batch"), ActionLog("批量重置用户密码")]
+        [HttpPut("resetpassword/batch"), ActionLog("【管理人员】批量重置密码")]
         public async Task<IActionResult> BatchResetPassword(BatchResetPasswordUserCommand command)
         {
             var response = await _bus.SendAsync(command);
@@ -212,7 +212,7 @@ namespace UserCenter.Controllers.v1
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        [HttpPut("changepassword"), ActionLog("修改用户密码")]
+        [HttpPut("changepassword"), ActionLog("【管理人员】修改密码")]
         public async Task<IActionResult> ChangePassword(ChangePasswordUserCommand command)
         {
             var response = await _bus.SendAsync(command);
@@ -236,7 +236,7 @@ namespace UserCenter.Controllers.v1
         /// </summary>
         /// <param name="cmd"></param>
         /// <returns></returns>
-        [HttpPost("batch-state-request"), ActionLog("启用禁用用户状态")]
+        [HttpPost("batch-state-request"), ActionLog("【管理人员】更新禁启用状态")]
         public async Task<IActionResult> ChangeStatus(UpdateStatusUserCommand cmd)
         {
             var response = await _bus.SendAsync(cmd);
@@ -271,7 +271,7 @@ namespace UserCenter.Controllers.v1
         /// 修改自定义图标
         /// </summary>
         /// <returns></returns>
-        [HttpPut("favorite"), ActionLog("修改用户自定义图标")]
+        [HttpPut("favorite"), ActionLog("【管理人员】修改自定义图标")]
         public async Task<IActionResult> AssignFavorite(AssignFavoriteUserCommand cmd)
         {
             var response = await _bus.SendAsync(cmd);

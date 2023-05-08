@@ -2,11 +2,12 @@
 
   <PropertyGroup>
 	  <TargetFramework>net5.0</TargetFramework>
-	  <Version>1.0.3-rc10.6.1</Version>
+	  <Version>1.0.3-rc10.6.2</Version>
 	  <Description>
-      +修复 异常中间件已知问题
-      +新增 导出EXCELsheet名参数传入指定,默认sheet
-    </Description>
+		  +修复 异常中间件已知问题
+		  +新增 导出EXCELsheet名参数传入指定,默认sheet
+		  +优化 ActionLog日志记录，支持自定义参数解析
+	  </Description>
 	  <PackageReleaseNotes>
 		  +修复 异常中间件 -add by caladi 2022/2/23
 		  +新增 导出EXCELsheet名参数传入指定,默认sheet --add by corbin 2022/3/30
@@ -17,6 +18,7 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="DynamicExpresso.Core" Version="2.16.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="4.1.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.QualityTools.Testing.Fakes" Version="16.7.4-beta.20330.2" />

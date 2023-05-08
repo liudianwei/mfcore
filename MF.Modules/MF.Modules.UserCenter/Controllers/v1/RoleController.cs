@@ -29,7 +29,7 @@ namespace UserCenter.Controllers.v1
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        [HttpPost, ActionLog("新增角色")]
+        [HttpPost, ActionLog("【角色】新增")]
         public async Task<IActionResult> Post(CreateRoleCommand command)
         {
             var response = await _bus.SendAsync(command);
@@ -42,7 +42,7 @@ namespace UserCenter.Controllers.v1
         /// <param name="id"></param>
         /// <param name="command"></param>
         /// <returns></returns>
-        [HttpPut("{id}"), ActionLog("修改角色")]
+        [HttpPut("{id}"), ActionLog("【角色】修改")]
         public async Task<IActionResult> Put(string id, UpdateRoleCommand command)
         {
             command.Id = id;
@@ -55,7 +55,7 @@ namespace UserCenter.Controllers.v1
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete("{id}"), ActionLog("删除角色")]
+        [HttpDelete("{id}"), ActionLog("【角色】删除")]
         public async Task<IActionResult> Delete(string id)
         {
             var response = await _bus.SendAsync(new DeleteRoleCommand(new List<string> { id }));
@@ -67,7 +67,7 @@ namespace UserCenter.Controllers.v1
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpPost("batch-delete-request"), ActionLog("批量删除角色")]
+        [HttpPost("batch-delete-request"), ActionLog("【角色】批量删除")]
         public async Task<IActionResult> BatchDelete(List<string> ids)
         {
             var response = await _bus.SendAsync(new DeleteRoleCommand(ids));
@@ -104,7 +104,7 @@ namespace UserCenter.Controllers.v1
         /// <param name="id"></param>
         /// <param name="command"></param>
         /// <returns></returns>
-        [HttpPost("{id}/permission"), ActionLog("给角色分配权限")]
+        [HttpPost("{id}/permission"), ActionLog("【角色】分配权限")]
         public async Task<IActionResult> AssignPermissionToRole(string id, AssignPermissionToRoleRoleCommand command)
         {
             command.Id = id;
@@ -118,7 +118,7 @@ namespace UserCenter.Controllers.v1
         /// <param name="id"></param>
         /// <param name="command"></param>
         /// <returns></returns>
-        [HttpPost("{id}/user"), ActionLog("给用户分配角色")]
+        [HttpPost("{id}/user"), ActionLog("【角色】分配用户")]
         public async Task<IActionResult> AssignUserToRole(string id, AssignUserToRoleRoleCommand command)
         {
             command.Id = id;
@@ -149,16 +149,16 @@ namespace UserCenter.Controllers.v1
             return Result(response);
         }
 
-        /// <summary>
-        /// 获取所有role树形的列表
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("tree")]
-        public async Task<IActionResult> AllTree()
-        {
-            var response = await _bus.SendAsync(new QueryAllTreeRoleCommand());
-            return Result(response);
-        }
+        ///// <summary>
+        ///// 获取所有role树形的列表
+        ///// </summary>
+        ///// <returns></returns>
+        //[HttpGet("tree")]
+        //public async Task<IActionResult> AllTree()
+        //{
+        //    var response = await _bus.SendAsync(new QueryAllTreeRoleCommand());
+        //    return Result(response);
+        //}
 
         /// <summary>
         /// 根据role-id获取role

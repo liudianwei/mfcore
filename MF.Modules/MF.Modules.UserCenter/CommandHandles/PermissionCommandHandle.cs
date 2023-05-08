@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
-using DAL.UserCenter.Entities;
+﻿using DAL.UserCenter.Entities;
 using DAL.UserCenter.IRepository;
-
 using Mapster;
-
 using MediatR;
-
 using MF.Core.Extensions;
 using MF.FluentValidation;
 using MF.NetCore;
@@ -18,9 +9,12 @@ using MF.NetCoreApp;
 using MF.Orm;
 using MF.Orm.UnitOfWork;
 using MF.Utils;
-
 using SqlSugar;
-
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using UserCenter.Commands;
 using UserCenter.Dtos;
 using UserCenter.Enums;
@@ -71,7 +65,7 @@ namespace UserCenter.CommandHandles
                 return Failed(BaseSystemError.OBJECT_CANNOT_BE_NULL);
             }
             PermissionDto dto = cmd.Dto;
-            var permission = _permissionRepository.Queryable().First(p => p.Name.Equals(dto.Name) && !p.Type.Equals(PermissionType.BUTTON));
+            var permission = _permissionRepository.Queryable().First(p => p.Name == dto.Name && p.Type != PermissionType.BUTTON);
 
             // 判断权限是否存在
             if (permission.NotNull())
@@ -82,7 +76,7 @@ namespace UserCenter.CommandHandles
             // 如果父id不为空 查询父权限
             if (dto.ParentId.NotNull())
             {
-                var parent = _permissionRepository.QueryableToEntity(p => p.Id.Equals(dto.ParentId));
+                var parent = _permissionRepository.QueryableToEntity(p => p.Id == dto.ParentId);
                 if (parent.IsNull())
                 {
                     return Failed(BaseSystemError.OBJECT_DOES_NOT_EXIST);
@@ -136,7 +130,7 @@ namespace UserCenter.CommandHandles
             var parentId = dtos[0].ParentId;
             // 根据父id和名称查询权限
             var names = dtos.Select(i => i.Name).ToList();
-            var permissions = allpermissions.Where(p => p.ParentId.Equals(parentId) && names.Contains(p.Name)).ToList();
+            var permissions = allpermissions.Where(p => p.ParentId == parentId && names.Contains(p.Name)).ToList();
 
             // 判断权限是否存在
             if (permissions.NotNullT())
@@ -147,7 +141,7 @@ namespace UserCenter.CommandHandles
             // 如果父id不为空 查询父权限
             if (parentId.NotNull())
             {
-                var parent = allpermissions.Where(p => p.Id.Equals(parentId)).ToList();
+                var parent = allpermissions.Where(p => p.Id == parentId).ToList();
                 if (parent.IsNull())
                 {
                     return Failed(BaseSystemError.OBJECT_DOES_NOT_EXIST);
@@ -213,7 +207,7 @@ namespace UserCenter.CommandHandles
         private bool AssignPermissionGroup(Permission permission, List<string> permissionGroupIds, string updator)
         {
             //删除和权限组的关联记录
-            _permissionPermissiongroupRepository.Delete(pgp => pgp.PermissionId.Equals(permission.Id), false);
+            _permissionPermissiongroupRepository.Delete(pgp => pgp.PermissionId == permission.Id, false);
 
             List<PermissionPermissiongroup> list = new List<PermissionPermissiongroup>();
             foreach (var permissionGroupId in permissionGroupIds)
@@ -294,7 +288,7 @@ namespace UserCenter.CommandHandles
             //名称发生修改 不能和别人重名
             if (!dto.Name.Equals(permission.Name))
             {
-                var permissionIndb = _permissionRepository.Queryable().First(p => !p.Id.Equals(dto.Id) && p.Name.Equals(dto.Name) && !p.Type.Equals(PermissionType.BUTTON));
+                var permissionIndb = _permissionRepository.Queryable().First(p => p.Id != dto.Id && p.Name == dto.Name && p.Type != PermissionType.BUTTON);
                 if (permissionIndb.NotNull())
                 {
                     return Failed(BaseSystemError.OBJECT_ALREADY_EXIST);
@@ -314,7 +308,7 @@ namespace UserCenter.CommandHandles
                 else
                 {
                     //权限如果已经被分配给角色 就不允许修改权限的上级菜单
-                    if (_rolePermissionRepository.Queryable().Any(p => p.PermissionId.Equals(dto.Id)))
+                    if (_rolePermissionRepository.Queryable().Any(p => p.PermissionId == dto.Id))
                     {
                         return Failed(UserCenterError.PERMISSION_ALREADY_ASSIGN);
                     }
@@ -417,7 +411,7 @@ namespace UserCenter.CommandHandles
                     {
                         if (dto.ParentId.NotNull())//父级菜单存在
                         {
-                            if (!allpermissions.Any(i => i.Id.Equals(dto.ParentId)))
+                            if (!allpermissions.Any(i => i.Id== dto.ParentId))
                             {
                                 return Failed(BaseSystemError.OBJECT_DOES_NOT_EXIST);
                             }
@@ -444,7 +438,7 @@ namespace UserCenter.CommandHandles
                     // 如果名称发生改变 需要判断和兄弟节点是否重名
                     if (!dto.Name.Equals(permission.Name))
                     {
-                        if (allpermissions.Any(p => p.Id != dto.Id && p.ParentId.Equals(dto.ParentId) && p.Name.Equals(dto.Name)))
+                        if (allpermissions.Any(p => p.Id != dto.Id && p.ParentId == dto.ParentId && p.Name == dto.Name))
                         {
                             return Failed(BaseSystemError.OBJECT_ALREADY_EXIST);//同名的兄弟权限已经存在
                         }
@@ -484,7 +478,7 @@ namespace UserCenter.CommandHandles
 
                 permission.ParentId = dto.ParentId;
                 permission.Url = dto.Url;
-                permission.IframeUrl = dto.IframeUrl;                
+                permission.IframeUrl = dto.IframeUrl;
                 permission.OrderNum = dto.OrderNum;
                 permission.Perms = dto.Perms;
 
@@ -513,7 +507,7 @@ namespace UserCenter.CommandHandles
         /// <param name="allpermission"></param>
         private void FindAllChildNode(List<Permission> children, string parentId, List<Permission> allpermission)
         {
-            List<Permission> permissionList = allpermission.Where(p => p.ParentId.Equals(parentId)).ToList();
+            List<Permission> permissionList = allpermission.Where(p => p.ParentId == parentId).ToList();
             if (permissionList.NotNullT())
             {
                 children.AddRange(permissionList);
@@ -536,21 +530,21 @@ namespace UserCenter.CommandHandles
             }
 
             Permission permission = (Permission)_task.Result.Data;
-            List<RolePermission> linkList = _rolePermissionRepository.QueryableToList(rp => rp.PermissionId.Equals(permission.Id));
+            List<RolePermission> linkList = _rolePermissionRepository.QueryableToList(rp => rp.PermissionId == permission.Id);
 
             if (linkList.NotNullT())
             {
                 return Failed(UserCenterError.PERMISSION_ALREADY_ASSIGN);
             }
 
-            List<Permission> permissions = _permissionRepository.QueryableToList(p => p.ParentId.Equals(cmd.Id));
+            List<Permission> permissions = _permissionRepository.QueryableToList(p => p.ParentId == cmd.Id);
 
             if (permissions.NotNullT())
             {
                 return Failed(UserCenterError.SUB_PERMISSION_NOT_EMPTY);
             }
 
-            bool flag = _permissionRepository.Delete(p => p.Id.Equals(cmd.Id));
+            bool flag = _permissionRepository.Delete(p => p.Id == cmd.Id);
 
             return SucceedOrFail(flag, cmd.Id);
         }
@@ -640,17 +634,17 @@ namespace UserCenter.CommandHandles
             var uid = _globalCore.UserId;
             var db = _unitOfWork.GetDbClient();
             string[] oldArr = new string[] { };
-            var subpermissions = _permissionRepository.Queryable().Where(i => i.ParentId.Equals(cmd.Id)).ToList();
+            var subpermissions = _permissionRepository.Queryable().Where(i => i.ParentId == cmd.Id).ToList();
             if (!uid.Equals(SystemConstants.superId))
             {
                 var ss1 = db.Queryable<RolePermission, RoleUser>((a, b) => new JoinQueryInfos(
-                        JoinType.Left, a.RoleId.Equals(b.RoleId)
+                        JoinType.Left, a.RoleId == b.RoleId
                     ))
-                    .Where((a, b) => b.UserId.Equals(uid) && a.State != BaseStateConstants.DELETE && b.State != BaseStateConstants.DELETE)
+                    .Where((a, b) => b.UserId == uid && a.State != BaseStateConstants.DELETE && b.State != BaseStateConstants.DELETE)
                     .Select(a => a.PermissionId)
                     .ToArray();
 
-                oldArr = subpermissions.Where(it => ss1.Contains(it.Id) || it.Creator.Equals(_globalCore.UserConcatName)).Select(it => it.Id).ToArray();
+                oldArr = subpermissions.Where(it => ss1.Contains(it.Id) || it.Creator == _globalCore.UserConcatName).Select(it => it.Id).ToArray();
             }
             else
             {
@@ -708,18 +702,17 @@ namespace UserCenter.CommandHandles
             var query = db
                 .Queryable<Permission, RolePermission, Role, RoleUser, User, PermissionPermissiongroup, Permissiongroup>
                 ((p, rp, r, ru, u, pgp, gp) => new JoinQueryInfos(
-                    JoinType.Left, rp.PermissionId.Equals(p.Id),
-                    JoinType.Left, r.Id.Equals(rp.RoleId),
-                    JoinType.Left, ru.RoleId.Equals(r.Id),
-                    JoinType.Left, u.Id.Equals(ru.UserId),
-                    JoinType.Left, pgp.PermissionId.Equals(p.Id),
-                    JoinType.Left, gp.Id.Equals(pgp.PermissiongroupId)
+                    JoinType.Left, rp.PermissionId == p.Id,
+                    JoinType.Left, r.Id == rp.RoleId,
+                    JoinType.Left, ru.RoleId == r.Id,
+                    JoinType.Left, u.Id == ru.UserId,
+                    JoinType.Left, pgp.PermissionId == p.Id,
+                    JoinType.Left, gp.Id == pgp.PermissiongroupId
                 ))
                 .Where((p, rp, r, ru, u, pgp, gp) => p.State != BaseStateConstants.DELETE)
-                .WhereIF(!_globalCore.UserId.Equals(SystemConstants.superId), (p, rp, r, ru, u, pgp, gp) => rp.State == BaseStateConstants.ACTIVATE)
-                .WhereIF(!_globalCore.UserId.Equals(SystemConstants.superId), (p, rp, r, ru, u, pgp, gp) => u.Id.Equals(_globalCore.UserId))
-                .Where((p, rp, r, ru, u, pgp, gp) => p.Type.Equals(PermissionType.BUTTON))
-                .Where((p, rp, r, ru, u, pgp, gp) => gp.Name.Equals(cmd.PermissionGroupName))
+                .WhereIF(_globalCore.UserId != SystemConstants.superId, (p, rp, r, ru, u, pgp, gp) => u.Id == _globalCore.UserId && rp.State == BaseStateConstants.ACTIVATE)
+                .Where((p, rp, r, ru, u, pgp, gp) => p.Type == PermissionType.BUTTON)
+                .Where((p, rp, r, ru, u, pgp, gp) => gp.Name == cmd.PermissionGroupName)
                 .OrderBy((p, rp, r, ru, u, pgp, gp) => p.CreateTime, OrderByType.Desc)
                 .Select((p, rp, r, ru, u, pgp, gp) => new PermissionDto
                 {
@@ -753,16 +746,16 @@ namespace UserCenter.CommandHandles
             var query = db
             .Queryable<Permission, RolePermission, Role, RoleUser, User, PermissionPermissiongroup, Permissiongroup>
             ((p, rp, r, ru, u, pgp, gp) => new JoinQueryInfos(
-                JoinType.Left, rp.PermissionId.Equals(p.Id),
-                JoinType.Left, r.Id.Equals(rp.RoleId) && rp.State == BaseStateConstants.ACTIVATE,
-                JoinType.Left, ru.RoleId.Equals(r.Id),
-                JoinType.Left, u.Id.Equals(ru.UserId),
-                JoinType.Left, pgp.PermissionId.Equals(p.Id),
-                JoinType.Left, gp.Id.Equals(pgp.PermissiongroupId)
+                JoinType.Left, rp.PermissionId == p.Id,
+                JoinType.Left, r.Id == rp.RoleId && rp.State == BaseStateConstants.ACTIVATE,
+                JoinType.Left, ru.RoleId == r.Id,
+                JoinType.Left, u.Id == ru.UserId,
+                JoinType.Left, pgp.PermissionId == p.Id,
+                JoinType.Left, gp.Id == pgp.PermissiongroupId
             ))
-            .WhereIF(!_globalCore.UserId.Equals(SystemConstants.superId), (p, rp, r, ru, u, pgp, gp) => u.Id.Equals(_globalCore.UserId))
-            .Where((p, rp, r, ru, u, pgp, gp) => p.Type.Equals(PermissionType.MENU) || p.Type.Equals(PermissionType.CATALOG))
-            .Where((p, rp, r, ru, u, pgp, gp) => gp.Name.Equals(cmd.PermissionGroupName))
+            .WhereIF(_globalCore.UserId != SystemConstants.superId, (p, rp, r, ru, u, pgp, gp) => u.Id == _globalCore.UserId)
+            .Where((p, rp, r, ru, u, pgp, gp) => p.Type == PermissionType.MENU || p.Type == PermissionType.CATALOG)
+            .Where((p, rp, r, ru, u, pgp, gp) => gp.Name == cmd.PermissionGroupName)
             .Where((p, rp, r, ru, u, pgp, gp) => p.State == BaseStateConstants.ACTIVATE)
             .OrderBy((p, rp, r, ru, u, pgp, gp) => p.CreateTime, OrderByType.Desc)
             .Select((p, rp, r, ru, u, pgp, gp) => new PermissionDto
@@ -779,7 +772,7 @@ namespace UserCenter.CommandHandles
                 Icon = p.Icon,
                 CreateTime = p.CreateTime,
                 Perms = p.Perms,
-                State=p.State
+                State = p.State
             });
             var list = query.ToList();
             list = list.Distinct(new PermissionDtoComparer<PermissionDto>()).ToList();
@@ -800,7 +793,7 @@ namespace UserCenter.CommandHandles
             var db = _unitOfWork.GetDbClient();
             var query = db
                 .Queryable<Permission>()
-                .Where(p => p.Type.Equals(PermissionType.MENU) || p.Type.Equals(PermissionType.CATALOG))
+                .Where(p => p.Type == PermissionType.MENU || p.Type == PermissionType.CATALOG)
                 .Where(p => p.State != BaseStateConstants.DELETE)
                 .Where(p => cmd.List.Contains(p.Id))
                 .OrderBy(p => p.OrderNum, OrderByType.Asc)
@@ -846,14 +839,14 @@ namespace UserCenter.CommandHandles
             var db = _unitOfWork.GetDbClient();
             var list1 = db.Queryable<Permission, RolePermission, Role, RoleUser, User, PermissionPermissiongroup, Permissiongroup>
             ((p, rp, r, ru, u, pgp, gp) => new JoinQueryInfos(
-                JoinType.Left, rp.PermissionId.Equals(p.Id),
-                    JoinType.Left, r.Id.Equals(rp.RoleId),
-                    JoinType.Left, ru.RoleId.Equals(r.Id),
-                    JoinType.Left, u.Id.Equals(ru.UserId),
-                    JoinType.Left, pgp.PermissionId.Equals(p.Id),
-                    JoinType.Left, gp.Id.Equals(pgp.PermissiongroupId)
+                JoinType.Left, rp.PermissionId == p.Id,
+                JoinType.Left, r.Id == rp.RoleId,
+                JoinType.Left, ru.RoleId == r.Id,
+                JoinType.Left, u.Id == ru.UserId,
+                JoinType.Left, pgp.PermissionId == p.Id,
+                JoinType.Left, gp.Id == pgp.PermissiongroupId
             ))
-            .Where((p, rp, r, ru, u, pgp, gp) => u.Id.Equals(uid) && p.State == BaseStateConstants.ACTIVATE)
+            .Where((p, rp, r, ru, u, pgp, gp) => u.Id == uid && p.State == BaseStateConstants.ACTIVATE)
             //.OrderBy((p, rp, r, ru, u, pgp, gp) => p.CreateTime, OrderByType.Desc)
             .Select((p, rp, r, ru, u, pgp, gp) => new PermissionDto
             {
@@ -876,10 +869,10 @@ namespace UserCenter.CommandHandles
 
             var list2 = db.Queryable<Permission, PermissionPermissiongroup, Permissiongroup>
             ((p, pgp, gp) => new JoinQueryInfos(
-                    JoinType.Left, pgp.PermissionId.Equals(p.Id),
-                    JoinType.Left, gp.Id.Equals(pgp.PermissiongroupId)
+                    JoinType.Left, pgp.PermissionId == p.Id,
+                    JoinType.Left, gp.Id == pgp.PermissiongroupId
             ))
-            .Where((p, pgp, gp) => p.Creator.Equals(_globalCore.UserConcatName) && p.State == BaseStateConstants.ACTIVATE)
+            .Where((p, pgp, gp) => p.Creator == _globalCore.UserConcatName && p.State == BaseStateConstants.ACTIVATE)
             //.OrderBy((p, pgp, gp) => p.CreateTime, OrderByType.Desc)
             .Select((p, pgp, gp) => new PermissionDto
             {
@@ -909,8 +902,8 @@ namespace UserCenter.CommandHandles
             var db = _unitOfWork.GetDbClient();
             var list = db.Queryable<Permission, PermissionPermissiongroup, Permissiongroup>
             ((p, pgp, pg) => new JoinQueryInfos(
-                JoinType.Left, pgp.PermissionId.Equals(p.Id),
-                JoinType.Left, pg.Id.Equals(pgp.PermissiongroupId)
+                JoinType.Left, pgp.PermissionId == p.Id,
+                JoinType.Left, pg.Id == pgp.PermissiongroupId
             ))
             .Where((p, pgp, pg) => p.State != BaseStateConstants.DELETE && pgp.State != BaseStateConstants.DELETE && pg.State != BaseStateConstants.DELETE)
             .OrderBy((p, pgp, pg) => p.CreateTime, OrderByType.Desc)

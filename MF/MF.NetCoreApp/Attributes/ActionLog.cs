@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Diagnostics;
 
 using Common.Commands;
-
+using DynamicExpresso;
 using MF.FluentValidation;
 using MF.MediatR;
 
@@ -15,10 +16,14 @@ namespace MF.NetCoreApp.Attributes
 {
     public sealed class ActionLog : ActionFilterAttribute
     {
+        /// <summary>
+        /// 执行动作描述
+        /// </summary>
         public string ActionContent { get; set; }
-
+        /// <summary>
+        /// 请求参数
+        /// </summary>
         private string ActionArguments { get; set; }
-
         /// <summary>
         /// 请求体中的所有值
         /// </summary>
@@ -27,47 +32,56 @@ namespace MF.NetCoreApp.Attributes
         private Stopwatch Stopwatch { get; set; }
 
         private IBus _bus;
-
-        public ActionLog(string _ActionContent)
+        /// <summary>
+        /// 解析器
+        /// </summary>
+        private Interpreter ExpressionEval { get; set; } = new Interpreter();
+        /// <summary>
+        /// 自定义参数格式为 LineCode:{command.LineCode}:ProductCode:{command.ProductCode}
+        /// </summary>
+        public string Parm { get; set; }
+        /// <summary>
+        /// 自定义参数 临时存储字段
+        /// </summary>
+        public string InitParm { get; set; }
+        /// <summary>
+        ///  执行动作描述 临时存储字段
+        /// </summary>
+        public string InitActionContent { get; set; }
+        /// <summary>
+        ///  执行动作支持携带参数
+        /// </summary>
+        /// <param name="_ActionContent">执行动作描述</param>
+        /// <param name="_p">参数携带</param>
+        public ActionLog(string _ActionContent, string _p = "")
         {
-            ActionContent = _ActionContent;
+            var arraylist = new ArrayList();
+            if (_p != "")
+            {
+                var par = _p.Split(":");
+                foreach (var item in par)
+                {
+                    if (item.Contains("{"))
+                    {
+                        arraylist.Add(item.Replace("{", "").Replace("}", ""));
+                    }
+                }
+            }
+            ExpressionEval.SetVariable("s", arraylist);
+            InitActionContent = ActionContent = _ActionContent;
+            InitParm = Parm = _p;
         }
 
         public ActionLog()
         {
-            ActionContent = "";
+            InitActionContent = ActionContent = "";
+            InitParm = Parm = "";
         }
 
         //private bool HasToken = true;
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            context.HttpContext.Request.Headers.TryGetValue("Authorization", out var token);
-
-            //Console.WriteLine(token.ToString());
-
-            //if (token.ToString().Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).Length != 2)
-            //{
-            //    context.HttpContext.Response.StatusCode = 403;
-            //}
-            //else
-            //{
-            //    // 解析token 获取用户名称
-            //    IConfiguration _configuration = (IConfiguration)context.HttpContext.RequestServices.GetService(typeof(IConfiguration));
-            //    JwtConfig jwt = _configuration?.GetSection("Jwt")?.Get<JwtConfig>();
-            //    //var jwtSecurityToken = jwt.ReadToken(token.ToString());
-
-            //    // 拿用户名称从缓存里面获取token
-
-            //    // 缓存里面没有 返回401
-            //    // 缓存里面和当前不一样 返回401
-            //    // 缓存存在就刷新过期时间
-
-            //    // 用户名获取权限 和当前的接口进行对比  判断是否有权限 没有 返回403
-
-            //    base.OnActionExecuting(context);
-            //}
-
             //授权
             bool ignore = false;
             foreach (var item in context.Filters)
@@ -88,38 +102,42 @@ namespace MF.NetCoreApp.Attributes
                     return;
                 }
             }
+            //执行动作 参数解析
+            if (InitParm != "")
+            {
+                //重置初始值
+                Parm = InitParm;
+                ActionContent = InitActionContent;
 
-            //查询缓存中是否存在TOKEN 没有就返回错误
-
-            // 后续添加了获取请求的请求体，如果在实际项目中不需要删除即可
-            //long contentLen = context.HttpContext.Request.ContentLength is null ? 0 : context.HttpContext.Request.ContentLength.Value;
-            //if (contentLen > 0)
-            //{
-            //    // 读取请求体中所有内容
-            //    System.IO.Stream stream = context.HttpContext.Request.Body;
-            //    if (context.HttpContext.Request.Method == "POST")
-            //    {
-            //        stream.Position = 0;
-            //    }
-            //    //byte[] buffer = new byte[contentLen];
-            //    //stream.ReadAsync(buffer, 0, buffer.Length);
-            //    //// 转化为字符串
-            //    //RequestBody = System.Text.Encoding.UTF8.GetString(buffer);
-
-            //    Encoding encoding = Encoding.UTF8;
-            //    var reader = new StreamReader(stream, encoding);
-            //    string result = reader.ReadToEnd();
-            //    stream.Position = 0;
-            //}
+                //解析
+                var interpreter = new Interpreter();
+                var parameters = context.ActionArguments;
+                if (parameters != null && parameters.Count > 0)
+                {
+                    foreach (var parameter in parameters)
+                    {
+                        interpreter.SetVariable(parameter.Key, parameter.Value);
+                    }
+                }
+                var list = ExpressionEval.Eval<ArrayList>("s");
+                foreach (var item in list)
+                {
+                    var tyu = interpreter.Eval(item.ToString()).ToString();
+                    if (item.ToString().Contains("State"))
+                    {
+                        tyu = (tyu == "0") ? "启用" : "禁用";
+                    }
+                    Parm = Parm.Replace("{" + item + "}", tyu);
+                }
+            }
             RequestBody = JsonConvert.SerializeObject(context.ActionArguments);
-
+            ActionContent += Parm;
             Stopwatch = new Stopwatch();
             Stopwatch.Start();
         }
 
         public override void OnActionExecuted(ActionExecutedContext context)
         {
-            //if (!HasToken) { return; }
             base.OnActionExecuted(context);
             Stopwatch.Stop();
 

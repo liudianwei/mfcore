@@ -45,20 +45,27 @@ namespace MF.Orm
             throw new Exception(errmsg);
         }
 
-
+        /// <summary>
+        /// 批量更新禁用、启用状态
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="ids"></param>
+        /// <param name="state"></param>
+        /// <param name="Trepository"></param>
+        /// <returns></returns>
         protected Task<PubResponse> EnabledStateus<T>(List<string> ids, string state, IBaseRepository<T> Trepository) where T : BaseEntity, new()
         {
-            if (state.IsNull())
-            {
-                return Failed(BaseSystemError.BATCH_STATE_NULL);
-            }
+            //if (state.IsNull())
+            //{
+            //    ThrowError(BaseSystemError.OBJECT_DOES_NOT_EXIST);
+            //}
             if (ids.Count == 0)
             {
-                return Failed(BaseSystemError.BATCH_STATE_DATA_NULL);
+                ThrowError(BaseSystemError.BATCH_STATE_DATA_NULL);
             }
             List<T> list = new List<T>();
             var stateL = Trepository.Queryable().Where(i => ids.Contains(i.Id)).ToList();
-            if (stateL.Count != ids.Count) return Failed(BaseSystemError.OBJECT_DOES_NOT_EXIST);
+            if (stateL.Count != ids.Count) ThrowError(BaseSystemError.OBJECT_DOES_NOT_EXIST);
 
             foreach (var item in stateL)
             {
@@ -83,6 +90,37 @@ namespace MF.Orm
                 list.Add(item);
             }
             var flag = Trepository.Update(list);
+            if (!flag)
+            {
+                ThrowError(BaseSystemError.STATE_UPDATE_ERROR);
+            }
+            return Succeed();
+        }
+        /// <summary>
+        /// 单条-更新禁用、启用状态
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="id"></param>
+        /// <param name="Trepository"></param>
+        /// <returns></returns>
+        protected Task<PubResponse> EnabledStateus<T>(string id, string _state, IBaseRepository<T> Trepository) where T : BaseEntity, new()
+        {
+            if (id.IsNull())
+            {
+                return Failed(BaseSystemError.ID_CANNOT_BE_EMPTY);
+            }
+            var stateM = Trepository.Queryable().InSingle(id);
+            if (stateM.IsNull()) return Failed(BaseSystemError.OBJECT_DOES_NOT_EXIST);
+
+            if (stateM.State == BaseStateConstants.ACTIVATE)
+            {
+                stateM.State = BaseStateConstants.DEACTIVE;
+            }
+            else if (stateM.State == BaseStateConstants.DEACTIVE)
+            {
+                stateM.State = BaseStateConstants.ACTIVATE;
+            }
+            var flag = Trepository.Update(stateM);
             return SucceedOrFail(flag);
         }
 

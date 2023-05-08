@@ -111,7 +111,7 @@ namespace MDCenter.CommandHandles
             {
                 return Failed(BaseSystemError.ID_CANNOT_BE_EMPTY);
             }
-            var isExist = _ucI18nRepository.Queryable().Where(i => i.Category == cmd.Category && i.Language == cmd.Language && !i.Id.Equals(cmd.Id)).Any();
+            var isExist = _ucI18nRepository.Queryable().Where(i => i.Category == cmd.Category && i.Language == cmd.Language && i.Id != cmd.Id).Any();
             if (isExist)
             {
                 return Failed(BaseSystemError.CATEGORY_LANGUAGE_ALREADY_EXIST);
