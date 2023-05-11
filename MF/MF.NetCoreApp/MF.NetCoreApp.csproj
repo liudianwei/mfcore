@@ -2,11 +2,11 @@
 
   <PropertyGroup>
 	  <TargetFramework>net5.0</TargetFramework>
-	  <Version>1.0.3-rc10.6.2</Version>
+	  <Version>1.0.3-rc10.6.4</Version>
 	  <Description>
 		  +修复 异常中间件已知问题
 		  +新增 导出EXCELsheet名参数传入指定,默认sheet
-		  +优化 ActionLog日志记录，支持自定义参数解析
+		  +优化 ActionLog日志记录，支持自定义参数解析 2023/5/11
 	  </Description>
 	  <PackageReleaseNotes>
 		  +修复 异常中间件 -add by caladi 2022/2/23

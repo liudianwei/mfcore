@@ -7,6 +7,12 @@ namespace UserCenter.Commands
 {
     public class CreateUserCommand : IRequest<PubResponse>
     {
-        public UserDto Dto { get;  set; }
+        public string Name { get; set; }
+
+        public string FullName { get; set; }
+
+        public string Email { get; set; }
+
+        public string Tel { get; set; }
     }
 }

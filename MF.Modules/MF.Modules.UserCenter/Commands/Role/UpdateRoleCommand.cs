@@ -7,7 +7,6 @@ namespace UserCenter.Commands
     {
         public string Id { get; set; }
         public string Name { get;  set; }
-        public string Updator { get;  set; }
         public string Remark { get;  set; }
 
         public UpdateRoleCommand()

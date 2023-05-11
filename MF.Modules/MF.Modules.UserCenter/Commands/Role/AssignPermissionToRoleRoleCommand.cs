@@ -8,6 +8,5 @@ namespace UserCenter.Commands
     {
         public string Id { get; set; }
         public List<string> List { get;  set; }
-        public string Updator { get;  set; }
     }
 }

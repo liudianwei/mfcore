@@ -27,12 +27,12 @@ namespace UserCenter.Controllers.v1
         /// <summary>
         /// 添加权限
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
         [HttpPost, ActionLog("【权限规则】添加权限")]
-        public async Task<IActionResult> Post(PermissionDto dto)
+        public async Task<IActionResult> Post(CreatePermissionCommand command)
         {
-            var response = await _bus.SendAsync(new CreatePermissionCommand { Dto = dto });
+            var response = await _bus.SendAsync(command);
             return Result(response);
         }
 
@@ -40,16 +40,12 @@ namespace UserCenter.Controllers.v1
         /// 更新permission
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="dto"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
         [HttpPut("{id}"), ActionLog("【权限规则】更新权限")]
-        public async Task<IActionResult> Put(string id, PermissionDto dto)
+        public async Task<IActionResult> Put(string id, UpdatePermissionCommand command)
         {
-            UpdatePermissionCommand command = new UpdatePermissionCommand
-            {
-                Id = id,
-                Dto = dto
-            };
+            command.Id = id;
             var response = await _bus.SendAsync(command);
             return Result(response);
         }

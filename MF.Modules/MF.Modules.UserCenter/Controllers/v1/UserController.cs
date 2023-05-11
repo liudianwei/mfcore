@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UserCenter.Commands;
-using UserCenter.Dtos;
 using UserCenter.Enums;
 using UserCenter.Response;
 
@@ -100,12 +99,12 @@ namespace UserCenter.Controllers.v1
         /// <summary>
         /// 创建user
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
         [HttpPost, ActionLog("【管理人员】创建用户")]
-        public async Task<IActionResult> Post(UserDto dto)
+        public async Task<IActionResult> Post(CreateUserCommand command)
         {
-            var response = await _bus.SendAsync(new CreateUserCommand { Dto = dto });
+            var response = await _bus.SendAsync(command);
             return Result(response);
         }
 
@@ -113,13 +112,13 @@ namespace UserCenter.Controllers.v1
         /// 更新user
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="dto"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
         [HttpPut("{id}"), ActionLog("【管理人员】更新用户")]
-        public async Task<IActionResult> Put(string id, UserDto dto)
+        public async Task<IActionResult> Put(string id, UpdateUserCommand command)
         {
-            dto.Id = id;
-            var response = await _bus.SendAsync(new UpdateUserCommand { Dto = dto });
+            command.Id = id;
+            var response = await _bus.SendAsync(command);
             return Result(response);
         }
 

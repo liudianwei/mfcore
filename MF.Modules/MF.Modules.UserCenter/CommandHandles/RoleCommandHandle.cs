@@ -85,8 +85,7 @@ namespace UserCenter.CommandHandles
             Role role = new Role
             {
                 Name = cmd.Name,
-                Remark = cmd.Remark,
-                Updator = cmd.Updator
+                Remark = cmd.Remark
             };
             role = _roleRepository.InsertReturnEntity(role);
 
@@ -130,7 +129,6 @@ namespace UserCenter.CommandHandles
             }
             roleById.Name = cmd.Name;
             roleById.Remark = cmd.Remark;
-            roleById.Updator = cmd.Updator;
 
             bool flag = _roleRepository.UpdateEntity(roleById);
             return SucceedOrFail(flag, $"修改前:角色-{beforeName},备注-{beforeRemark}");

@@ -28,12 +28,12 @@ namespace UserCenter.Controllers.v2
         /// <summary>
         /// 创建permissionGroup
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
         [HttpPost, ActionLog("创建权限组")]
-        public async Task<IActionResult> Post(PermissionGroupDto dto)
+        public async Task<IActionResult> Post(CreatePermissionGroupCommand command)
         {
-            var response = await _bus.SendAsync(new CreatePermissionGroupCommand() { Dto = dto });
+            var response = await _bus.SendAsync(command);
             return Result(response);
         }
 

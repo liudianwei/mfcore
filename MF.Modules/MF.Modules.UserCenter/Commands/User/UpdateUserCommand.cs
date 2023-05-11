@@ -6,6 +6,13 @@ namespace UserCenter.Commands
 {
     public class UpdateUserCommand : IRequest<PubResponse>
     {
-        public UserDto Dto { get;  set; }
+        public string Id { get; set; }
+        public string Name { get; set; }
+
+        public string FullName { get; set; }
+
+        public string Email { get; set; }
+
+        public string Tel { get; set; }
     }
 }

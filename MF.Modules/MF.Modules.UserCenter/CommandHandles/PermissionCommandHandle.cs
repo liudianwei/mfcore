@@ -55,16 +55,15 @@ namespace UserCenter.CommandHandles
         /// <summary>
         /// 新增权限
         /// </summary>
-        /// <param name="cmd"></param>
+        /// <param name="dto"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task<PubResponse> Handle(CreatePermissionCommand cmd, CancellationToken cancellationToken)
+        public Task<PubResponse> Handle(CreatePermissionCommand dto, CancellationToken cancellationToken)
         {
-            if (cmd.Dto.IsNull())
+            if (dto.IsNull())
             {
                 return Failed(BaseSystemError.OBJECT_CANNOT_BE_NULL);
             }
-            PermissionDto dto = cmd.Dto;
             var permission = _permissionRepository.Queryable().First(p => p.Name == dto.Name && p.Type != PermissionType.BUTTON);
 
             // 判断权限是否存在
@@ -93,24 +92,19 @@ namespace UserCenter.CommandHandles
             permission = new Permission
             {
                 Name = dto.Name,
-                Code = dto.Code,
                 ParentId = dto.ParentId,
                 Url = dto.Url,
                 OrderNum = dto.OrderNum,
-                Perms = dto.Perms,
                 Type = dto.Type,
                 Icon = dto.Icon,
-                ApiUrl = dto.ApiUrl,
-                IframeUrl = dto.IframeUrl,
-                Remark = dto.Remark,
-                Updator = dto.Updator
+                IframeUrl = dto.IframeUrl
             };
 
             // 保存权限
             permission = _permissionRepository.InsertReturnEntity(permission);
 
             // 分配权限和权限组的关系
-            var flag = AssignPermissionGroup(permission, dto.PermissionGroupIdList, dto.Updator);
+            var flag = AssignPermissionGroup(permission, dto.PermissionGroupIdList);
             return SucceedOrFail(flag, permission.Id, UserCenterError.ASSIGN_PERMISSIO_ERROR);
         }
 
@@ -120,7 +114,7 @@ namespace UserCenter.CommandHandles
         /// <param name="dtos"></param>
         /// <param name="allpermissions"></param>
         /// <returns></returns>
-        private Task<PubResponse> Add(List<PermissionDto> dtos, List<Permission> allpermissions)
+        private Task<PubResponse> Add(List<PermissionBtnDto> dtos, List<Permission> allpermissions)
         {
             if (dtos.IsNullT())
             {
@@ -159,26 +153,20 @@ namespace UserCenter.CommandHandles
 
             bool flag = false;
             List<Permission> adds = new List<Permission>();
-            var dict = new Dictionary<string, PermissionDto>();
+            var dict = new Dictionary<string, PermissionBtnDto>();
             foreach (var dto in dtos)
             {
                 // 创建权限对象
                 adds.Add(new Permission
                 {
                     Name = dto.Name,
-                    Code = dto.Code,
                     ParentId = dto.ParentId,
-                    Url = dto.Url,
-                    IframeUrl = dto.IframeUrl,
                     OrderNum = dto.OrderNum,
                     Perms = dto.Perms,
                     Type = dto.Type,
-                    Icon = dto.Icon,
-                    ApiUrl = dto.ApiUrl,
-                    Remark = dto.Remark,
-                    Updator = dto.Updator
+                    ApiUrl = dto.ApiUrl
                 });
-                dict.Add(dto.Name + ":" + dto.Code, dto);
+                dict.Add(dto.Name, dto);
             }
             // 批量插入权限
             _permissionRepository.Insert(adds);
@@ -186,7 +174,7 @@ namespace UserCenter.CommandHandles
             // 分配权限和权限组的关系
             foreach (var permission in adds)
             {
-                if (dict.TryGetValue(permission.Name + ":" + permission.Code, out var a))
+                if (dict.TryGetValue(permission.Name, out var a))
                 {
                     a.Id = permission.Id;
                 }
@@ -202,9 +190,8 @@ namespace UserCenter.CommandHandles
         /// </summary>
         /// <param name="permission"></param>
         /// <param name="permissionGroupIds"></param>
-        /// <param name="updator"></param>
         /// <returns></returns>
-        private bool AssignPermissionGroup(Permission permission, List<string> permissionGroupIds, string updator)
+        private bool AssignPermissionGroup(Permission permission, List<string> permissionGroupIds)
         {
             //删除和权限组的关联记录
             _permissionPermissiongroupRepository.Delete(pgp => pgp.PermissionId == permission.Id, false);
@@ -216,7 +203,6 @@ namespace UserCenter.CommandHandles
                 {
                     PermissiongroupId = permissionGroupId,
                     PermissionId = permission.Id,
-                    Updator = updator
                 };
                 list.Add(permissionPermissiongroup);
             }
@@ -230,7 +216,7 @@ namespace UserCenter.CommandHandles
         /// </summary>
         /// <param name="listdto"></param>
         /// <returns></returns>
-        private bool AssignPermissionGroup(List<PermissionDto> listdto)
+        private bool AssignPermissionGroup(List<PermissionBtnDto> listdto)
         {
             var ids = listdto.Select(i => i.Id).ToList();
             //批量删除和权限组的关联记录
@@ -245,7 +231,6 @@ namespace UserCenter.CommandHandles
                     {
                         PermissiongroupId = permissionGroupId,
                         PermissionId = item.Id,
-                        Updator = item.Updator
                     };
                     list.Add(permissionPermissiongroup);
                 }
@@ -257,13 +242,12 @@ namespace UserCenter.CommandHandles
         /// <summary>
         /// 更新权限
         /// </summary>
-        /// <param name="cmd"></param>
+        /// <param name="dto"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task<PubResponse> Handle(UpdatePermissionCommand cmd, CancellationToken cancellationToken)
+        public Task<PubResponse> Handle(UpdatePermissionCommand dto, CancellationToken cancellationToken)
         {
-            PermissionDto dto = cmd.Dto;
-            Task<PubResponse> _task = GetExistPermission(cmd.Id);
+            Task<PubResponse> _task = GetExistPermission(dto.Id);
             if (_task.Result.Status != ResultStatusConstants.SUCCESS)
             {
                 return Failed(_task.Result.Message);
@@ -314,21 +298,7 @@ namespace UserCenter.CommandHandles
                     }
                 }
             }
-
-            //List<Permission> children = new List<Permission>();
-            //var allpermission = _permissionRepository.QueryAll();
-            //FindAllChildNode(children, permission.Id, allpermission);
-
-            //foreach (var p in children)
-            //{
-            //    if (p.Id.Equals(dto.ParentId))
-            //    {
-            //        return Failed(BaseSystemError.PARENT_ID_IS_CHILDREN);
-            //    }
-            //}
-
             permission.Name = dto.Name;
-            permission.Code = dto.Code;
 
             if (permission.ParentId.IsNull() && dto.ParentId.NotNull())
             {
@@ -347,16 +317,11 @@ namespace UserCenter.CommandHandles
             permission.Url = dto.Url;
             permission.IframeUrl = dto.IframeUrl;
             permission.OrderNum = dto.OrderNum;
-            permission.Perms = dto.Perms;
-
             permission.Icon = dto.Icon;
-            permission.ApiUrl = dto.ApiUrl;
-            permission.Remark = dto.Remark;
-            permission.Updator = dto.Updator;
 
             if (_permissionRepository.UpdateEntity(permission))
             {
-                if (!AssignPermissionGroup(permission, dto.PermissionGroupIdList, dto.Updator))
+                if (!AssignPermissionGroup(permission, dto.PermissionGroupIdList))
                 {
                     return Failed(UserCenterError.ASSIGN_PERMISSIO_ERROR);
                 }
@@ -372,7 +337,7 @@ namespace UserCenter.CommandHandles
         /// <param name="dtos"></param>
         /// <param name="allpermissions"></param>
         /// <returns></returns>
-        private Task<PubResponse> Update(List<PermissionDto> dtos, List<Permission> allpermissions)
+        private Task<PubResponse> Update(List<PermissionBtnDto> dtos, List<Permission> allpermissions)
         {
             foreach (var dto in dtos)
             {
@@ -448,19 +413,7 @@ namespace UserCenter.CommandHandles
                 {
                     return Failed(UserCenterError.PERMISSION_NOT_FOUND);
                 }
-
-                //FindAllChildNode(children, dto.Id, allpermissions);//查询子权限
-                //foreach (var p in children)
-                //{
-                //    if (p.Id.Equals(dto.ParentId))// 如果子孙节点的id等于父id 提示错误信息
-                //    {
-                //        return Failed(BaseSystemError.PARENT_ID_IS_CHILDREN);
-                //    }
-                //}
-
                 permission.Name = dto.Name;
-                permission.Code = dto.Code;
-
                 if (permission.ParentId.IsNull() && dto.ParentId.NotNull())
                 {
                     //如果原来节点是顶级 编辑后不是 该权限就改成菜单类型
@@ -477,15 +430,9 @@ namespace UserCenter.CommandHandles
                 }
 
                 permission.ParentId = dto.ParentId;
-                permission.Url = dto.Url;
-                permission.IframeUrl = dto.IframeUrl;
                 permission.OrderNum = dto.OrderNum;
                 permission.Perms = dto.Perms;
-
-                permission.Icon = dto.Icon;
                 permission.ApiUrl = dto.ApiUrl;
-                permission.Remark = dto.Remark;
-                permission.Updator = dto.Updator;
             }
 
             if (_permissionRepository.Update(editList))
@@ -534,19 +481,19 @@ namespace UserCenter.CommandHandles
 
             if (linkList.NotNullT())
             {
-                return Failed(UserCenterError.PERMISSION_ALREADY_ASSIGN);
+                return Failed(UserCenterError.PERMISSION_ALREADY_ASSIGN, $"删除权限为：{permission.Name}");
             }
 
             List<Permission> permissions = _permissionRepository.QueryableToList(p => p.ParentId == cmd.Id);
 
             if (permissions.NotNullT())
             {
-                return Failed(UserCenterError.SUB_PERMISSION_NOT_EMPTY);
+                return Failed(UserCenterError.SUB_PERMISSION_NOT_EMPTY, $"删除权限为：{permission.Name}");
             }
 
             bool flag = _permissionRepository.Delete(p => p.Id == cmd.Id);
 
-            return SucceedOrFail(flag, cmd.Id);
+            return SucceedOrFail(flag, $"删除权限为：{permission.Name}");
         }
 
         /// <summary>
@@ -623,7 +570,7 @@ namespace UserCenter.CommandHandles
         /// <param name="cmd"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [Transaction]
+        //[Transaction]
         public Task<PubResponse> Handle(BatchPermissionCommand cmd, CancellationToken cancellationToken)
         {
             cmd.List.ForEach(p =>
@@ -650,16 +597,7 @@ namespace UserCenter.CommandHandles
             {
                 oldArr = subpermissions.Select(i => i.Id).ToArray();// 数据库里的id
             }
-
-            //var allpermissions = _permissionRepository.Queryable().WhereIF(!uid.Equals(SystemConstants.superId), it =>
-            //    it.Id == SqlFunc.Subqueryable<RolePermission>().Where(s1 => s1.RoleId.Equals(SqlFunc.Subqueryable<RoleUser>().Where(s => s.UserId.Equals(uid)).Select(s => s.RoleId))).Select(s2 => s2.Id)
-            //   ).Where(i => i.ParentId.Equals(cmd.Id)).ToList();
-
-
-
-            //var oldArr = allpermissions.Select(i => i.Id).ToArray();// 数据库里的id
             var newArr = cmd.List.Select(i => i.Id).ToArray();// 接口传来的id
-
             var operas = ArrayExt.GetOperationArray(oldArr, newArr);// 获取删除，新增，修改的id
 
             //// 新增权限操作
@@ -726,7 +664,6 @@ namespace UserCenter.CommandHandles
                     IframeUrl = p.IframeUrl,
                     Type = p.Type,
                     Icon = p.Icon,
-                    CreateTime = p.CreateTime,
                     Perms = p.Perms
                 });
             var list = query.ToList();
@@ -770,9 +707,7 @@ namespace UserCenter.CommandHandles
                 IframeUrl = p.IframeUrl,
                 Type = p.Type,
                 Icon = p.Icon,
-                CreateTime = p.CreateTime,
                 Perms = p.Perms,
-                State = p.State
             });
             var list = query.ToList();
             list = list.Distinct(new PermissionDtoComparer<PermissionDto>()).ToList();
@@ -809,18 +744,12 @@ namespace UserCenter.CommandHandles
                     IframeUrl = p.IframeUrl,
                     Type = p.Type,
                     Icon = p.Icon,
-                    CreateTime = p.CreateTime,
                     Perms = p.Perms
                 });
             var list = query.ToList();
             list = list.Distinct(new PermissionDtoComparer<PermissionDto>()).ToList();
             var menuids = list.Select(i => i.Id).ToList();
-            //查询所有菜单的按钮
-            //GetChilders(menuids, list);
-
             var dtoList = list.Adapt<List<PermissionTreeResp>>();
-            //Dictionary<string, PermissionTreeResp> dict = list.ToDictionary(i => i.Id, i => i.Adapt<PermissionTreeResp>());
-            //var tree = ToTree(dict);
             return Succeed(dtoList);
         }
 
@@ -847,7 +776,6 @@ namespace UserCenter.CommandHandles
                 JoinType.Left, gp.Id == pgp.PermissiongroupId
             ))
             .Where((p, rp, r, ru, u, pgp, gp) => u.Id == uid && p.State == BaseStateConstants.ACTIVATE)
-            //.OrderBy((p, rp, r, ru, u, pgp, gp) => p.CreateTime, OrderByType.Desc)
             .Select((p, rp, r, ru, u, pgp, gp) => new PermissionDto
             {
                 Id = p.Id,
@@ -860,10 +788,10 @@ namespace UserCenter.CommandHandles
                 IframeUrl = p.IframeUrl,
                 Type = p.Type,
                 Icon = p.Icon,
-                CreateTime = p.CreateTime,
                 PermissionGroupId = gp.Id,
                 PermissionGroupName = gp.Name,
-                Perms = p.Perms
+                Perms = p.Perms,
+                CreateTime = p.CreateTime
             })
             .Distinct();
 
@@ -873,7 +801,6 @@ namespace UserCenter.CommandHandles
                     JoinType.Left, gp.Id == pgp.PermissiongroupId
             ))
             .Where((p, pgp, gp) => p.Creator == _globalCore.UserConcatName && p.State == BaseStateConstants.ACTIVATE)
-            //.OrderBy((p, pgp, gp) => p.CreateTime, OrderByType.Desc)
             .Select((p, pgp, gp) => new PermissionDto
             {
                 Id = p.Id,
@@ -886,10 +813,10 @@ namespace UserCenter.CommandHandles
                 IframeUrl = p.IframeUrl,
                 Type = p.Type,
                 Icon = p.Icon,
-                CreateTime = p.CreateTime,
                 PermissionGroupId = gp.Id,
                 PermissionGroupName = gp.Name,
-                Perms = p.Perms
+                Perms = p.Perms,
+                CreateTime = p.CreateTime
             })
             .Distinct();
             var list = db.UnionAll(list1, list2).OrderBy(it => it.CreateTime, OrderByType.Desc).Distinct().ToList();
@@ -919,12 +846,10 @@ namespace UserCenter.CommandHandles
                 IframeUrl = p.IframeUrl,
                 Type = p.Type,
                 Icon = p.Icon,
-                CreateTime = p.CreateTime,
                 PermissionGroupId = pg.Id,
                 PermissionGroupName = pg.Name,
                 Perms = p.Perms
             })
-            //.Distinct()
             .ToList();
 
             return list;

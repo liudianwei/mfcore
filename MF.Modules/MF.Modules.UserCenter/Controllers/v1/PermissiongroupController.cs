@@ -28,12 +28,12 @@ namespace UserCenter.Controllers.v1
         /// <summary>
         /// 创建permissionGroup
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
         [HttpPost, ActionLog("【权限组】创建")]
-        public async Task<IActionResult> Post(PermissionGroupDto dto)
+        public async Task<IActionResult> Post(CreatePermissionGroupCommand command)
         {
-            var response = await _bus.SendAsync(new CreatePermissionGroupCommand() { Dto = dto });
+            var response = await _bus.SendAsync(command);
             return Result(response);
         }
 
@@ -56,7 +56,7 @@ namespace UserCenter.Controllers.v1
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete("{id}"), ActionLog("【权限组】删除权")]
+        [HttpDelete("{id}"), ActionLog("【权限组】删除")]
         public async Task<IActionResult> Delete(string id)
         {
             var response = await _bus.SendAsync(new DeletePermissionGroupCommand(new List<string>() { id }));

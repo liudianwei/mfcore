@@ -145,7 +145,7 @@ namespace UserCenter.Controllers.v1
         /// </summary>
         /// <param name="cmd"></param>
         /// <returns></returns>
-        [HttpPost("batch-state-request"), ActionLog("【任务调度】批量修改状态")]
+        [HttpPost("batch-state-request"), ActionLog("【任务调度】修改运行状态", ":{cmd.State}")]
         public async Task<IActionResult> BatchChangeState(BatchSetStateJobTaskCommand cmd)
         {
             var response = await _bus.SendAsync(cmd);

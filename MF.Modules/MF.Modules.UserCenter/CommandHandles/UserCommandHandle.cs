@@ -112,38 +112,37 @@ namespace UserCenter.CommandHandles
         /// <returns></returns>
         public Task<PubResponse> Handle(CreateUserCommand cmd, CancellationToken cancellationToken)
         {
-            UserDto dto = cmd.Dto;
-            if (dto.Name.IsNull())
+            if (cmd.Name.IsNull())
             {
                 return Failed(BaseSystemError.NAME_CANNOT_BE_EMPTY);
             }
 
-            if (dto.FullName.IsNull())
+            if (cmd.FullName.IsNull())
             {
                 return Failed(BaseSystemError.FULLNAME_CANNOT_BE_EMPTY);
             }
 
-            if (_userRepository.Queryable().Where(u => u.Name == dto.Name).Any())
+            if (_userRepository.Queryable().Where(u => u.Name == cmd.Name).Any())
             {
                 return Failed(UserCenterError.NAME_ALREADY_EXIST);
             }
 
-            if (dto.Email.NotNull() && !dto.Email.MatchEmail().isMatch)
+            if (cmd.Email.NotNull() && !cmd.Email.MatchEmail().isMatch)
             {
                 return Failed(UserCenterError.EMAIL_ERROR);
             }
 
-            if (dto.Tel.NotNull() && !dto.Tel.MatchPhoneNumber())
+            if (cmd.Tel.NotNull() && !cmd.Tel.MatchPhoneNumber())
             {
                 return Failed(UserCenterError.TEL_ERROR);
             }
 
             User user = new User
             {
-                Name = dto.Name,
-                FullName = dto.FullName,
-                Email = dto.Email,
-                Tel = dto.Tel,
+                Name = cmd.Name,
+                FullName = cmd.FullName,
+                Email = cmd.Email,
+                Tel = cmd.Tel,
                 Remark = "普通用户",
                 UserType = "SYS_USER"
             };
@@ -393,12 +392,11 @@ namespace UserCenter.CommandHandles
         /// <summary>
         /// 修改用户
         /// </summary>
-        /// <param name="cmd"></param>
+        /// <param name="dto"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task<PubResponse> Handle(UpdateUserCommand cmd, CancellationToken cancellationToken)
+        public Task<PubResponse> Handle(UpdateUserCommand dto, CancellationToken cancellationToken)
         {
-            UserDto dto = cmd.Dto;
             User user = _userRepository.Queryable().InSingle(dto.Id);
             if (user.IsNull())
             {
@@ -582,11 +580,16 @@ namespace UserCenter.CommandHandles
         [CacheRemove("uc:userole")]
         public Task<PubResponse> Handle(DeleteUserCommand cmd, CancellationToken cancellationToken)
         {
+            List<User> userList = _userRepository.Queryable().In(cmd.List).ToList();
+            if (cmd.List.IsNull() || cmd.List.Count <= 0 || cmd.List.Count != userList.Count)
+            {
+                return Failed(BaseSystemError.OBJECT_DOES_NOT_EXIST);
+            }
             //不能删除超级管理员
             cmd.List.Remove(SystemConstants.superId);
             CheckNull.BusinessException(!_userRepository.Delete(u => cmd.List.Contains(u.Id)), BaseSystemError.FAILED);
 
-            return Succeed();
+            return Succeed(userList.Select(i => new { i.Name, i.FullName }));
         }
 
         /// <summary>
@@ -713,13 +716,17 @@ namespace UserCenter.CommandHandles
         public Task<PubResponse> Handle(BatchResetPasswordUserCommand cmd, CancellationToken cancellationToken)
         {
             List<User> userList = _userRepository.Queryable().In(cmd.List).ToList();
+            if (cmd.List.IsNull() || cmd.List.Count <= 0 || cmd.List.Count != userList.Count)
+            {
+                return Failed(BaseSystemError.OBJECT_DOES_NOT_EXIST);
+            }
             foreach (var user in userList)
             {
                 user.Updator = _globalCore.UserName;
                 ChangePassword(user, SystemConstants.defaultPassword);
             }
             bool flag = _userRepository.Update(userList);
-            return SucceedOrFail(flag);
+            return SucceedOrFail(flag, userList.Select(i => new { i.Name, i.FullName }));
         }
 
         /// <summary>

@@ -84,12 +84,12 @@ namespace UserCenter.Controllers.v2
         /// <summary>
         /// 创建user
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
         [HttpPost, ActionLog("创建用户")]
-        public async Task<IActionResult> Post(UserDto dto)
+        public async Task<IActionResult> Post(CreateUserCommand command)
         {
-            var response = await _bus.SendAsync(new CreateUserCommand { Dto = dto });
+            var response = await _bus.SendAsync(command);
             return Result(response);
         }
 

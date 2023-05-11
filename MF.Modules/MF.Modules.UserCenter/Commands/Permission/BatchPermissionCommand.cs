@@ -8,6 +8,7 @@ namespace UserCenter.Commands
     public class BatchPermissionCommand : IRequest<PubResponse>
     {
         public string Id { get; set; }
-        public List<PermissionDto> List { get; set; }
+        public string ParentName { get; set; }
+        public List<PermissionBtnDto> List { get; set; }
     }
 }

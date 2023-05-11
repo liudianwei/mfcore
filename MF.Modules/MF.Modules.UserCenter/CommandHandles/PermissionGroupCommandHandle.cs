@@ -54,23 +54,20 @@ namespace UserCenter.CommandHandles
         /// <returns></returns>
         public Task<PubResponse> Handle(CreatePermissionGroupCommand cmd, CancellationToken cancellationToken)
         {
-            PermissionGroupDto dto = cmd.Dto;
-
-            if (dto.Name.IsNull())
+            if (cmd.Name.IsNull())
             {
                 return Failed(BaseSystemError.NAME_CANNOT_BE_EMPTY);
             }
-            Permissiongroup permissionGroup = FindModelByName(dto.Name);
+            Permissiongroup permissionGroup = FindModelByName(cmd.Name);
             if (permissionGroup.NotNull())
             {
                 return Failed(BaseSystemError.OBJECT_ALREADY_EXIST);
             }
             permissionGroup = new Permissiongroup
             {
-                Name = dto.Name,
-                Code = dto.Code,
-                Remark = dto.Remark,
-                Updator = dto.Updator
+                Name = cmd.Name,
+                Code = cmd.Name,//暂未起作用
+                Remark = cmd.Remark
             };
 
             permissionGroup = _permissiongroupRepository.InsertReturnEntity(permissionGroup);
@@ -117,13 +114,13 @@ namespace UserCenter.CommandHandles
                 }
             }
             permissionGroup.Name = cmd.Name;
-            permissionGroup.Code = cmd.Code;
+            //permissionGroup.Code = cmd.Code;
             permissionGroup.Remark = cmd.Remark;
-            permissionGroup.Updator = cmd.Updator;
+            //permissionGroup.Updator = cmd.Updator;
 
             var flag = _permissiongroupRepository.UpdateEntity(permissionGroup);
 
-            return SucceedOrFail(flag, permissionGroup.Id);
+            return SucceedOrFail(flag);
         }
 
         /// <summary>
@@ -189,7 +186,7 @@ namespace UserCenter.CommandHandles
                     }
                 }
             }
-            return Succeed(ubdellist);
+            return Succeed(list.Select(pg => pg.Name).ToList());
         }
 
         /// <summary>

@@ -55,9 +55,9 @@ namespace MF.NetCoreApp.Attributes
         /// <param name="_p">参数携带</param>
         public ActionLog(string _ActionContent, string _p = "")
         {
-            var arraylist = new ArrayList();
-            if (_p != "")
+            if (_p != "" && _p.Contains(":"))
             {
+                var arraylist = new ArrayList();
                 var par = _p.Split(":");
                 foreach (var item in par)
                 {
@@ -66,10 +66,10 @@ namespace MF.NetCoreApp.Attributes
                         arraylist.Add(item.Replace("{", "").Replace("}", ""));
                     }
                 }
+                InitParm = Parm = _p;
+                ExpressionEval.SetVariable("s", arraylist);
             }
-            ExpressionEval.SetVariable("s", arraylist);
             InitActionContent = ActionContent = _ActionContent;
-            InitParm = Parm = _p;
         }
 
         public ActionLog()
@@ -103,7 +103,7 @@ namespace MF.NetCoreApp.Attributes
                 }
             }
             //执行动作 参数解析
-            if (InitParm != "")
+            if (!string.IsNullOrWhiteSpace(InitParm))
             {
                 //重置初始值
                 Parm = InitParm;
@@ -119,15 +119,15 @@ namespace MF.NetCoreApp.Attributes
                         interpreter.SetVariable(parameter.Key, parameter.Value);
                     }
                 }
-                var list = ExpressionEval.Eval<ArrayList>("s");
-                foreach (var item in list)
+                var arrayList = ExpressionEval.Eval<ArrayList>("s", Array.Empty<Parameter>());
+                foreach (var item in arrayList)
                 {
                     var tyu = interpreter.Eval(item.ToString()).ToString();
                     if (item.ToString().Contains("State"))
                     {
-                        tyu = (tyu == "0") ? "启用" : "禁用";
+                        tyu = ((!InitActionContent.Contains("任务调度")) ? ((tyu == "0") ? "启用" : "禁用") : ((tyu == "1") ? "重启" : "暂停"));
                     }
-                    Parm = Parm.Replace("{" + item + "}", tyu);
+                    Parm = Parm.Replace("{" + item?.ToString() + "}", tyu);
                 }
             }
             RequestBody = JsonConvert.SerializeObject(context.ActionArguments);

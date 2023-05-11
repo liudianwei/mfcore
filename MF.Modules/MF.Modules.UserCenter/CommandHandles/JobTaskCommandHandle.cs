@@ -96,7 +96,17 @@ namespace UserCenter.CommandHandles
         /// <returns></returns>
         public Task<PubResponse> Handle(DeleteJobTaskCommand cmd, CancellationToken cancellationToken)
         {
-            return SucceedOrFail(_backgroundJobService.DeleteBackgroundJob(cmd.List.First()));
+            if (cmd.List.IsNull()|| cmd.List.Count<=0)
+            {
+                return Failed(BaseSystemError.PARAM_IS_ERROR);
+            }
+            var jobTaskList = _backgroundJobService.GeByIDsScheduleJobInfoList(cmd.List);
+            if (jobTaskList.IsNull() || jobTaskList.Count != cmd.List.Count)
+            {
+                return Failed(BaseSystemError.OBJECT_DOES_NOT_EXIST);
+            }
+            var flag = _backgroundJobService.DeleteBackgroundJob(cmd.List.First());
+            return SucceedOrFail(flag, jobTaskList.Select(i => i.Name));
         }
 
         /// <summary>
@@ -252,10 +262,11 @@ namespace UserCenter.CommandHandles
             {
                 cmd.State = (int)JobTaskEnum.PopWait;
             }
+            var jobTasks = new List<JobTask>();
             if (cmd.List.NotNullT())
             {
                 cmd.List = cmd.List.Distinct().ToList();
-                var jobTasks = _backgroundJobService.GeByIDsScheduleJobInfoList(cmd.List);
+                jobTasks = _backgroundJobService.GeByIDsScheduleJobInfoList(cmd.List);
                 if (jobTasks.Count != cmd.List.Count|| jobTasks.IsNull())
                 {
                     ThrowError(BaseSystemError.OBJECT_DOES_NOT_EXIST);
@@ -266,7 +277,7 @@ namespace UserCenter.CommandHandles
             {
                 ThrowError(BaseSystemError.PARAM_IS_BLANK);
             }
-            return Succeed();
+            return Succeed(jobTasks.Select(i => i.Name).ToList());
         }
 
     }

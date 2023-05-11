@@ -12,7 +12,7 @@ namespace UserCenter.Validators
         {
             _Repository = Repository;
 
-            RuleFor(c => c.Dto.Id).NotEmpty().WithMessage("id不能为空");
+            RuleFor(c => c.Id).NotEmpty().WithMessage("id不能为空");
             //RuleFor(c => c.Id).Must(Validator).WithMessage("重复");
         }
 
