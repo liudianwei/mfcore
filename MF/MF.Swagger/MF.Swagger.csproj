@@ -2,10 +2,13 @@
 
   <PropertyGroup>
 	  <TargetFramework>net5</TargetFramework>
-	  <Version>1.0.1-rc1</Version>
+	  <Version>1.0.1-rc1.1.1</Version>
 	  <Description>
 		  API文档
 	  </Description>
+	  <PackageReleaseNotes>
+		  支持token在指定时间段内进行延期 ---2023/5/24
+	  </PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

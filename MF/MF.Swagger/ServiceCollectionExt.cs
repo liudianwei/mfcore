@@ -1,19 +1,19 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using MF.Swagger;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using MF.Swagger;
 
 namespace MF.Extensions.DependencyInjection
 {
@@ -104,6 +104,36 @@ namespace MF.Extensions.DependencyInjection
                     {
                         //context.Token = context.Request.Query["assess_token"];
                         //context.HttpContext.Request.Headers["Authorization"] = context.Token;
+                        return Task.CompletedTask;
+                    },
+                    OnTokenValidated = context =>
+                    {
+                        try
+                        {
+                            var exTime = context.SecurityToken.ValidTo.ToLocalTime();
+                            TimeSpan ts = exTime - DateTime.Now;
+                            context.Response.Headers.Add("Refreshtoken", "");
+                            //提前JwtRefreshTime分钟 更新token 前端保证有http请求才会走到这边
+                            if (!double.TryParse(jwtConfig.JwtRefreshTime, out double refreshTime))
+                            {
+                                refreshTime = 30 * 60;//默认提前30分钟延期
+                            }
+                            if (ts.TotalSeconds < refreshTime)
+                            {
+                                var tokens = context.Request.Headers["Authorization"];
+                                tokens = tokens.ToString().Replace("Bearer ", "");
+                                var claims = new List<Claim>(jwtConfig.ReadToken(tokens).Claims);
+                                claims.RemoveAll(i => i.Type == "aud");
+
+                                // 生成jwt
+                                var jwtobj = jwtConfig.GenToken(claims);
+                                context.Response.Headers["Refreshtoken"] = jwtobj.Item1;
+                            }
+                        }
+                        catch
+                        {
+
+                        }
                         return Task.CompletedTask;
                     }
                 };

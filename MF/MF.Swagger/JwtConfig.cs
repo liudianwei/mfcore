@@ -12,9 +12,14 @@ namespace MF.Swagger
     public class JwtConfig
     {
         public string JwtSecurityKey { get; set; }
+        //jwt 签 发 者
         public string JwtIssuer { get; set; }
+        //接收一方
         public string JwtAudience { get; set; }
+        //过期时间 秒
         public string JwtExpireTime { get; set; }
+        //提前多久进行延期
+        public string JwtRefreshTime { get; set; }
 
 #pragma warning disable CA1822 // Mark members as static
 
