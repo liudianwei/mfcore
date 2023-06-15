@@ -51,7 +51,7 @@ namespace Common.Utils
         private IConfiguration GetConfigObjs(string className)
         {
             //string aa = Configuration.GetSection("MEASSettings").Get<MEASSettings>().PrintName;
-            return Configuration.GetSection(className);//    MEASSettings bbbb = see.Get<MEASSettings>();
+            return Configuration?.GetSection(className);//    MEASSettings bbbb = see.Get<MEASSettings>();
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Common.Utils
         public object GetConfigObjByEntity<T>(T obj)
         {
             string className = Type.GetType(obj.ToString()).Name;
-            return Configuration.GetSection(className).Get(Type.GetType(obj.ToString()));
+            return Configuration?.GetSection(className).Get(Type.GetType(obj.ToString()));
         }
         /// <summary>
         /// 根据节点获取配置文件对象实例
