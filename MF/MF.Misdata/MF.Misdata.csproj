@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFrameworks>net5.0</TargetFrameworks>
     <Platforms>AnyCPU;ARM64</Platforms>
-    <Version>1.1.2-rc2</Version>
-    <Description>更新最新ORM(5.1.3.52);ORM使用Update更新时,新增是否校验InnerVersion字段进行内部乐观锁,默认不校验</Description>
+    <Version>1.1.2-rc3</Version>
+    <Description>优化mqttclient断开连接时,频繁写日志导致磁盘满问题</Description>
     <PackageReleaseNotes>
       1、机器码记录到日志
       2、优化日志组件
@@ -24,6 +24,7 @@
       16、修复创建流水号已知的bug(例如,流水号限定3位,当流水号为1000时,仍然能创建成功)
       17、创建流水号移除ref用法
       18、更新最新ORM(5.1.3.52);ORM使用Update更新时,新增是否校验InnerVersion字段进行内部乐观锁,默认不校验
+      19、优化mqttclient断开连接时,频繁写日志导致磁盘满问题
     </PackageReleaseNotes>
     
   </PropertyGroup>

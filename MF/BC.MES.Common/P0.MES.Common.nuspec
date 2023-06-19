@@ -2,14 +2,14 @@
 <package>
   <metadata>
     <id>MES.Common</id>
-    <version>1.2.5-rc4</version>
+    <version>1.2.5</version>
     <title>MES.Common</title>
     <authors>corbin chen</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
     <!-- <icon>icon.png</icon> -->
     <projectUrl>http://192.168.0.111:9009/v3/index.json</projectUrl>
-    <description>升级SqlSugar 5.1.4.58</description>
+    <description>2023-06-19 优化mqtt连接失败时频繁写入日志，导致磁盘满的问题</description>
     <releaseNotes>
       v1.0.0  基础版本
       v1.1.0  新增netmq断线重连机制
@@ -27,8 +27,9 @@
       v1.2.5-rc2 升级SqlSugar
       v1.2.5-rc3 优化日志输出
       v1.2.5-rc4 升级SqlSugar 5.1.4.58
+      v1.2.5  2023-06-19 优化mqtt连接失败时频繁写入日志，导致磁盘满的问题
     </releaseNotes>
-    <copyright>Copyright ©2022 Macroinf Corporation</copyright>
+    <copyright>Copyright ©2023 Macroinf Corporation</copyright>
     <tags>MES.Common</tags>
     <dependencies>
       <group targetFramework=".NETFramework4.6.1">

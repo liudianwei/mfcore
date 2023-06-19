@@ -140,7 +140,7 @@ namespace Common.Communication
             }
             catch (Exception ex)
             {
-                SystemLog.Fatal($"### MQTT CREATE FAILED ###", ex);
+                SystemLog.Exception($"### MQTT CREATE FAILED ###", ex);
             }
         }
 
@@ -186,14 +186,15 @@ namespace Common.Communication
         {
             if (!_close)
             {
-                SystemLog.Error($"### MQTT DISCONNECTED FROM SERVER ###");
+                SystemLog.Error($"### MQTT DISCONNECTED FROM SERVER,SLEEP 5S,UNTIL CONNECTED ###");
+                Thread.Sleep(5000);
                 try
                 {
                     await Client.ConnectAsync(options);
                 }
                 catch (Exception ex)
                 {
-                    SystemLog.Exception($"### MQTT RECONNECTING FAILED ###", ex);
+                    SystemLog.Error($"### MQTT RECONNECTING FAILED, {ex.Message}###");
                 }
             }
         }
