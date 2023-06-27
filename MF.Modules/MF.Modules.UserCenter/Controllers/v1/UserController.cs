@@ -92,7 +92,7 @@ namespace UserCenter.Controllers.v1
         [HttpGet("logout")]
         public async Task<IActionResult> Logout(string name)
         {
-            var response = await _bus.SendAsync(new LogoutUserCommand());
+            var response = await _bus.SendAsync(new LogoutUserCommand() { TempMark = name });
             return Result(response);
         }
 
@@ -341,7 +341,7 @@ namespace UserCenter.Controllers.v1
         /// <returns></returns>
         [HttpGet("ipclogin")]
         [AllowAnonymous]
-        public async Task<IActionResult> IPCLogin(string name, string password, string shiftCode, string shiftName, string opName, string opDesc, string lineCode, string lineName)
+        public async Task<IActionResult> IPCLogin(string name, string password, string shiftCode, string shiftName, string opName, string opDesc, string lineCode, string lineName, string loginType="web")
         {
             var response = await _bus.SendAsync(new IPCLoginUserCommand()
             {
@@ -352,7 +352,7 @@ namespace UserCenter.Controllers.v1
                 LineCode=lineCode,
                 OpName = opName,
                 OpDesc = opDesc,
-                LoginType = LoginTypeEnum.Login.Name
+                LoginType = loginType//LoginTypeEnum.Login.Name
             });
 
             await _bus.SendAsync(new UpdateProduceMonitorCommand() { UserName = name, OpName = opName, OpDesc = opDesc, ShiftCode = shiftCode, ShiftName = shiftName,LineCode=lineCode,LineName=lineName });

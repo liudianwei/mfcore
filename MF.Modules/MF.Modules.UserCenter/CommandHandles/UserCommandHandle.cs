@@ -302,7 +302,8 @@ namespace UserCenter.CommandHandles
                 Ip = _globalCore.GetIp(),
                 ClientName = _globalCore.GetBrowser(),
                 Creator = string.Concat(user.Name, "|", user.FullName),
-                Updator = string.Concat(user.Name, "|", user.FullName)
+                Updator = string.Concat(user.Name, "|", user.FullName),
+                Remark = user.TempMark
             };
 
             _accesslogRepository.Insert(accesslog);
@@ -330,12 +331,19 @@ namespace UserCenter.CommandHandles
                 RecordLoginFailed(user);
                 return Failed(BaseSystemError.USER_DEACTIVE);
             }
-
-            // 校验密码
-            if (!VerifyPassword(user, cmd.Password))
+            user.TempMark = cmd.TempMark;
+            if (cmd.LoginType.ToLower() != "card")//刷卡登录无需密码校验
             {
-                RecordLoginFailed(user);
-                return Failed(BaseSystemError.USERNAME_OR_PASSWORD_ERROR);
+                // 校验密码
+                if (!VerifyPassword(user, cmd.Password))
+                {
+                    RecordLoginFailed(user);
+                    return Failed(BaseSystemError.USERNAME_OR_PASSWORD_ERROR);
+                }
+            }
+            else
+            {
+                user.TempMark += "-CARD";
             }
 
             // 生成jwt
@@ -382,7 +390,8 @@ namespace UserCenter.CommandHandles
                 AccessType = LoginRecordEnum.loginOut.Name,
                 UserName = _globalCore.UserName,
                 Ip = _globalCore.GetIp(),
-                ClientName = _globalCore.GetBrowser()
+                ClientName = _globalCore.GetBrowser(),
+                Remark = cmd.TempMark
             };
             _accesslogRepository.Insert(accesslog);
 
@@ -1378,7 +1387,8 @@ namespace UserCenter.CommandHandles
             {
                 Name = cmd.Name,
                 Password = cmd.Password,
-                LoginType = cmd.LoginType
+                LoginType = cmd.LoginType,
+                TempMark = $"IPC-{cmd.LineCode}-{cmd.OpName}-{cmd.ShiftCode}"
             },
             cancellationToken);
         }

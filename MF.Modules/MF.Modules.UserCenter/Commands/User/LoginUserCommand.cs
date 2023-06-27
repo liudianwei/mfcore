@@ -9,6 +9,7 @@ namespace UserCenter.Commands
         public string Password { get; set; }
         public string LoginType { get; set; }
         public bool LoginFalse { get; set; } = false;
+        public string TempMark { get; set; } = "WEB";//扩展字段
     }
     public class FindUserTokenCommand : IRequest<PubResponse>
     {

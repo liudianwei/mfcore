@@ -7,9 +7,9 @@ using SqlSugar;
 namespace DAL.UserCenter.Entities
 {
     /// <summary>
-    /// ÓÃ»§ ±í
+    /// ç”¨æˆ· è¡¨
     /// </summary>
-    [SugarTable("uc_user", "ÓÃ»§")]
+    [SugarTable("uc_user", "ç”¨æˆ·")]
     public partial class User : BaseEntity
     {
         public User()
@@ -17,86 +17,89 @@ namespace DAL.UserCenter.Entities
         }
 
         /// <summary>
-        /// Desc:Ãû³Æ
+        /// Desc:åç§°
         /// Default:NULL
         /// Nullable:True
         /// </summary>
-        [SugarColumn(ColumnName = "name", ColumnDescription = "Ãû³Æ", IsNullable = true, Length = 64, ColumnDataType = "varchar", DecimalDigits = 0)]
+        [SugarColumn(ColumnName = "name", ColumnDescription = "åç§°", IsNullable = true, Length = 64, ColumnDataType = "varchar", DecimalDigits = 0)]
         public string Name { get; set; }
 
         /// <summary>
-        /// Desc:±¸×¢
+        /// Desc:å¤‡æ³¨
         /// Default:NULL
         /// Nullable:True
         /// </summary>
-        [SugarColumn(ColumnName = "remark", ColumnDescription = "±¸×¢", IsNullable = true, Length = 255, ColumnDataType = "varchar", DecimalDigits = 0)]
+        [SugarColumn(ColumnName = "remark", ColumnDescription = "å¤‡æ³¨", IsNullable = true, Length = 255, ColumnDataType = "varchar", DecimalDigits = 0)]
         public string Remark { get; set; }
 
         /// <summary>
-        /// Desc:È«³Æ
+        /// Desc:å…¨ç§°
         /// Default:NULL
         /// Nullable:True
         /// </summary>
-        [SugarColumn(ColumnName = "full_name", ColumnDescription = "È«³Æ", IsNullable = true, Length = 64, ColumnDataType = "varchar", DecimalDigits = 0)]
+        [SugarColumn(ColumnName = "full_name", ColumnDescription = "å…¨ç§°", IsNullable = true, Length = 64, ColumnDataType = "varchar", DecimalDigits = 0)]
         public string FullName { get; set; }
 
         /// <summary>
-        /// Desc:ÃÜÂë
+        /// Desc:å¯†ç 
         /// Default:NULL
         /// Nullable:True
         /// </summary>
-        [SugarColumn(ColumnName = "password", ColumnDescription = "ÃÜÂë", IsNullable = true, Length = 64, ColumnDataType = "varchar", DecimalDigits = 0)]
+        [SugarColumn(ColumnName = "password", ColumnDescription = "å¯†ç ", IsNullable = true, Length = 64, ColumnDataType = "varchar", DecimalDigits = 0)]
         public string Password { get; set; }
 
         /// <summary>
-        /// Desc:ÑÎÖµ
+        /// Desc:ç›å€¼
         /// Default:NULL
         /// Nullable:True
         /// </summary>
-        [SugarColumn(ColumnName = "salt", ColumnDescription = "ÑÎÖµ", IsNullable = true, Length = 64, ColumnDataType = "varchar", DecimalDigits = 0)]
+        [SugarColumn(ColumnName = "salt", ColumnDescription = "ç›å€¼", IsNullable = true, Length = 64, ColumnDataType = "varchar", DecimalDigits = 0)]
         public string Salt { get; set; }
 
         /// <summary>
-        /// Desc:µç×ÓÓÊ¼ş
+        /// Desc:ç”µå­é‚®ä»¶
         /// Default:NULL
         /// Nullable:True
         /// </summary>
-        [SugarColumn(ColumnName = "email", ColumnDescription = "µç×ÓÓÊ¼ş", IsNullable = true, Length = 64, ColumnDataType = "varchar", DecimalDigits = 0)]
+        [SugarColumn(ColumnName = "email", ColumnDescription = "ç”µå­é‚®ä»¶", IsNullable = true, Length = 64, ColumnDataType = "varchar", DecimalDigits = 0)]
         public string Email { get; set; }
 
         /// <summary>
-        /// Desc:µç»°
+        /// Desc:ç”µè¯
         /// Default:NULL
         /// Nullable:True
         /// </summary>
-        [SugarColumn(ColumnName = "tel", ColumnDescription = "µç»°", IsNullable = true, Length = 64, ColumnDataType = "varchar", DecimalDigits = 0)]
+        [SugarColumn(ColumnName = "tel", ColumnDescription = "ç”µè¯", IsNullable = true, Length = 64, ColumnDataType = "varchar", DecimalDigits = 0)]
         public string Tel { get; set; }
 
         /// <summary>
-        /// Desc:Ö÷Ìâ
+        /// Desc:ä¸»é¢˜
         /// Default:NULL
         /// Nullable:True
         /// </summary>
-        [SugarColumn(ColumnName = "theme", ColumnDescription = "Ö÷Ìâ", IsNullable = true, Length = 64, ColumnDataType = "varchar", DecimalDigits = 0)]
+        [SugarColumn(ColumnName = "theme", ColumnDescription = "ä¸»é¢˜", IsNullable = true, Length = 64, ColumnDataType = "varchar", DecimalDigits = 0)]
         public string Theme { get; set; }
 
         /// <summary>
-        /// Desc:ÉÏÒ»´ÎÃÜÂëĞŞ¸ÄÊ±¼ä
+        /// Desc:ä¸Šä¸€æ¬¡å¯†ç ä¿®æ”¹æ—¶é—´
         /// Default:NULL
         /// Nullable:True
         /// </summary>
-        [SugarColumn(ColumnName = "password_change_time", ColumnDescription = "ÉÏÒ»´ÎÃÜÂëĞŞ¸ÄÊ±¼ä", IsNullable = true, Length = 0, DecimalDigits = 0)]
+        [SugarColumn(ColumnName = "password_change_time", ColumnDescription = "ä¸Šä¸€æ¬¡å¯†ç ä¿®æ”¹æ—¶é—´", IsNullable = true, Length = 0, DecimalDigits = 0)]
         public System.DateTime? PasswordChangeTime { get; set; }
 
         /// <summary>
-        /// Desc:ÓÃ»§ÀàĞÍ
+        /// Desc:ç”¨æˆ·ç±»å‹
         /// Default:NULL
         /// Nullable:True
         /// </summary>
-        [SugarColumn(ColumnName = "user_type", ColumnDescription = "ÓÃ»§ÀàĞÍ", IsNullable = true, Length = 64, ColumnDataType = "varchar", DecimalDigits = 0)]
+        [SugarColumn(ColumnName = "user_type", ColumnDescription = "ç”¨æˆ·ç±»å‹", IsNullable = true, Length = 64, ColumnDataType = "varchar", DecimalDigits = 0)]
         public string UserType { get; set; }
 
-        [Navigate(typeof(RoleUser), nameof(RoleUser.UserId), nameof(RoleUser.RoleId))]//×¢ÒâË³Ğò
-        public List<Role> RoleList { get; set; }//Ö»ÄÜÊÇnull²»ÄÜ¸³Ä¬ÈÏÖµ
+        [Navigate(typeof(RoleUser), nameof(RoleUser.UserId), nameof(RoleUser.RoleId))]//æ³¨æ„é¡ºåº
+        public List<Role> RoleList { get; set; }//åªèƒ½æ˜¯nullä¸èƒ½èµ‹é»˜è®¤å€¼
+
+        [SugarColumn(IsIgnore = true)]
+        public string TempMark { get; set; }//è®°å½•æ‰©å±•ä¿¡æ¯
     }
 }
