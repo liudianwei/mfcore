@@ -22,7 +22,7 @@ namespace Common.Communication
         /// <summary>
         /// Redis 地址
         /// </summary>
-        private static readonly string RedisAddress = ConfigHelper.GetAppseting("Redis:Address");
+        private static readonly string RedisAddress = ConfigHelper.GetAppseting("Redis:Address") ?? "127.0.0.1:18222";
 
         /// <summary>
         /// Redis 访问密码
@@ -32,12 +32,12 @@ namespace Common.Communication
         /// <summary>
         /// Redis 写通道名称
         /// </summary>
-        private static readonly string WriteChannel = ConfigHelper.GetAppseting("Redis:PlcWriteChannel");
+        private static readonly string WriteChannel = ConfigHelper.GetAppseting("Redis:PlcWriteChannel") ?? "WriteTagNodeValue";
 
         /// <summary>
         /// Redis 触发通道名称
         /// </summary>
-        private static readonly string OnChangeChannel = ConfigHelper.GetAppseting("Redis:PlcOnChangeChannel");
+        private static readonly string OnChangeChannel = ConfigHelper.GetAppseting("Redis:PlcOnChangeChannel") ?? "ChangeTagNodeValue";
 
         /// <summary>
         /// 初始化 Redis 客户端
@@ -163,7 +163,7 @@ namespace Common.Communication
 
                         else
                         {
-                            var result = RestHelper.Get(ConfigHelper.GetAppseting("HttpServer:Url"), $"/{tag.OpCode}/DeviceRead?TagId={tag.TagID}");
+                            var result = RestHelper.Get(ConfigHelper.GetAppseting("HttpServer:Url") ?? "http://127.0.0.1:18555", $"/{tag.OpCode}/DeviceRead?TagId={tag.TagID}");
                             if (result.IsSuccess)
                             {
                                 tag.TagValue = result.Value;
@@ -245,7 +245,7 @@ namespace Common.Communication
                 var FromPLC = needReadFromRedis.Where(i => !i.IsMonitor).ToList();
                 FromPLC.ForEach(tag =>
                 {
-                    var result = RestHelper.Get(ConfigHelper.GetAppseting("HttpServer:Url"), $"/{tag.OpCode}/DeviceRead?TagId={tag.TagID}");
+                    var result = RestHelper.Get(ConfigHelper.GetAppseting("HttpServer:Url") ?? "http://127.0.0.1:18555", $"/{tag.OpCode}/DeviceRead?TagId={tag.TagID}");
                     if (result.IsSuccess)
                     {
                         tag.TagValue = result.Value;
@@ -319,7 +319,7 @@ namespace Common.Communication
                 foreach (var tag in FromPLC)
                 {
                     var tagv = tag;
-                    var result = RestHelper.Get(ConfigHelper.GetAppseting("HttpServer:Url"), $"/{tag.OpCode}/DeviceRead?TagId={tag.TagID}");
+                    var result = RestHelper.Get(ConfigHelper.GetAppseting("HttpServer:Url") ?? "http://127.0.0.1:18555", $"/{tag.OpCode}/DeviceRead?TagId={tag.TagID}");
                     if (result.IsSuccess)
                     {
                         tagv.TagValue = result.Value;
@@ -399,7 +399,7 @@ namespace Common.Communication
 
                         else
                         {
-                            var result = RestHelper.Post(ConfigHelper.GetAppseting("HttpServer:Url"), $"/{tag.OpCode}/DeviceWrite", new OperateWriteValue() { TagId = tag.TagID.ToString(), Value = tag.TagValue.ToString() });
+                            var result = RestHelper.Post(ConfigHelper.GetAppseting("HttpServer:Url") ?? "http://127.0.0.1:18555", $"/{tag.OpCode}/DeviceWrite", new OperateWriteValue() { TagId = tag.TagID.ToString(), Value = tag.TagValue.ToString() });
                             if (result.IsSuccess)
                             {
                                 SystemLog.Debug($"WriteApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue}", tag.OpName);

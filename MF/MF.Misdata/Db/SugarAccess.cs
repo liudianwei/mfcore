@@ -27,14 +27,15 @@ namespace Common.DBUtils
         /// <returns></returns>
         public static (SqlSugar.DbType, string) GetConnectionParam()
         {
-            string type = ConfigHelper.GetAppseting("ConnectronStr:Use");
+            string type = ConfigHelper.GetAppseting("ConnectronStr:Use") ?? "MSSQL";
+            string connectStr = ConfigHelper.GetAppseting($"ConnectronStr:{type}") ?? "server=192.168.0.73\\MSSQLSERVER2019;User ID=sa;Password=126.com;database=ames24_dev";
             return type switch
             {
-                "MYSQL" => (SqlSugar.DbType.MySql, ConfigHelper.GetAppseting($"ConnectronStr:{type}")),
-                "MSSQL" => (SqlSugar.DbType.SqlServer, ConfigHelper.GetAppseting($"ConnectronStr:{type}")),
-                "SQLITE" => (SqlSugar.DbType.Sqlite, ConfigHelper.GetAppseting($"ConnectronStr:{type}")),
-                "ORACLE" => (SqlSugar.DbType.Oracle, ConfigHelper.GetAppseting($"ConnectronStr:{type}")),
-                "POSTGRESQL" => (SqlSugar.DbType.PostgreSQL, ConfigHelper.GetAppseting($"ConnectronStr:{type}")),
+                "MYSQL" => (SqlSugar.DbType.MySql, connectStr),
+                "MSSQL" => (SqlSugar.DbType.SqlServer, connectStr),
+                "SQLITE" => (SqlSugar.DbType.Sqlite, connectStr),
+                "ORACLE" => (SqlSugar.DbType.Oracle, connectStr),
+                "POSTGRESQL" => (SqlSugar.DbType.PostgreSQL, connectStr),
                 _ => throw new Exception("不支持的数据库类型"),
             };
         }

@@ -24,42 +24,42 @@ namespace Common.Communication
         /// <summary>
         /// mqtt Ip
         /// </summary>
-        private static readonly string MqttIp = ConfigHelper.GetAppseting("MQTT:Address").Split(':')[0];
+        private static readonly string MqttIp = (ConfigHelper.GetAppseting("MQTT:Address") ?? "127.0.0.1:1883").Split(':')[0];
 
         /// <summary>
         /// mqtt Port
         /// </summary>
-        private static readonly int MqttPort = Convert.ToInt32(ConfigHelper.GetAppseting("MQTT:Address").Split(':')[1]);
+        private static readonly int MqttPort = Convert.ToInt32((ConfigHelper.GetAppseting("MQTT:Address") ?? "127.0.0.1:1883").Split(':')[1]);
 
         /// <summary>
         /// mqtt ClientID
         /// </summary>
-        private static readonly string ClientID = ConfigHelper.GetAppseting("MQTT:ClientId");
+        private static readonly string ClientID = ConfigHelper.GetAppseting("MQTT:ClientId") ?? "MisData_Unknown_1";
 
         /// <summary>
         /// mqtt UserName
         /// </summary>
-        private static readonly string UserName = ConfigHelper.GetAppseting("MQTT:UserName");
+        private static readonly string UserName = ConfigHelper.GetAppseting("MQTT:UserName") ?? "master";
 
         /// <summary>
         /// mqtt Password
         /// </summary>
-        private static readonly string Password = ConfigHelper.GetAppseting("MQTT:Password");
+        private static readonly string Password = ConfigHelper.GetAppseting("MQTT:Password") ?? "";
 
         /// <summary>
         /// mqtt CleanSession
         /// </summary>
-        private static readonly bool CleanSession = ConfigHelper.GetAppseting("MQTT:CleanSession") == "1";
+        private static readonly bool CleanSession = (ConfigHelper.GetAppseting("MQTT:CleanSession") ?? "0") == "1";
 
         /// <summary>
         /// mqtt发布通道
         /// </summary>
-        private static readonly string SentTopic = ConfigHelper.GetAppseting("MQTT:SentTopic");
+        private static readonly string SentTopic = ConfigHelper.GetAppseting("MQTT:SentTopic") ?? "misdataSent";
 
         /// <summary>
         /// mqtt订阅通道
         /// </summary>
-        private static readonly string RecvTopic = ConfigHelper.GetAppseting("MQTT:RecvTopic");
+        private static readonly string RecvTopic = ConfigHelper.GetAppseting("MQTT:RecvTopic") ?? "misdataRecv";
 
         /// <summary>
         /// 初始化客户端
