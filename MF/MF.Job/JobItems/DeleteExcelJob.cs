@@ -8,6 +8,7 @@ using Quartz;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace MF.Job.JobItems
@@ -20,23 +21,13 @@ namespace MF.Job.JobItems
         public async Task Execute(IJobExecutionContext context)
         {
             Version Ver = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-            Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute begin Ver." + Ver.ToString());
-            //logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute begin Ver." + Ver.ToString());
-            Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Executing ...");
-            //logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Executing ...");
-
+            Stopwatch sw_qs = new Stopwatch();
+            sw_qs.Start();//开始计时
+            //Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute begin Ver." + Ver.ToString());
+            //Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Executing ...");
             var uri = context.JobDetail.JobDataMap.Get("Target").ToString();
             var resource = context.JobDetail.JobDataMap.Get("TargetDetail").ToString();
-            //var token = context.JobDetail.JobDataMap.Get("Token").ToString();
-            //var method = context.JobDetail.JobDataMap.Get("Method").ToString();
-            //var jobargs = context.JobDetail.JobDataMap.Get("JobArgs").ToString();
             var name = context.JobDetail.JobDataMap.Get("JobName").ToString();
-            //string head = $"JobId: {context.JobDetail.Key.Name}" + Environment.NewLine
-            //    + $"JobName: {name}" + Environment.NewLine
-            //    + $"TotalSeconds: {context.JobRunTime.TotalSeconds}(s)" + Environment.NewLine
-            //    + $"FireTime: {TimeZoneInfo.ConvertTimeFromUtc(context.FireTimeUtc.DateTime, TimeZoneInfo.Local)}" + Environment.NewLine
-            //    + $"NextFireTime: {TimeZoneInfo.ConvertTimeFromUtc(context.NextFireTimeUtc.Value.DateTime, TimeZoneInfo.Local)}" + Environment.NewLine
-            //    + $"Message: " + Environment.NewLine;
 
             try
             {
@@ -54,11 +45,8 @@ namespace MF.Job.JobItems
             {
                 logger.Error($"### {e.Source} === {e.Message} ###");
             }
-            finally
-            {
-                Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute end ");
-                //logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute end ");
-            }
+            sw_qs.Stop();//结束计时
+            Console.WriteLine($"[{DateTime.Now}] Job_{context.JobDetail.JobDataMap.Get("JobName").ToString()} Execute Complete,Time consuming {sw_qs.ElapsedMilliseconds}ms ");
         }
 
         public class ExportLogDto

@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 using MF.Rest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NLog;
-
 using Quartz;
 
 namespace ApiJob
@@ -21,10 +22,10 @@ namespace ApiJob
         public async Task Execute(IJobExecutionContext context)
         {
             Version Ver = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-            Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute begin Ver." + Ver.ToString());
-            //logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute begin Ver." + Ver.ToString());
-            Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Executing ...");
-            //logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Executing ...");
+            Stopwatch sw_qs = new Stopwatch();
+            sw_qs.Start();//开始计时
+            //Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute begin Ver." + Ver.ToString());
+            //Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Executing ...");
 
             var uri = context.JobDetail.JobDataMap.Get("Target").ToString();
             var resource = context.JobDetail.JobDataMap.Get("TargetDetail").ToString();
@@ -52,31 +53,29 @@ namespace ApiJob
                         case "Content-Type":
                             _contenttype = item.Value.ToString();
                             break;
+
                         case "tokenKey":
                             _tokenKey = item.Value.ToString();
                             break;
+
                         case "tokenValue":
                             _token = item.Value.ToString();
                             break;
+
                         case "apiSource":
                             _apiSource = item.Value.ToString();
                             break;
+
                         default:
                             break;
                     }
                 }
             }
             var jobargs = context.JobDetail.JobDataMap.Get("JobArgs").ToString();
-            //string head = $"JobId: {context.JobDetail.Key.Name}" + Environment.NewLine
-            //    + $"JobName: {name}" + Environment.NewLine
-            //    + $"TotalSeconds: {context.JobRunTime.TotalSeconds}(s)" + Environment.NewLine
-            //    + $"FireTime: {TimeZoneInfo.ConvertTimeFromUtc(context.FireTimeUtc.DateTime, TimeZoneInfo.Local)}" + Environment.NewLine
-            //    + $"NextFireTime: {TimeZoneInfo.ConvertTimeFromUtc(context.NextFireTimeUtc.Value.DateTime, TimeZoneInfo.Local)}" + Environment.NewLine
-            //    + $"Message: " + Environment.NewLine;
 
             if (_apiSource == "private")
             {
-                if (_tokenT!="")
+                if (_tokenT != "")
                 {
                     _token = _tokenT;
                 }
@@ -89,47 +88,64 @@ namespace ApiJob
                     {
                         _expireTime = results.Data.ExpireTime.ToLocalTime().AddSeconds(-10);
                         //Console.WriteLine($"过期时间{_expireTime}");
-                        _token=_tokenT = $"Bearer {results.Data.Token}";
+                        _token = _tokenT = $"Bearer {results.Data.Token}";
                     }
                 }
             }
             string result = "";
+            string record = "";
             try
             {
                 switch (method)
                 {
                     case "get":
-                        result = MRestClient.Get(uri, resource + jobargs, 5000, _token, _tokenKey, _contenttype);
+                        JObject jo = new JObject();
+                        var args = "?";
+                        try
+                        {
+                            List<string> arry = new List<string>();
+                            if (!jobargs.Trim().Equals("{}") && jobargs.Trim().Length > 2)
+                            {
+                                jo = JObject.Parse(jobargs);
+                                foreach (var item in jo)
+                                {
+                                    arry.Add(item.Key + "=" + item.Value);
+                                }
+                                args += string.Join("&", arry);
+                            }
+                        }
+                        catch { }
+                        result = MRestClient.Get(uri, resource + args, 5000, _token, _tokenKey, _contenttype);
+                        record = $"### JobName:{name} {uri}{resource} === {method} ==={args} === {result} ###";
                         break;
 
                     case "post":
                         result = MRestClient.Post(uri, resource, jobargs, _token, _tokenKey, _contenttype);
+                        record = $"### JobName:{name} {uri}{resource} === {method} === {jobargs} === {result} ###";
                         break;
 
                     case "delete":
                         result = MRestClient.Delete(uri, resource, null, _token, _tokenKey, _contenttype);
+                        record = $"### JobName:{name} {uri}{resource} === {method} === null === {result} ###";
                         break;
 
                     default:
                         break;
                 }
-
                 if (!result.Contains("\"status\":\"success\""))
                 {
-                    logger.Error($"### JobName:{name} {uri}{resource} === {result} ###");
+                    logger.Error(record);
                 }
-                await Task.Delay(500);
+                await Task.Delay(100);
             }
             catch (Exception e)
             {
                 logger.Error($"### 异常 {e.Source} === {e.Message} ###");
             }
-            finally
-            {
-                Console.WriteLine($"[{DateTime.Now}] " + "Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute end ");
-                //logger.Info("Job_" + context.JobDetail.JobDataMap.Get("JobName").ToString() + " Execute end ");
-            }
+            sw_qs.Stop();//结束计时
+            Console.WriteLine($"[{DateTime.Now}] Job_{context.JobDetail.JobDataMap.Get("JobName").ToString()} Execute Complete,{record},Time consuming {sw_qs.ElapsedMilliseconds}ms ");
         }
+
         public class HttpResults
         {
             public int Code { get; set; }
@@ -140,6 +156,7 @@ namespace ApiJob
 
             public UserLoginResp Data { get; set; }
         }
+
         public class UserLoginResp
         {
             public string Username { get; set; }

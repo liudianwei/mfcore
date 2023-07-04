@@ -4,13 +4,15 @@
 	  <TargetFrameworks>net5</TargetFrameworks>
     <RootNamespace>MF.ApiJob</RootNamespace>
     <AssemblyName>MF.ApiJob</AssemblyName>
-	  <Version>1.0.5-rc7.3.4</Version>
+	  <Version>1.0.5-rc7.3.7</Version>
 	  <Description>
-		  +更新MF.Job.Core引用
+		  +优化调用apijob时get类型请求,参数异常问题
 	  </Description>
 	  <PackageReleaseNotes>
-		  +优化 第三方自定义接口token问题-2022/8/10
-	  </PackageReleaseNotes>
+      +优化 第三方自定义接口token问题-2022/8/10
+      +更新MF.Job.Core引用
+      +优化调用apijob时get类型请求,参数异常问题
+    </PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

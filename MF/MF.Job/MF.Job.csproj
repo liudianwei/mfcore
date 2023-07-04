@@ -2,10 +2,10 @@
 
   <PropertyGroup>
 	  <TargetFrameworks>net5</TargetFrameworks>
-	  <Version>1.0.4-rc5.0.4</Version>
+	  <Version>1.0.4-rc5.0.6</Version>
 	  <Description>
-		 Excel任务导出
-	  </Description>
+      修复 web修改状态直接停止的问题 调度任务未真正停止bug -2023/7/4
+    </Description>
 	  <PackageReleaseNotes>
 		  +修复 Job任务导出数据错误-2022/3/24
 		  +修复 Job任务导出Token失效问题-2022/4/27
@@ -13,7 +13,8 @@
 		  +修复 定期删除Job任务无法执行问题-2022/8/5
 		  +优化 结束时间可空 -2022/8/5
 		  +优化 开始时间可空 -2022/8/24
-		  +修复 一次只能执行一条任务的问题 -2022/8/24
+		  +修复 一次只能执行一条任务的问题 -2022/8/
+      +修复 web修改状态直接停止的问题 调度任务未真正停止bug -2023/7/4
 	  </PackageReleaseNotes>
   </PropertyGroup>
 

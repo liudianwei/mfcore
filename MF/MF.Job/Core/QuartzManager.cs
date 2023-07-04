@@ -99,9 +99,11 @@ namespace MF.Job.Core
                         case "ExportExcel":
                             type = new ExportExcelJob().GetType();
                             break;
+
                         case "DeleteExcel":
                             type = new DeleteExcelJob().GetType();
                             break;
+
                         default:
                             type = GetClassInfo(jobInfo.JobType, "MF.ApiJob.dll", "ApiJob.Run");
                             break;
@@ -174,17 +176,24 @@ namespace MF.Job.Core
                 {
                     new BackgroundJobService().UpdateBackgroundJobState(jobInfo.BackgroundJobId, 0);
                 }
+                if (jobInfo.State == 5 || jobInfo.State == 0 || jobInfo.State == 2)
+                {
+                    await Scheduler.DeleteJob(jobKey);//删除Job
+                }
             }
             else
             {
                 if (jobInfo.State == 5)//被标记为停止中的job改成停止
                 {
-                    await Scheduler.DeleteJob(jobKey);//删除Job
                     new BackgroundJobService().UpdateBackgroundJobState(jobInfo.BackgroundJobId, 0);
                 }
                 else if (jobInfo.State == 3)
                 {
                     new BackgroundJobService().UpdateBackgroundJobState(jobInfo.BackgroundJobId, 1);
+                }
+                if (jobInfo.State == 5 || jobInfo.State == 0 || jobInfo.State == 2)
+                {
+                    await Scheduler.DeleteJob(jobKey);//删除Job
                 }
             }
         }

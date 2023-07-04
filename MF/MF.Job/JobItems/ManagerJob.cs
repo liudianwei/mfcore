@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 using MF.Job.Core;
@@ -13,11 +14,11 @@ namespace MF.Job.JobItems
         public async Task Execute(IJobExecutionContext context)
         {
             Version Ver = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-            Console.WriteLine($"[{DateTime.Now}] ManagerJob Execute begin Ver." + Ver.ToString());
+            Stopwatch sw_qs = new Stopwatch();
+            sw_qs.Start();//开始计时
             try
             {
                 await new QuartzManager().JobScheduler(context.Scheduler);
-                Console.WriteLine($"[{DateTime.Now}] ManagerJob Executing ...");
             }
             catch (Exception ex)
             {
@@ -31,10 +32,8 @@ namespace MF.Job.JobItems
                 Console.WriteLine(ex.Message);
                 Console.BackgroundColor = c;
             }
-            finally
-            {
-                Console.WriteLine($"[{DateTime.Now}] ManagerJob Execute end ");
-            }
+            sw_qs.Stop();//结束计时
+            Console.WriteLine($"[{DateTime.Now}] ManagerJob Execute Complete Ver.{Ver.ToString()},Time consuming {sw_qs.ElapsedMilliseconds}ms");
         }
     }
 }
