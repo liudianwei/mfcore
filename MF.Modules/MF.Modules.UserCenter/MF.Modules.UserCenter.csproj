@@ -18,18 +18,7 @@
 			+新增 登录退出日志新增来源明细(IPC/WEB);支持刷卡免密登录方式---2023/6/27
 		</PackageReleaseNotes>
     </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <DocumentationFile>bin\Debug\UserCenter.xml</DocumentationFile>
-        <OutputPath>bin\Debug\</OutputPath>
-        <NoWarn>1701;1702;1591</NoWarn>
-        <WarningLevel>5</WarningLevel>
-    </PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DocumentationFile>bin\Debug\netcoreapp3.1\UserCenter.xml</DocumentationFile>
-		<OutputPath>bin\Debug\netcoreapp3.1\</OutputPath>
-	</PropertyGroup>
-
+    
     <ItemGroup>
 		<PackageReference Include="Ardalis.SmartEnum" Version="2.1.0" />
       <ProjectReference Include="..\..\MF\MF.Cache\MF.Cache.csproj" />
