@@ -207,5 +207,18 @@ namespace UserCenter.Controllers.v1
             var response = await _bus.SendAsync(new QueryByRoleNameCommand() { RoleName = roleName });
             return Result(response);
         }
+        /// <summary>
+        /// 根据role-id和权限组查询permission列表
+        /// 根据角色和权限组查询菜单，用来获取内置角色的IPC菜单ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="group"></param>
+        /// <returns></returns>
+        [HttpGet("{id}/permission/{group}/group")]
+        public async Task<IActionResult> FindPermissionByRoleIdGroup(string id, string group)
+        {
+            var response = await _bus.SendAsync(new QueryPermissionsByRoleIdGroupRoleCommand() { Id = id, PermissionGroupName = group });
+            return Result(response);
+        }
     }
 }

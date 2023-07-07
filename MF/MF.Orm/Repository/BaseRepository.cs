@@ -55,10 +55,10 @@ namespace MF.Orm.Repository
         private void PreUpdate(T entity)
         {
             entity.UpdateTime = DateTime.Now;
-            //if (entity.Updator == null || entity.Updator.Trim() == "")
-            //{
-            entity.Updator = globalCore.UserConcatName;
-            //}
+            if (entity.Updator == null || entity.Updator.Trim() == "")
+            {
+                entity.Updator = globalCore.UserConcatName;
+            }
         }
 
         #region 新增

@@ -37,7 +37,8 @@ namespace UserCenter.CommandHandles
         IRequestHandler<QueryByRoleNameCommand, PubResponse>,
         IRequestHandler<QueryPageRoleCommand, PubResponse>,
         IRequestHandler<QueryPermissionsByRoleIdRoleCommand, PubResponse>,
-        IRequestHandler<QueryUsersByRoleIdRoleRoleCommand, PubResponse>
+        IRequestHandler<QueryUsersByRoleIdRoleRoleCommand, PubResponse>,
+        IRequestHandler<QueryPermissionsByRoleIdGroupRoleCommand, PubResponse>
     {
         private readonly IRoleRepository _roleRepository;
         private readonly IRolePermissionRepository _rolePermissionRepository;
@@ -583,6 +584,44 @@ namespace UserCenter.CommandHandles
             var users = _userRepository.Queryable().In(uids).ToList();
             return Succeed(users);
             //return SucceedOrFail(users.Count == uids.Count, users, BaseSystemError.OBJECT_DOES_NOT_EXIST);
+        }
+        /// <summary>
+        /// (工厂MES加角色 权限)
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public Task<PubResponse> Handle(QueryPermissionsByRoleIdGroupRoleCommand cmd, CancellationToken cancellationToken)
+        {
+            var db = _unitOfWork.GetDbClient();
+            var list = db
+            .Queryable<Permission, RolePermission, Role, PermissionPermissiongroup, Permissiongroup>
+            ((p, rp, r, pgp, gp) => new JoinQueryInfos(
+                JoinType.Left, rp.PermissionId == p.Id,
+                JoinType.Left, r.Id == rp.RoleId && rp.State == BaseStateConstants.ACTIVATE,
+                JoinType.Left, pgp.PermissionId == p.Id,
+                JoinType.Left, gp.Id == pgp.PermissiongroupId
+            ))
+            .Where((p, rp, r, pgp, gp) => p.Type == PermissionType.MENU || p.Type == PermissionType.CATALOG)
+            .Where((p, rp, r, pgp, gp) => r.Id == cmd.Id)
+            .Where((p, rp, r, pgp, gp) => gp.Name == cmd.PermissionGroupName)
+            .Where((p, rp, r, pgp, gp) => p.State == BaseStateConstants.ACTIVATE)
+            .OrderBy((p, rp, r, pgp, gp) => p.CreateTime, OrderByType.Desc)
+            .Select((p, rp, r, pgp, gp) => new PermissionDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Code = p.Code,
+                ParentId = p.ParentId,
+                ApiUrl = p.ApiUrl,
+                OrderNum = p.OrderNum,
+                Url = p.Url,
+                IframeUrl = p.IframeUrl,
+                Type = p.Type,
+                Icon = p.Icon,
+                Perms = p.Perms,
+            }).ToList();
+            return Succeed(list);
         }
     }
 }

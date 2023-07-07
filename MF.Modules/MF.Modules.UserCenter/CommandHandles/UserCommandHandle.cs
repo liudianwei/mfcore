@@ -1388,7 +1388,7 @@ namespace UserCenter.CommandHandles
                 Name = cmd.Name,
                 Password = cmd.Password,
                 LoginType = cmd.LoginType,
-                TempMark = $"IPC-{cmd.LineCode}-{cmd.OpName}-{cmd.ShiftCode}"
+                TempMark = $"IPC-{cmd.LineCode}-{cmd.OpName}-{cmd.ShiftCode}-{cmd.ShiftName}"
             },
             cancellationToken);
         }

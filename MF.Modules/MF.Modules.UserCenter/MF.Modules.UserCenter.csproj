@@ -3,7 +3,7 @@
     <PropertyGroup>
 		<TargetFramework>net5</TargetFramework>
 		<IsPackable>true</IsPackable>
-		<Version>1.0.2-rc5.1.5</Version>
+		<Version>1.0.2-rc5.1.7</Version>
 		<Description>
 			用户中心
 		</Description>
@@ -16,6 +16,8 @@
 			+优化 将IPCCheckBtnUserCommand移入MF.Modules.UserCenter.Shared---2023/2/6
 			+优化 Controller日志记录统一加入模块(如:ActionLog("【管理人员】创建用户"))---2023/5/8
 			+新增 登录退出日志新增来源明细(IPC/WEB);支持刷卡免密登录方式---2023/6/27
+			+新增 访问日志根据时间返回数据列表(应用场景:需向工厂MES上传上下岗记录)---2023/6/28
+			+新增 根据角色和权限组查询菜单，用来获取内置角色的IPC菜单ID ---2023/7/6
 		</PackageReleaseNotes>
     </PropertyGroup>
     

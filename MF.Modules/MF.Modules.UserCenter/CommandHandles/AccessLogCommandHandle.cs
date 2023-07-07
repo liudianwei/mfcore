@@ -23,7 +23,8 @@ namespace UserCenter.CommandHandles
         IRequestHandler<CreateAccessLogCommand, PubResponse>,
         IRequestHandler<UpdateAccessLogCommand, PubResponse>,
         IRequestHandler<QueryPageAccessLogCommand, PubResponse>,
-        IRequestHandler<DeleteAccessLogCommand, PubResponse>
+        IRequestHandler<DeleteAccessLogCommand, PubResponse>,
+        IRequestHandler<QueryAccessLogByTimeCommand, PubResponse>
     {
         private readonly IAccesslogRepository _accessLogRepository;
         private readonly GlobalCore _globalCore;
@@ -60,6 +61,17 @@ namespace UserCenter.CommandHandles
         public Task<PubResponse> Handle(DeleteAccessLogCommand request, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
+        }
+
+        public Task<PubResponse> Handle(QueryAccessLogByTimeCommand cmd, CancellationToken cancellationToken)
+        {
+            var requestTime = cmd.RequestTime ?? DateTime.Now.AddDays(-3);//如果为空 那就是返回前3天数据
+            var list = _accessLogRepository.Queryable()
+                   .WhereIF(cmd.Source != "", i => i.Remark.Contains(cmd.Source))
+                   .Where(i => i.CreateTime >= requestTime)
+                   .OrderBy((o) => o.CreateTime, OrderByType.Desc)
+                   .ToList();
+            return Succeed(list);
         }
     }
 }
