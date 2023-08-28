@@ -2,10 +2,12 @@
 
   <PropertyGroup>
     <TargetFrameworks>net5.0</TargetFrameworks>
-	  <Version>1.0.1.5</Version>
+	  <Version>1.0.1.6</Version>
 	  <Description>代码生成器</Description>
 	  <PackageReleaseNotes>
-		  修改注册码授权提示信息 ---2023/4/11
+		  解决sqlserver生成实体的问题(datetime) ---2022/10/30
+		  修复表没有前缀出现异常问题 ---2023/3/13
+		  优化Command(去除InnerVersion)、导出模板(去除Id、InnerVersion) ---2023/8/11
 	  </PackageReleaseNotes>
 	  <AssemblyName>MF.CodeGen</AssemblyName>
 	  <RootNamespace>MF.CodeGen</RootNamespace>

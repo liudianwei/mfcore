@@ -512,8 +512,11 @@ namespace CodeGen
 
                 foreach (var columnEntity in ColumnEntityList)
                 {
-                    sb.AppendLine();
-                    sb.AppendLine($"        public {columnEntity.FieldType} {columnEntity.FieldName} {{ get; set; }}");
+                    if (columnEntity.FieldName != "InnerVersion")
+                    {
+                        sb.AppendLine();
+                        sb.AppendLine($"        public {columnEntity.FieldType} {columnEntity.FieldName} {{ get; set; }}");
+                    }
                 }
 
                 dtoFieldsTempStr = sb.ToString();
@@ -538,10 +541,13 @@ namespace CodeGen
 
                 foreach (var columnEntity in ColumnEntityList)
                 {
-                    sb.AppendLine();
-                    sb.AppendLine($"        [ExcelDescription(Name = \"{columnEntity.ColumnComment}\")]");
-                    sb.AppendLine($"        [ExcelColumnName(\"{columnEntity.ColumnComment}\")]");
-                    sb.AppendLine($"        public {columnEntity.FieldType} {columnEntity.FieldName} {{ get; set; }}");
+                    if (columnEntity.FieldName!= "Id"&& columnEntity.FieldName != "InnerVersion")
+                    {
+                        sb.AppendLine();
+                        sb.AppendLine($"        [ExcelDescription(Name = \"{columnEntity.ColumnComment}\")]");
+                        sb.AppendLine($"        [ExcelColumnName(\"{columnEntity.ColumnComment}\")]");
+                        sb.AppendLine($"        public {columnEntity.FieldType} {columnEntity.FieldName} {{ get; set; }}");
+                    }
                 }
 
                 respFieldsTempStr = sb.ToString();
