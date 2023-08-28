@@ -135,12 +135,12 @@ namespace MF.Utils.SPC
         /// <param name="LSL"></param>
         /// <param name="USL"></param>
         /// <returns></returns>
-        static public double CalcCp(int n, double[] X, double LSL, double USL)
+        static public double CalcCp(int n, double[] X, double LSL, double USL, string Type = "XR")
         {
             double Sigma;
-            double Rbar = CalcRbar(X, n);
+            double _bar = Type == "XR" ? CalcRbar(X, n) : CalcSbar(X, n);
             double d2 = (double)Spc_Param.Tables[Xml_Spc_Param.Table_Name].Rows[n - 2][Xml_Spc_Param.Param_L_D1];
-            Sigma = Rbar / d2;
+            Sigma = _bar / d2;
             double Cp = (USL - LSL) / (6 * Sigma);
             return Cp;
         }

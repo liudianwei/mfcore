@@ -3,6 +3,8 @@ using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
+using System.Linq;
+using System.Xml;
 
 namespace MF.Utils.SPC
 {
@@ -77,7 +79,7 @@ namespace MF.Utils.SPC
             switch (SpcType)
             {
                 case "1"://基本趋势图
-                    JsonStr = BasicTrend(dt, SqlTabCoName(Dictionary, "UpperLimit"), SqlTabCoName(Dictionary, "LowerLimit"), SqlTabCoName(Dictionary, "Measurements"), SqlTabCoName(Dictionary, "ComponentSerialNum"));
+                    JsonStr = BasicTrend(dt, Convert.ToInt32(Sample), SqlTabCoName(Dictionary, "UpperLimit"), SqlTabCoName(Dictionary, "LowerLimit"), SqlTabCoName(Dictionary, "Measurements"), SqlTabCoName(Dictionary, "ComponentSerialNum"));
                     break;
 
                 case "2"://样本趋势图
@@ -89,15 +91,15 @@ namespace MF.Utils.SPC
                     break;
 
                 case "4"://工序能力分析
-                    JsonStr = NormalDistribution(dt, SqlTabCoName(Dictionary, "UpperLimit"), SqlTabCoName(Dictionary, "LowerLimit"), SqlTabCoName(Dictionary, "Measurements"));
+                    JsonStr = NormalDistribution(dt, Convert.ToInt32(Sample), SqlTabCoName(Dictionary, "UpperLimit"), SqlTabCoName(Dictionary, "LowerLimit"), SqlTabCoName(Dictionary, "Measurements"));
                     break;
 
                 case "5"://排列图
                     JsonStr = Pareto(dt, Convert.ToInt32(Sample), Convert.ToInt32(SampleNum), SqlTabCoName(Dictionary, "Measurements"));
                     break;
 
-                case "6"://正太分布图
-                    JsonStr = NormalDistribution_Mean(dt, Convert.ToInt32(Sample), SqlTabCoName(Dictionary, "Measurements"));
+                case "6"://均值正太分布图(XR/XS)
+                    JsonStr = NormalDistribution_Mean(dt, Convert.ToInt32(Sample), SqlTabCoName(Dictionary, "UpperLimit"), SqlTabCoName(Dictionary, "LowerLimit"), SqlTabCoName(Dictionary, "Measurements"), SqlTabCoName(Dictionary, "Type"));
                     break;
 
                 case "7"://均值极差-均值图
@@ -150,7 +152,18 @@ namespace MF.Utils.SPC
             return CoName;
         }
 
-        public DataTable BasicTrend(DataTable dt, string UpperLimitName, string LowerLimitName, string MeasurementsName, string ComponentSerialNum)
+        /// <summary>
+        /// 基本趋势图
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <param name="Sample"></param>
+        /// <param name="UpperLimitName"></param>
+        /// <param name="LowerLimitName"></param>
+        /// <param name="MeasurementsName"></param>
+        /// <param name="ComponentSerialNum"></param>
+        /// <param name="Type"></param>
+        /// <returns></returns>
+        public DataTable BasicTrend(DataTable dt, int Sample, string UpperLimitName, string LowerLimitName, string MeasurementsName, string ComponentSerialNum, string Type = "XS")
         {
             DataTable table = new DataTable();
             double USL = 0;
@@ -170,21 +183,6 @@ namespace MF.Utils.SPC
 
             if (dt.Rows.Count > 0)
             {
-                #region USL LSL
-
-                try
-                {
-                    USL = Convert.ToDouble(dt.Rows[0][UpperLimitName]);
-                    LSL = Convert.ToDouble(dt.Rows[0][LowerLimitName]);
-                }
-                catch
-                {
-                    USL = 0;
-                    LSL = 0;
-                }
-
-                #endregion USL LSL
-
                 #region Y_Data
 
                 X = new double[dt.Rows.Count];
@@ -195,10 +193,30 @@ namespace MF.Utils.SPC
 
                 #endregion Y_Data
 
+                #region USL LSL
+
+                try
+                {
+                    USL = Convert.ToDouble(dt.Rows[0][UpperLimitName]);
+                    LSL = Convert.ToDouble(dt.Rows[0][LowerLimitName]);
+                }
+                catch
+                {
+                }
+                //规格上下合理性判断，超过90%样本，就算不合理
+                if ((X.Where(x => x > USL).Count() * 1.0 / X.Count()) > 0.9 || (X.Where(x => x < LSL).Count() * 1.0 / X.Count()) > 0.9)
+                {
+                    USL = Type == "XR" ? Spc_Data.XR(X, Sample).UCL_X : Spc_Data.XS(X, Sample).UCL_X;
+                    LSL = Type == "XR" ? Spc_Data.XR(X, Sample).LCL_X : Spc_Data.XS(X, Sample).LCL_X;
+                }
+
+                #endregion USL LSL
+
                 #region QU SL QL
 
                 //计算SPC参数
                 SpcCaculator.SpcValue(X, ref USL, ref LSL, out x, out s, out QU, out QL, out Cp, out Cpk, out sx, out sy);
+                CSpc_Data_Cpk Spc_Data_Cpk = Spc_Data.Cpk(X, Sample, USL, LSL, Type);
 
                 #endregion QU SL QL
 
@@ -223,14 +241,20 @@ namespace MF.Utils.SPC
                     //dr["X_Data_Description"] = dt.Rows[i]["ComponentSerialNum"];
                     //dr["Y_Data"] = dt.Rows[i]["Measurements"];
                     dr["Y_Data"] = dt.Rows[i][MeasurementsName];
-                    dr["SPC_KeyValue"] = USL.ToString("F4") + "," + QU.ToString("F4") + "," + sx[5].ToString("F4") + "," + QL.ToString("F4") + "," + LSL.ToString("F4") + ","
-                        + Cp.ToString("F4") + "," + Cpk.ToString("F4") + "," + yMin.ToString("F4") + "," + yMax.ToString("F4");
+                    dr["SPC_KeyValue"] = USL.ToString("F3") + "," + QU.ToString("F3") + "," + sx[5].ToString("F3") + "," + QL.ToString("F3") + "," + LSL.ToString("F3") + ","
+                        + Spc_Data_Cpk.Cp.ToString("F3") + "," + Spc_Data_Cpk.Cpk.ToString("F3") + "," + yMin.ToString("F3") + "," + yMax.ToString("F3");
                     table.Rows.Add(dr);
                 }
             }
             return table;
         }
 
+        /// <summary>
+        /// 样本趋势图
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <param name="MeasurementsName"></param>
+        /// <returns></returns>
         public DataTable SampleTrend(DataTable dt, string MeasurementsName)
         {
             DataTable table = new DataTable();
@@ -251,6 +275,13 @@ namespace MF.Utils.SPC
             return table;
         }
 
+        /// <summary>
+        /// 直方图
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <param name="Sample"></param>
+        /// <param name="MeasurementsName"></param>
+        /// <returns></returns>
         public DataTable Histogram(DataTable dt, int Sample, string MeasurementsName)
         {
             DataTable table = new DataTable();
@@ -342,11 +373,14 @@ namespace MF.Utils.SPC
         /// 正太分布图
         /// </summary>
         /// <param name="dt"></param>
+        /// <param name="Sample"></param>
         /// <param name="UpperLimitName"></param>
         /// <param name="LowerLimitName"></param>
         /// <param name="MeasurementsName"></param>
+        /// <param name="Type"></param>
         /// <returns></returns>
-        public DataTable NormalDistribution(DataTable dt, string UpperLimitName, string LowerLimitName, string MeasurementsName)
+        public DataTable NormalDistribution(DataTable dt, int Sample, string UpperLimitName = "upper_limit", string LowerLimitName = "lower_limit",
+            string MeasurementsName = "measure_value", string Type = "XS")
         {
             DataTable table = new DataTable();
 
@@ -367,21 +401,6 @@ namespace MF.Utils.SPC
 
             if (dt.Rows.Count > 0)
             {
-                #region USL LSL
-
-                try
-                {
-                    USL = Convert.ToDouble(dt.Rows[0][UpperLimitName]);
-                    LSL = Convert.ToDouble(dt.Rows[0][LowerLimitName]);
-                }
-                catch
-                {
-                    USL = 0;
-                    LSL = 0;
-                }
-
-                #endregion USL LSL
-
                 #region X
 
                 X = new double[dt.Rows.Count];
@@ -392,10 +411,30 @@ namespace MF.Utils.SPC
 
                 #endregion X
 
+                #region USL LSL
+
+                try
+                {
+                    USL = Convert.ToDouble(dt.Rows[0][UpperLimitName]);
+                    LSL = Convert.ToDouble(dt.Rows[0][LowerLimitName]);
+                }
+                catch
+                {
+                }
+                //规格上下合理性判断，超过90%样本，就算不合理
+                if ((X.Where(x => x > USL).Count() * 1.0 / X.Count()) > 0.9 || (X.Where(x => x < LSL).Count() * 1.0 / X.Count()) > 0.9)
+                {
+                    USL = Type == "XR" ? Spc_Data.XR(X, Sample).UCL_X : Spc_Data.XS(X, Sample).UCL_X;
+                    LSL = Type == "XR" ? Spc_Data.XR(X, Sample).LCL_X : Spc_Data.XS(X, Sample).LCL_X;
+                }
+
+                #endregion USL LSL
+
                 #region QU SL QL
 
                 //计算SPC参数
                 SpcCaculator.SpcValue(X, ref USL, ref LSL, out x, out s, out QU, out QL, out Cp, out Cpk, out sx, out sy);
+                CSpc_Data_Cpk Spc_Data_Cpk = Spc_Data.Cpk(X, Sample, USL, LSL, Type);
 
                 #endregion QU SL QL
 
@@ -416,8 +455,8 @@ namespace MF.Utils.SPC
                     dr = table.NewRow();
                     dr["X_Data"] = sx[i];
                     dr["Y_Data"] = sy[i];
-                    dr["SPC_KeyValue"] = USL.ToString("F4") + "," + QU.ToString("F4") + "," + sx[5].ToString("F4") + "," + QL.ToString("F4") + "," + LSL.ToString("F4") + ","
-                        + Cp.ToString("F4") + "," + Cpk.ToString("F4") + "," + xMin.ToString("F4") + "," + xMax.ToString("F4");
+                    dr["SPC_KeyValue"] = USL.ToString("F3") + "," + QU.ToString("F3") + "," + sx[5].ToString("F3") + "," + QL.ToString("F3") + "," + LSL.ToString("F3") + ","
+                        + Spc_Data_Cpk.Cp.ToString("F3") + "," + Spc_Data_Cpk.Cpk.ToString("F3") + "," + xMin.ToString("F3") + "," + xMax.ToString("F3");
                     table.Rows.Add(dr);
                 }
             }
@@ -481,7 +520,7 @@ namespace MF.Utils.SPC
                     average = acv / (Sample * SampleNum);
                     X_Data += bottom.ToString() + "~" + top.ToString();
                     Y_Data_1 += number;
-                    Y_Data_2 += average.ToString("F2");
+                    Y_Data_2 += average.ToString("F3");
                     if (top < maxV)
                     {
                         Y_Data_1 += ",";
@@ -522,7 +561,7 @@ namespace MF.Utils.SPC
         /// <param name="Sample"></param>
         /// <param name="MeasurementsName"></param>
         /// <returns></returns>
-        public DataTable NormalDistribution_Mean(DataTable dt, int Sample, string MeasurementsName)
+        public DataTable NormalDistribution_Mean(DataTable dt, int Sample, string UpperLimitName = "upper_limit", string LowerLimitName = "lower_limit", string MeasurementsName = "measure_value", string Type = "XR")
         {
             DataTable table = new DataTable();
 
@@ -552,17 +591,30 @@ namespace MF.Utils.SPC
 
                 #region 计算SPC参数
 
-                double ValueUp = SpcCaculator.Max(X);
-                double ValueDown = SpcCaculator.Min(X);
-                CSpc_Data_Cpk Spc_Data_Cpk = Spc_Data.Cpk(X, Sample, ValueUp, ValueDown);
-                CSpc_Data_XR Spc_Data_XR = Spc_Data.XR(X, Sample);
-                SL = Spc_Data_XR.CL_X;
-                USL = Spc_Data_XR.UCL_X;
-                LSL = Spc_Data_XR.LCL_X;
+                //USL = Spc_Data_XR.UCL_X;
+                //LSL = Spc_Data_XR.LCL_X;
+                //double ValueUp = SpcCaculator.Max(X);
+                //double ValueDown = SpcCaculator.Min(X);
+                try
+                {
+                    USL = Convert.ToDouble(dt.Rows[0][UpperLimitName]);
+                    LSL = Convert.ToDouble(dt.Rows[0][LowerLimitName]);
+                }
+                catch
+                {
+                }
+                //规格上下合理性判断，超过90%样本，就算不合理
+                if ((X.Where(x => x > USL).Count() * 1.0 / X.Count()) > 0.9 || (X.Where(x => x < LSL).Count() * 1.0 / X.Count()) > 0.9)
+                {
+                    USL = Type == "XR" ? Spc_Data.XR(X, Sample).UCL_X : Spc_Data.XS(X, Sample).UCL_X;
+                    LSL = Type == "XR" ? Spc_Data.XR(X, Sample).LCL_X : Spc_Data.XS(X, Sample).LCL_X;
+                }
+                CSpc_Data_Cpk Spc_Data_Cpk = Spc_Data.Cpk(X, Sample, USL, LSL, Type);
+                SL = Spc_Data_Cpk.X2;
                 Cp = Spc_Data_Cpk.Cp;
                 Cpk = Spc_Data_Cpk.Cpk;
-                Cpl = Spc_Data_Cpk.CPL;
-                Cpu = Spc_Data_Cpk.CPU;
+                Cpl = Spc_Data_Cpk.Cpl;
+                Cpu = Spc_Data_Cpk.Cpu;
 
                 #endregion 计算SPC参数
 
@@ -583,12 +635,15 @@ namespace MF.Utils.SPC
                     dr = table.NewRow();
                     dr["X_Data"] = Spc_Data_Cpk.NormalDistributionX[i];
                     dr["Y_Data"] = Spc_Data_Cpk.NormalDistributionY[i];
-                    dr["SPC_KeyValue"] = USL.ToString("F4") + "," + SL.ToString("F4") + "," + LSL.ToString("F4") + "," + Cp.ToString("F4") + "," + Cpk.ToString("F4") + "," + Cpl.ToString("F4") + "," + Cpu.ToString("F4") + "," + xMin.ToString("F4") + "," + xMax.ToString("F4");
+                    dr["SPC_KeyValue"] = USL.ToString("F3") + "," + SL.ToString("F3") + "," + LSL.ToString("F3") + ","
+                        + Cp.ToString("F3") + "," + Cpk.ToString("F3") + "," + Cpl.ToString("F3") + "," + Cpu.ToString("F3") + "," + xMin.ToString("F3") + "," + xMax.ToString("F3");
                     table.Rows.Add(dr);
                 }
             }
             return table;
         }
+
+        #region 均值极差
 
         /// <summary>
         /// 均值极差-均值图
@@ -646,7 +701,7 @@ namespace MF.Utils.SPC
                     dr = table.NewRow();
                     dr["X_Data"] = i + 1;
                     dr["Y_Data"] = Spc_Data_XR.CL_Xk[i];
-                    dr["SPC_KeyValue"] = UCL.ToString("F4") + "," + CL.ToString("F4") + "," + LCL.ToString("F4") + "," + yMin.ToString("F4") + "," + yMax.ToString("F4");
+                    dr["SPC_KeyValue"] = UCL.ToString("F3") + "," + CL.ToString("F3") + "," + LCL.ToString("F3") + "," + yMin.ToString("F3") + "," + yMax.ToString("F3");
                     table.Rows.Add(dr);
                 }
             }
@@ -709,133 +764,7 @@ namespace MF.Utils.SPC
                     dr = table.NewRow();
                     dr["X_Data"] = i + 1;
                     dr["Y_Data"] = Spc_Data_XR.CL_Rk[i];
-                    dr["SPC_KeyValue"] = UCL.ToString("F4") + "," + CL.ToString("F4") + "," + LCL.ToString("F4") + "," + yMin.ToString("F4") + "," + yMax.ToString("F4");
-                    table.Rows.Add(dr);
-                }
-            }
-            return table;
-        }
-
-        /// <summary>
-        /// 均值标准差-均值图
-        /// </summary>
-        /// <param name="dt"></param>
-        /// <param name="Sample"></param>
-        /// <param name="MeasurementsName"></param>
-        /// <returns></returns>
-        public DataTable MeanStandardpoor_Mean(DataTable dt, int Sample, string MeasurementsName)
-        {
-            DataTable table = new DataTable();
-            double UCL = 0;
-            double CL = 0;
-            double LCL = 0;
-            double yMin = 0;
-            double yMax = 0;
-
-            double[] X;
-
-            if (dt.Rows.Count > 0)
-            {
-                #region X
-
-                X = new double[dt.Rows.Count];
-                for (int i = 0; i < dt.Rows.Count; i++)
-                {
-                    X[i] = Convert.ToDouble(dt.Rows[i][MeasurementsName]);
-                }
-
-                #endregion X
-
-                #region 计算SPC参数
-
-                CSpc_Data_XS Spc_Data_XS = Spc_Data.XS(X, Sample);
-                CL = Spc_Data_XS.CL_X;
-                UCL = Spc_Data_XS.UCL_X;
-                LCL = Spc_Data_XS.LCL_X;
-
-                #endregion 计算SPC参数
-
-                DataRow dr;
-                table.Columns.Add("X_Data", typeof(double));
-                table.Columns.Add("Y_Data", typeof(double));
-                table.Columns.Add("SPC_KeyValue", typeof(string));
-
-                #region yMin,yMax
-
-                yMin = Math.Min(Math.Min(SpcCaculator.Min(Spc_Data_XS.CL_Xk), UCL), LCL) - (UCL + LCL) / 2;
-                yMax = Math.Max(Math.Max(SpcCaculator.Max(Spc_Data_XS.CL_Xk), UCL), LCL) + (UCL + LCL) / 2;
-
-                #endregion yMin,yMax
-
-                for (int i = 0; i < Spc_Data_XS.CL_Xk.Length; i++)
-                {
-                    dr = table.NewRow();
-                    dr["X_Data"] = i + 1;
-                    dr["Y_Data"] = Spc_Data_XS.CL_Xk[i];
-                    dr["SPC_KeyValue"] = UCL.ToString("F4") + "," + CL.ToString("F4") + "," + LCL.ToString("F4") + "," + yMin.ToString("F4") + "," + yMax.ToString("F4");
-                    table.Rows.Add(dr);
-                }
-            }
-            return table;
-        }
-
-        /// <summary>
-        /// 均值标准差-标准差图
-        /// </summary>
-        /// <param name="dt"></param>
-        /// <param name="Sample"></param>
-        /// <param name="MeasurementsName"></param>
-        /// <returns></returns>
-        public DataTable MeanStandardpoor_Standardpoor(DataTable dt, int Sample, string MeasurementsName)
-        {
-            DataTable table = new DataTable();
-            double UCL = 0;
-            double CL = 0;
-            double LCL = 0;
-            double yMin = 0;
-            double yMax = 0;
-
-            double[] X;
-
-            if (dt.Rows.Count > 0)
-            {
-                #region X
-
-                X = new double[dt.Rows.Count];
-                for (int i = 0; i < dt.Rows.Count; i++)
-                {
-                    X[i] = Convert.ToDouble(dt.Rows[i][MeasurementsName]);
-                }
-
-                #endregion X
-
-                #region 计算SPC参数
-
-                CSpc_Data_XS Spc_Data_XS = Spc_Data.XS(X, Sample);
-                CL = Spc_Data_XS.CL_S;
-                UCL = Spc_Data_XS.UCL_S;
-                LCL = Spc_Data_XS.LCL_S;
-
-                #endregion 计算SPC参数
-
-                DataRow dr;
-                table.Columns.Add("X_Data", typeof(double));
-                table.Columns.Add("Y_Data", typeof(double));
-                table.Columns.Add("SPC_KeyValue", typeof(string));
-
-                #region yMin,yMax
-
-                yMin = Math.Min(Math.Min(SpcCaculator.Min(Spc_Data_XS.CL_Sk), UCL), LCL) - (UCL + LCL) / 2;
-                yMax = Math.Max(Math.Max(SpcCaculator.Max(Spc_Data_XS.CL_Sk), UCL), LCL) + (UCL + LCL) / 2;
-
-                #endregion yMin,yMax
-
-                for (int i = 0; i < Spc_Data_XS.CL_Sk.Length; i++)
-                {
-                    dr = table.NewRow();
-                    dr["X_Data"] = i + 1;
-                    dr["Y_Data"] = Spc_Data_XS.CL_Sk[i];
-                    dr["SPC_KeyValue"] = UCL.ToString("F4") + "," + CL.ToString("F4") + "," + LCL.ToString("F4") + "," + yMin.ToString("F4") + "," + yMax.ToString("F4");
+                    dr["SPC_KeyValue"] = UCL.ToString("F3") + "," + CL.ToString("F3") + "," + LCL.ToString("F3") + "," + yMin.ToString("F3") + "," + yMax.ToString("F3");
                     table.Rows.Add(dr);
                 }
             }
@@ -854,9 +783,9 @@ namespace MF.Utils.SPC
             DataTable table = new DataTable();
 
             double[] X;
-            double UCL = 0;
-            double CL = 0;
-            double LCL = 0;
+            double USL = 0;
+            //double CL = 0;
+            double LSL = 0;
 
             if (dt.Rows.Count > 0)
             {
@@ -872,10 +801,25 @@ namespace MF.Utils.SPC
 
                 #region 计算SPC参数
 
-                CSpc_Data_XR Spc_Data_XR = Spc_Data.XR(X, Sample);
-                CL = Spc_Data_XR.CL_X;
-                UCL = Spc_Data_XR.UCL_X;
-                LCL = Spc_Data_XR.LCL_X;
+                try
+                {
+                    USL = Convert.ToDouble(dt.Rows[0][1]);
+                    LSL = Convert.ToDouble(dt.Rows[0][2]);
+                    //规格上下合理性判断，超过90%样本，就算不合理
+                    if ((X.Where(x => x > USL).Count() * 1.0 / X.Count()) > 0.9 || (X.Where(x => x < LSL).Count() * 1.0 / X.Count()) > 0.9)
+                    {
+                        USL = 0;
+                        LSL = 0;
+                    }
+                }
+                catch
+                {
+                }
+                //CSpc_Data_XR Spc_Data_XR = Spc_Data.XR(X, Sample);
+                //CL = Spc_Data_XR.CL_X;
+                //UCL = Spc_Data_XR.UCL_X;
+                //LCL = Spc_Data_XR.LCL_X;
+                //USL= dt.Rows[0]
 
                 #endregion 计算SPC参数
 
@@ -883,7 +827,7 @@ namespace MF.Utils.SPC
 
                 string ImageCode = "";
 
-                Bitmap bp = DrawXRChart_X_2018(X, Sample, LCL, UCL);
+                Bitmap bp = DrawXRChart_X_2018(X, Sample, LSL, USL);
                 IntPtr pr = bp.GetHbitmap();
                 Image _Image = Image.FromHbitmap(pr);
                 System.IO.MemoryStream _MemoryStream = new System.IO.MemoryStream();
@@ -912,38 +856,6 @@ namespace MF.Utils.SPC
         }
 
         /// <summary>
-        /// 观测值最大值
-        /// </summary>
-        /// <param name="Xn">子组观测值</param>
-        /// <returns></returns>
-        static private double Max(double[] Xn)
-        {
-            double temp;
-            temp = Xn[0];
-            for (int i = 0; i < Xn.Length; i++)
-            {
-                temp = (Xn[i] > temp) ? Xn[i] : temp;
-            }
-            return temp;
-        }
-
-        /// <summary>
-        /// 观测值最小值
-        /// </summary>
-        /// <param name="Xn">子组观测值</param>
-        /// <returns></returns>
-        static private double Min(double[] Xn)
-        {
-            double temp;
-            temp = Xn[0];
-            for (int i = 0; i < Xn.Length; i++)
-            {
-                temp = (Xn[i] < temp) ? Xn[i] : temp;
-            }
-            return temp;
-        }
-
-        /// <summary>
         /// 画XR图的表
         /// </summary>
         /// <param name="X">数据</param>
@@ -954,8 +866,8 @@ namespace MF.Utils.SPC
         public static void Spc_Table_XR(double[] X, int n, double LSL, double USL, Graphics g)
         {
             CSpc_Data_XR Spc_Data_XR = Spc_Data.XR(X, n);
-            USL = Convert.ToDouble(Spc_Data_XR.UCL_X.ToString("F2"));
-            LSL = Convert.ToDouble(Spc_Data_XR.LCL_X.ToString("F2"));
+            USL = USL == 0 ? Convert.ToDouble(Spc_Data_XR.UCL_X) : USL;
+            LSL = LSL == 0 ? Convert.ToDouble(Spc_Data_XR.LCL_X) : LSL;
 
             int x0 = 5;
             int y0 = 5;
@@ -1079,14 +991,14 @@ namespace MF.Utils.SPC
             SolidBrush brush = new SolidBrush(Color.GreenYellow);
             //g.FillRectangle(brush, 10+x0, 4 + (n + 7) * height+y0, 65+x0, 34+y0);
             g.DrawString("USL=", font2, Brushes.Black, 10 + x0, 4 + (n + 7) * height + y0);
-            g.DrawString(USL.ToString().TrimEnd('0'), font3, Brushes.Black, 40 + x0, 4 + (n + 7) * height + y0);
+            g.DrawString(USL.ToString("0.000").ToString().TrimEnd('0'), font3, Brushes.Black, 40 + x0, 4 + (n + 7) * height + y0);
             g.DrawString("LSL=", font2, Brushes.Black, 10 + x0, 4 + (n + 8) * height + y0);
-            g.DrawString(LSL.ToString().TrimEnd('0'), font3, Brushes.Black, 40 + x0, 4 + (n + 8) * height + y0);
+            g.DrawString(LSL.ToString("0.000").ToString().TrimEnd('0'), font3, Brushes.Black, 40 + x0, 4 + (n + 8) * height + y0);
 
             if (USL != 0 && LSL != 0)
             {
                 //计算无偏稳态过程能力指数
-                double Cp = SPC_Table_Data.CalcCp(n, X, LSL, USL);
+                double Cp = SPC_Table_Data.CalcCp(n, X, LSL, USL, "XR");
                 //把计算的能力指数写到表中
                 g.DrawString("Cp=", font2, Brushes.Black, 120 + x0, 4 + (n + 5) * height + y0);
                 g.DrawString(Cp.ToString("0.000").ToString().TrimEnd('0'), font3, Brushes.Black, 150 + x0, 4 + (n + 5) * height + y0);
@@ -1096,20 +1008,20 @@ namespace MF.Utils.SPC
                 //double Cpl = SPC_Table_Data.CalcCpl(X, n, LSL);
                 //double Cpk = SPC_Table_Data.CalcCpk(Cpu, Cpl);
 
-                double ValueUp = Max(X);
-                double ValueDown = Min(X);
+                //double ValueUp = Max(X);
+                //double ValueDown = Min(X);
                 //绘图数据
-                CSpc_Data_Cpk Spc_Data_Cpk = Spc_Data.Cpk(X, n, ValueUp, ValueDown);
+                CSpc_Data_Cpk Spc_Data_Cpk = Spc_Data.Cpk(X, n, Spc_Data_XR.UCL_X, Spc_Data_XR.LCL_X, "XR");
 
                 //把计算的能力指数写到表中
                 g.DrawString("Cpk=", font2, Brushes.Black, 120 + x0, 4 + (n + 6) * height + y0);
                 g.DrawString(Spc_Data_Cpk.Cpk.ToString("0.000").ToString().TrimEnd('0'), font3, Brushes.Black, 150 + x0, 4 + (n + 6) * height + y0);
                 //把计算的Cpu写到表中
                 g.DrawString("Cpu=", font2, Brushes.Black, 120 + x0, 4 + (n + 7) * height + y0);
-                g.DrawString(Spc_Data_Cpk.CPU.ToString("0.000").ToString().TrimEnd('0'), font3, Brushes.Black, 150 + x0, 4 + (n + 7) * height + y0);
+                g.DrawString(Spc_Data_Cpk.Cpu.ToString("0.000").ToString().TrimEnd('0'), font3, Brushes.Black, 150 + x0, 4 + (n + 7) * height + y0);
                 //把计算的Cpl写到表中
                 g.DrawString("Cpl=", font2, Brushes.Black, 120 + x0, 4 + (n + 8) * height + y0);
-                g.DrawString(Spc_Data_Cpk.CPL.ToString("0.000").ToString().TrimEnd('0'), font3, Brushes.Black, 150 + x0, 4 + (n + 8) * height + y0);
+                g.DrawString(Spc_Data_Cpk.Cpl.ToString("0.000").ToString().TrimEnd('0'), font3, Brushes.Black, 150 + x0, 4 + (n + 8) * height + y0);
 
                 //计算无偏过程性能指数
                 double Pp = SPC_Table_Data.CalcPp(n, X, LSL, USL);
@@ -1126,7 +1038,7 @@ namespace MF.Utils.SPC
                 g.DrawString(Ppk.ToString("0.000").ToString().TrimEnd('0'), font3, Brushes.Black, 260 + x0, 4 + (n + 6) * height + y0);
                 //把计算的Ppu写到表中
                 g.DrawString("Ppu=", font2, Brushes.Black, 230 + x0, 4 + (n + 7) * height + y0);
-                g.DrawString(Ppk.ToString("0.000").ToString().TrimEnd('0'), font3, Brushes.Black, 260 + x0, 4 + (n + 7) * height + y0);
+                g.DrawString(Ppu.ToString("0.000").ToString().TrimEnd('0'), font3, Brushes.Black, 260 + x0, 4 + (n + 7) * height + y0);
                 //把计算的Ppl写到表中
                 g.DrawString("Ppl=", font2, Brushes.Black, 230 + x0, 4 + (n + 8) * height + y0);
                 g.DrawString(Ppl.ToString("0.000").ToString().TrimEnd('0'), font3, Brushes.Black, 260 + x0, 4 + (n + 8) * height + y0);
@@ -1149,21 +1061,27 @@ namespace MF.Utils.SPC
             //return tableBitmap;
         }
 
+        #endregion 均值极差
+
+        #region 均值标准差
+
         /// <summary>
-        /// 均值标准差-数据图
+        /// 均值标准差-均值图
         /// </summary>
         /// <param name="dt"></param>
         /// <param name="Sample"></param>
         /// <param name="MeasurementsName"></param>
         /// <returns></returns>
-        public DataTable MeanStandardpoorTablePic(DataTable dt, int Sample, string MeasurementsName)
+        public DataTable MeanStandardpoor_Mean(DataTable dt, int Sample, string MeasurementsName)
         {
             DataTable table = new DataTable();
-
-            double[] X;
             double UCL = 0;
             double CL = 0;
             double LCL = 0;
+            double yMin = 0;
+            double yMax = 0;
+
+            double[] X;
 
             if (dt.Rows.Count > 0)
             {
@@ -1186,11 +1104,149 @@ namespace MF.Utils.SPC
 
                 #endregion 计算SPC参数
 
+                DataRow dr;
+                table.Columns.Add("X_Data", typeof(double));
+                table.Columns.Add("Y_Data", typeof(double));
+                table.Columns.Add("SPC_KeyValue", typeof(string));
+
+                #region yMin,yMax
+
+                yMin = Math.Min(Math.Min(SpcCaculator.Min(Spc_Data_XS.CL_Xk), UCL), LCL) - (UCL + LCL) / 2;
+                yMax = Math.Max(Math.Max(SpcCaculator.Max(Spc_Data_XS.CL_Xk), UCL), LCL) + (UCL + LCL) / 2;
+
+                #endregion yMin,yMax
+
+                for (int i = 0; i < Spc_Data_XS.CL_Xk.Length; i++)
+                {
+                    dr = table.NewRow();
+                    dr["X_Data"] = i + 1;
+                    dr["Y_Data"] = Spc_Data_XS.CL_Xk[i];
+                    dr["SPC_KeyValue"] = UCL.ToString("F3") + "," + CL.ToString("F3") + "," + LCL.ToString("F3") + "," + yMin.ToString("F3") + "," + yMax.ToString("F3");
+                    table.Rows.Add(dr);
+                }
+            }
+            return table;
+        }
+
+        /// <summary>
+        /// 均值标准差-标准差图
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <param name="Sample"></param>
+        /// <param name="MeasurementsName"></param>
+        /// <returns></returns>
+        public DataTable MeanStandardpoor_Standardpoor(DataTable dt, int Sample, string MeasurementsName)
+        {
+            DataTable table = new DataTable();
+            double UCL = 0;
+            double CL = 0;
+            double LCL = 0;
+            double yMin = 0;
+            double yMax = 0;
+
+            double[] X;
+
+            if (dt.Rows.Count > 0)
+            {
+                #region X
+
+                X = new double[dt.Rows.Count];
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    X[i] = Convert.ToDouble(dt.Rows[i][MeasurementsName]);
+                }
+
+                #endregion X
+
+                #region 计算SPC参数
+
+                CSpc_Data_XS Spc_Data_XS = Spc_Data.XS(X, Sample);
+                CL = Spc_Data_XS.CL_S;
+                UCL = Spc_Data_XS.UCL_S;
+                LCL = Spc_Data_XS.LCL_S;
+
+                #endregion 计算SPC参数
+
+                DataRow dr;
+                table.Columns.Add("X_Data", typeof(double));
+                table.Columns.Add("Y_Data", typeof(double));
+                table.Columns.Add("SPC_KeyValue", typeof(string));
+
+                #region yMin,yMax
+
+                yMin = Math.Min(Math.Min(SpcCaculator.Min(Spc_Data_XS.CL_Sk), UCL), LCL) - (UCL + LCL) / 2;
+                yMax = Math.Max(Math.Max(SpcCaculator.Max(Spc_Data_XS.CL_Sk), UCL), LCL) + (UCL + LCL) / 2;
+
+                #endregion yMin,yMax
+
+                for (int i = 0; i < Spc_Data_XS.CL_Sk.Length; i++)
+                {
+                    dr = table.NewRow();
+                    dr["X_Data"] = i + 1;
+                    dr["Y_Data"] = Spc_Data_XS.CL_Sk[i];
+                    dr["SPC_KeyValue"] = UCL.ToString("F3") + "," + CL.ToString("F3") + "," + LCL.ToString("F3") + "," + yMin.ToString("F3") + "," + yMax.ToString("F3");
+                    table.Rows.Add(dr);
+                }
+            }
+            return table;
+        }
+
+        /// <summary>
+        /// 均值标准差-数据图
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <param name="Sample"></param>
+        /// <param name="MeasurementsName"></param>
+        /// <returns></returns>
+        public DataTable MeanStandardpoorTablePic(DataTable dt, int Sample, string MeasurementsName)
+        {
+            DataTable table = new DataTable();
+
+            double[] X;
+            double USL = 0;
+            //double CL = 0;
+            double LSL = 0;
+
+            if (dt.Rows.Count > 0)
+            {
+                #region X
+
+                X = new double[dt.Rows.Count];
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    X[i] = Convert.ToDouble(dt.Rows[i][MeasurementsName]);
+                }
+
+                #endregion X
+
+                #region 计算SPC参数
+
+                //CSpc_Data_XS Spc_Data_XS = Spc_Data.XS(X, Sample);
+                //CL = Spc_Data_XS.CL_X;
+                //UCL = Spc_Data_XS.UCL_X;
+                //LCL = Spc_Data_XS.LCL_X;
+                try
+                {
+                    USL = Convert.ToDouble(dt.Rows[0][1]);
+                    LSL = Convert.ToDouble(dt.Rows[0][2]);
+                    //规格上下合理性判断，超过90%样本，就算不合理
+                    if ((X.Where(x => x > USL).Count() * 1.0 / X.Count()) > 0.9 || (X.Where(x => x < LSL).Count() * 1.0 / X.Count()) > 0.9)
+                    {
+                        USL = 0;
+                        LSL = 0;
+                    }
+                }
+                catch
+                {
+                }
+
+                #endregion 计算SPC参数
+
                 #region 生成图片Image
 
                 string ImageCode = "";
 
-                Bitmap bp = DrawXSChart_X_2018(X, Sample, LCL, UCL);
+                Bitmap bp = DrawXSChart_X_2018(X, Sample, LSL, USL);
                 IntPtr pr = bp.GetHbitmap();
                 Image _Image = Image.FromHbitmap(pr);
                 System.IO.MemoryStream _MemoryStream = new System.IO.MemoryStream();
@@ -1232,8 +1288,8 @@ namespace MF.Utils.SPC
         public static void Spc_Table_XS(double[] X, int n, double LSL, double USL, Graphics g)
         {
             CSpc_Data_XS Spc_Data_XS = Spc_Data.XS(X, n);
-            USL = Convert.ToDouble(Spc_Data_XS.UCL_X.ToString("F2"));
-            LSL = Convert.ToDouble(Spc_Data_XS.LCL_X.ToString("F2"));
+            USL = USL == 0 ? Convert.ToDouble(Spc_Data_XS.UCL_X) : USL;
+            LSL = LSL == 0 ? Convert.ToDouble(Spc_Data_XS.LCL_X) : LSL;
 
             int x0 = 5;
             int y0 = 5;
@@ -1361,14 +1417,14 @@ namespace MF.Utils.SPC
             SolidBrush brush = new SolidBrush(Color.GreenYellow);
             //g.FillRectangle(brush, 10+x0, 4 + (n + 7) * height+y0, 65+x0, 34+y0);
             g.DrawString("USL=", font2, Brushes.Black, 10 + x0, 4 + (n + 7) * height + y0);
-            g.DrawString(USL.ToString().TrimEnd('0'), font3, Brushes.Black, 40 + x0, 4 + (n + 7) * height + y0);
+            g.DrawString(USL.ToString("0.000").ToString().TrimEnd('0'), font3, Brushes.Black, 40 + x0, 4 + (n + 7) * height + y0);
             g.DrawString("LSL=", font2, Brushes.Black, 10 + x0, 4 + (n + 8) * height + y0);
-            g.DrawString(LSL.ToString().TrimEnd('0'), font3, Brushes.Black, 40 + x0, 4 + (n + 8) * height + y0);
+            g.DrawString(LSL.ToString("0.000").ToString().TrimEnd('0'), font3, Brushes.Black, 40 + x0, 4 + (n + 8) * height + y0);
 
             if (USL != 0 && LSL != 0)
             {
                 //计算无偏稳态过程能力指数
-                double Cp = SPC_Table_Data.CalcCp(n, X, LSL, USL);
+                double Cp = SPC_Table_Data.CalcCp(n, X, LSL, USL, "XS");
                 //把计算的能力指数写到表中
                 g.DrawString("Cp=", font2, Brushes.Black, 120 + x0, 4 + (n + 5) * height + y0);
                 g.DrawString(Cp.ToString("0.000").ToString().TrimEnd('0'), font3, Brushes.Black, 150 + x0, 4 + (n + 5) * height + y0);
@@ -1378,20 +1434,20 @@ namespace MF.Utils.SPC
                 //double Cpl = SPC_Table_Data.CalcCpl(X, n, LSL);
                 //double Cpk = SPC_Table_Data.CalcCpk(Cpu, Cpl);
 
-                double ValueUp = Max(X);
-                double ValueDown = Min(X);
+                //double ValueUp = Max(X);
+                //double ValueDown = Min(X);
                 //绘图数据
-                CSpc_Data_Cpk Spc_Data_Cpk = Spc_Data.Cpk(X, n, ValueUp, ValueDown);
+                CSpc_Data_Cpk Spc_Data_Cpk = Spc_Data.Cpk(X, n, Spc_Data_XS.UCL_X, Spc_Data_XS.LCL_X, "XS");
 
                 //把计算的能力指数写到表中
                 g.DrawString("Cpk=", font2, Brushes.Black, 120 + x0, 4 + (n + 6) * height + y0);
                 g.DrawString(Spc_Data_Cpk.Cpk.ToString("0.000").ToString().TrimEnd('0'), font3, Brushes.Black, 150 + x0, 4 + (n + 6) * height + y0);
                 //把计算的Cpu写到表中
                 g.DrawString("Cpu=", font2, Brushes.Black, 120 + x0, 4 + (n + 7) * height + y0);
-                g.DrawString(Spc_Data_Cpk.CPU.ToString("0.000").ToString().TrimEnd('0'), font3, Brushes.Black, 150 + x0, 4 + (n + 7) * height + y0);
+                g.DrawString(Spc_Data_Cpk.Cpu.ToString("0.000").ToString().TrimEnd('0'), font3, Brushes.Black, 150 + x0, 4 + (n + 7) * height + y0);
                 //把计算的Cpl写到表中
                 g.DrawString("Cpl=", font2, Brushes.Black, 120 + x0, 4 + (n + 8) * height + y0);
-                g.DrawString(Spc_Data_Cpk.CPL.ToString("0.000").ToString().TrimEnd('0'), font3, Brushes.Black, 150 + x0, 4 + (n + 8) * height + y0);
+                g.DrawString(Spc_Data_Cpk.Cpl.ToString("0.000").ToString().TrimEnd('0'), font3, Brushes.Black, 150 + x0, 4 + (n + 8) * height + y0);
 
                 //计算无偏过程性能指数
                 double Pp = SPC_Table_Data.CalcPp(n, X, LSL, USL);
@@ -1430,6 +1486,40 @@ namespace MF.Utils.SPC
             font3.Dispose();
 
             //return tableBitmap;
+        }
+
+        #endregion 均值标准差
+
+        /// <summary>
+        /// 观测值最大值
+        /// </summary>
+        /// <param name="Xn">子组观测值</param>
+        /// <returns></returns>
+        static private double Max(double[] Xn)
+        {
+            double temp;
+            temp = Xn[0];
+            for (int i = 0; i < Xn.Length; i++)
+            {
+                temp = (Xn[i] > temp) ? Xn[i] : temp;
+            }
+            return temp;
+        }
+
+        /// <summary>
+        /// 观测值最小值
+        /// </summary>
+        /// <param name="Xn">子组观测值</param>
+        /// <returns></returns>
+        static private double Min(double[] Xn)
+        {
+            double temp;
+            temp = Xn[0];
+            for (int i = 0; i < Xn.Length; i++)
+            {
+                temp = (Xn[i] < temp) ? Xn[i] : temp;
+            }
+            return temp;
         }
     }
 }

@@ -320,10 +320,10 @@ namespace MF.Utils.SPC
                 {
                     Xi[i] = X[j * n + i];
                 }
-                //子组极差
+                //子组标准差
                 Sk[j] = StandardDeviation(Xi);
             }
-            //子组极差的平均值
+            //子组标准差的平均值
             return Average(Sk);
         }
 
@@ -387,14 +387,14 @@ namespace MF.Utils.SPC
             int k = X.Length / n;
             Spc_Data_XS.n = n;
             Spc_Data_XS.k = k;
-            double CL_R;
+            //double CL_R;
 
-            CL_R = Range_R2(X, n, out double[] CL_Rk);
+            //CL_R = Range_R2(X, n, out double[] CL_Rk);
 
             Spc_Data_XS.CL_X = Average(X, n, out Spc_Data_XS.CL_Xk);
             Spc_Data_XS.CL_S = StandardDeviation_S2(X, n, out Spc_Data_XS.CL_Sk);
-            Spc_Data_XS.UCL_X = Spc_Data_XS.CL_X + CL_R * (double)Spc_Param.Tables[Xml_Spc_Param.Table_Name].Rows[n - 2][Xml_Spc_Param.Param_A3];
-            Spc_Data_XS.LCL_X = Spc_Data_XS.CL_X - CL_R * (double)Spc_Param.Tables[Xml_Spc_Param.Table_Name].Rows[n - 2][Xml_Spc_Param.Param_A3];
+            Spc_Data_XS.UCL_X = Spc_Data_XS.CL_X + Spc_Data_XS.CL_S * (double)Spc_Param.Tables[Xml_Spc_Param.Table_Name].Rows[n - 2][Xml_Spc_Param.Param_A3];
+            Spc_Data_XS.LCL_X = Spc_Data_XS.CL_X - Spc_Data_XS.CL_S * (double)Spc_Param.Tables[Xml_Spc_Param.Table_Name].Rows[n - 2][Xml_Spc_Param.Param_A3];
             Spc_Data_XS.UCL_S = Spc_Data_XS.CL_S * (double)Spc_Param.Tables[Xml_Spc_Param.Table_Name].Rows[n - 2][Xml_Spc_Param.Param_B4];
             Spc_Data_XS.LCL_S = Spc_Data_XS.CL_S * (double)Spc_Param.Tables[Xml_Spc_Param.Table_Name].Rows[n - 2][Xml_Spc_Param.Param_B3];
 
@@ -439,7 +439,7 @@ namespace MF.Utils.SPC
         /// </summary>
         /// <param name="X">全部测量数据数组,不合格数</param>
         /// <param name="n">子组大小。单个子组观测值的个数</param>
-        static public CSpc_Data_Cpk Cpk(double[] X, int n, double USL, double LSL)
+        static public CSpc_Data_Cpk Cpk(double[] X, int n, double USL, double LSL, string Type = "XR")
         {
             //子组平均值的平均值
             double X2;
@@ -454,9 +454,10 @@ namespace MF.Utils.SPC
             X2 = Average(X, n);
             R2 = Range_R2(X, n);
             S2 = StandardDeviation_S2(X, n);
+            Spc_Data_Cpk.X2 = X2;
             Spc_Data_Cpk.n = n;
             Spc_Data_Cpk.k = k;
-            Spc_Data_Cpk.Singma = R2 / (double)Spc_Param.Tables[Xml_Spc_Param.Table_Name].Rows[n - 2][Xml_Spc_Param.Param_L_D1];
+            Spc_Data_Cpk.Singma = (Type == "XR" ? R2 : S2) / (double)Spc_Param.Tables[Xml_Spc_Param.Table_Name].Rows[n - 2][Xml_Spc_Param.Param_L_D1];
             Spc_Data_Cpk.SingmaS = S2;
             //如果没给出测量值的上限和下限
             if ((USL - LSL) == 0)
@@ -468,17 +469,17 @@ namespace MF.Utils.SPC
             Spc_Data_Cpk.LSL = LSL;
             Spc_Data_Cpk.USL = USL;
             Spc_Data_Cpk.Cp = (USL - LSL) / (6 * Spc_Data_Cpk.Singma);
-            Spc_Data_Cpk.CPU = (USL - X2) / (3 * Spc_Data_Cpk.Singma);
-            Spc_Data_Cpk.CPL = (X2 - LSL) / (3 * Spc_Data_Cpk.Singma);
+            Spc_Data_Cpk.Cpu = (USL - X2) / (3 * Spc_Data_Cpk.Singma);
+            Spc_Data_Cpk.Cpl = (X2 - LSL) / (3 * Spc_Data_Cpk.Singma);
 
             Spc_Data_Cpk.Pp = (USL - LSL) / (6 * Spc_Data_Cpk.SingmaS);
-            Spc_Data_Cpk.PPU = (USL - X2) / (3 * Spc_Data_Cpk.SingmaS);
-            Spc_Data_Cpk.PPL = (X2 - LSL) / (3 * Spc_Data_Cpk.SingmaS);
+            Spc_Data_Cpk.Ppu = (USL - X2) / (3 * Spc_Data_Cpk.SingmaS);
+            Spc_Data_Cpk.Ppl = (X2 - LSL) / (3 * Spc_Data_Cpk.SingmaS);
             if ((USL - LSL) != 0)
             {
                 Spc_Data_Cpk.Ca = Math.Abs((USL + LSL) / 2 - X2) / ((USL - LSL) / 2);
-                Spc_Data_Cpk.CR = 6 * Spc_Data_Cpk.Singma / (USL - LSL);
-                Spc_Data_Cpk.PR = 6 * Spc_Data_Cpk.SingmaS / (USL - LSL);
+                Spc_Data_Cpk.Cr = 6 * Spc_Data_Cpk.Singma / (USL - LSL);
+                Spc_Data_Cpk.Pr = 6 * Spc_Data_Cpk.SingmaS / (USL - LSL);
             }
 
             Spc_Data_Cpk.Cpk = (1 - Math.Abs(Spc_Data_Cpk.Ca)) * Spc_Data_Cpk.Cp;
@@ -792,17 +793,17 @@ namespace MF.Utils.SPC
         /// <summary>
         /// 能力指数上限
         /// </summary>
-        public double CPU;
+        public double Cpu;
 
         /// <summary>
         /// 能力指数下限
         /// </summary>
-        public double CPL;
+        public double Cpl;
 
         /// <summary>
         /// 稳定过程的能力比值
         /// </summary>
-        public double CR;
+        public double Cr;
 
         /// <summary>
         /// 过程能力指数。过程准确度和过程精密度综合考虑， 越大越好
@@ -817,17 +818,17 @@ namespace MF.Utils.SPC
         /// <summary>
         /// 能力指数上限
         /// </summary>
-        public double PPU;
+        public double Ppu;
 
         /// <summary>
         /// 能力指数下限
         /// </summary>
-        public double PPL;
+        public double Ppl;
 
         /// <summary>
         /// 性能比率
         /// </summary>
-        public double PR;
+        public double Pr;
 
         /// <summary>
         /// 性能指数
@@ -895,6 +896,11 @@ namespace MF.Utils.SPC
         /// 正态分布图Y坐标
         /// </summary>
         public double[] NormalDistributionY;
+
+        /// <summary>
+        /// Xbarbar
+        /// </summary>
+        public double X2;
     }
 
     /// <summary>
