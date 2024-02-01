@@ -20,7 +20,18 @@ namespace Spc.Test
             }
 
             SpcUtil spcUtil = new SpcUtil();
-            var result = spcUtil.MeanpoorTablePic(dt, 5, coln);
+            var result1 = spcUtil.BasicTrend(dt, 5, "upper_limit", "lower_limit", coln, "");
+            var result2 = spcUtil.SampleTrend(dt, coln);
+            var result3 = spcUtil.Histogram(dt, 5, coln);
+            var result4 = spcUtil.NormalDistribution(dt, 5, "upper_limit", "lower_limit", coln);
+            var result5 = spcUtil.Pareto(dt, 5, 10, coln);
+            var result6 = spcUtil.NormalDistribution_Mean(dt, 5, "upper_limit", "lower_limit", coln);
+            var result7 = spcUtil.Meanpoor_Mean(dt, 5, coln);
+            var result8 = spcUtil.Meanpoor_Poor(dt, 5, coln);
+            var result9 = spcUtil.MeanStandardpoor_Mean(dt, 5, coln);
+            var result10 = spcUtil.MeanStandardpoor_Standardpoor(dt, 5, coln);
+            var result11 = spcUtil.MeanpoorTablePic(dt, 5, coln);
+            var result12 = spcUtil.MeanStandardpoorTablePic(dt, 5, coln);
             Console.ReadLine();
         }
     }
