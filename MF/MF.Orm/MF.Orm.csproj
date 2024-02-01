@@ -2,9 +2,9 @@
 
   <PropertyGroup>
 	  <TargetFramework>net5</TargetFramework>
-	  <Version>1.0.8-rc5.8.12</Version>
+	  <Version>1.0.8-rc5.8.15</Version>
 	  <Description>
-		  SqlSugarCore 5.1.4.86
+		  SqlSugarCore 5.1.4.128
 	  </Description>
 	  <PackageReleaseNotes>
 		  新增功能－批量插入BulkCopy、批量更新BulkUpdate（SqlSever、MySql、PgSql、Oracle、Sqlite 全支持）
@@ -15,14 +15,17 @@
 		  新增 EnabledStateus(单条数据状态更新) ---2023/5/8
 		  升级SqlSugarCore 5.1.4.83 ---2023/6/7
 		  升级SqlSugarCore 5.1.4.86 ---2023/6/27
+		  升级SqlSugarCore 5.1.4.115 ---2023/11/16
+		  升级SqlSugarCore 5.1.4.124 ---2023/12/1
+		  升级SqlSugarCore 5.1.4.128 ---2023/12/20
 	  </PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
-    <PackageReference Include="SqlSugar.ClickHouseCore" Version="5.1.4.67" />
-    <PackageReference Include="SqlSugarCore" Version="5.1.4.86" />
+    <PackageReference Include="SqlSugar.ClickHouseCore" Version="5.1.4.110" />
+    <PackageReference Include="SqlSugarCore" Version="5.1.4.128" />
   </ItemGroup>
 
   <ItemGroup>

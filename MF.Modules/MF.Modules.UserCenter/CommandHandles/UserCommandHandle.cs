@@ -23,6 +23,7 @@ using MF.Core.Extensions;
 using MF.Core.Security;
 using MF.FluentValidation;
 using MF.MediatR;
+using MF.Modules.UserCenter.Commands.User;
 using MF.NetCore;
 using MF.NetCoreApp;
 using MF.Orm;
@@ -74,8 +75,9 @@ namespace UserCenter.CommandHandles
         IRequestHandler<StoreUpdateStatusUserCommand, PubResponse>,
         IRequestHandler<StoreBatchResetPasswordUserCommand, PubResponse>,
         IRequestHandler<IPCCheckBindUserCommand, PubResponse>,
-        IRequestHandler<IPCCheckBtnUserCommand, PubResponse>,
-        IRequestHandler<FindUserTokenCommand, PubResponse>
+        IRequestHandler<IPCCheckBtnUserCommand, PubResponse>, 
+        IRequestHandler<FindUserTokenCommand, PubResponse>,
+        IRequestHandler<CheckUserCommand, PubResponse>
     {
         private readonly IUserRepository _userRepository;
         private readonly IAccesslogRepository _accesslogRepository;
@@ -332,7 +334,7 @@ namespace UserCenter.CommandHandles
                 return Failed(BaseSystemError.USER_DEACTIVE);
             }
             user.TempMark = cmd.TempMark;
-            if (cmd.LoginType.ToLower() != "card")//刷卡登录无需密码校验
+            if ((cmd.LoginType ?? "").ToLower() != "card")//刷卡登录无需密码校验
             {
                 // 校验密码
                 if (!VerifyPassword(user, cmd.Password))
@@ -1388,7 +1390,7 @@ namespace UserCenter.CommandHandles
                 Name = cmd.Name,
                 Password = cmd.Password,
                 LoginType = cmd.LoginType,
-                TempMark = $"IPC-{cmd.LineCode}-{cmd.OpName}-{cmd.ShiftCode}-{cmd.ShiftName}"
+                TempMark = $"IPC&{cmd.LineCode}&{cmd.OpName}&{cmd.ShiftCode}&{cmd.ShiftName}"
             },
             cancellationToken);
         }
@@ -1530,5 +1532,41 @@ namespace UserCenter.CommandHandles
 
             return jwt.CreateToken(claims, exTime);
         }
+
+        /// <summary>
+        /// 校验用户、密码是否正确 返回当前用户所有角色信息
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public Task<PubResponse> Handle(CheckUserCommand cmd, CancellationToken cancellationToken)
+        {
+            // 查询用户是否存在
+            var user = _userRepository.QueryableToEntity(u => u.Name == cmd.Name);
+            if (user.IsNull())
+            {
+                return Failed(BaseSystemError.USERNAME_OR_PASSWORD_ERROR);
+            }
+
+            // 校验密码
+            if (!VerifyPassword(user, cmd.Password))
+            {
+                return Failed(BaseSystemError.USERNAME_OR_PASSWORD_ERROR);
+            }
+
+            // 校验状态
+            if (user.State == BaseStateConstants.DEACTIVE || user.State == BaseStateConstants.DELETE)
+            {
+                return Failed(BaseSystemError.USER_DEACTIVE);
+            }
+            //获取当前用户 所拥有的角色
+            List<Role> listRole = null;
+            Task<PubResponse> _task2 = _bus.SendAsync(new QueryByUserNameRoleCommand() { UserName = cmd.Name });
+            if (_task2.Result.Status == ResultStatusConstants.SUCCESS)
+            {
+                listRole = (List<Role>)_task2.Result.Data;
+            }
+            return Succeed(listRole);
+        }        
     }
 }

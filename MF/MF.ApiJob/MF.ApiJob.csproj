@@ -4,15 +4,16 @@
 	  <TargetFrameworks>net5</TargetFrameworks>
     <RootNamespace>MF.ApiJob</RootNamespace>
     <AssemblyName>MF.ApiJob</AssemblyName>
-	  <Version>1.0.5-rc7.3.7</Version>
+	  <Version>1.0.5-rc7.3.8</Version>
 	  <Description>
-		  +优化调用apijob时get类型请求,参数异常问题
+		  任务调度执行
 	  </Description>
 	  <PackageReleaseNotes>
-      +优化 第三方自定义接口token问题-2022/8/10
-      +更新MF.Job.Core引用
-      +优化调用apijob时get类型请求,参数异常问题
-    </PackageReleaseNotes>
+		  +优化 调用apijob时get类型请求,参数异常问题
+		  +优化 第三方自定义接口token问题-2022/8/10
+		  +优化 调用apijob时get类型请求,参数异常问题
+		  +升级 SqlSugarCore 5.1.4.114 ---2023/11/6
+	  </PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

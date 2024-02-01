@@ -2,13 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-	  <Version>1.0.3</Version>
+	  <Version>1.0.4</Version>
 	  <Description>ClickHouse是一个用于联机分析(OLAP)的列式数据库管理系统(DBMS)</Description>
+	  <PackageReleaseNotes>
+		  升级ClickHouse.Client 6.8.1 ---2023/11/16
+	  </PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ClickHouse.Client" Version="5.0.4" />
-    <PackageReference Include="MSTest.TestFramework" Version="2.2.10" />
+    <PackageReference Include="ClickHouse.Client" Version="6.8.1" />
   </ItemGroup>
 
   <ItemGroup>

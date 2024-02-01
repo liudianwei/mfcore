@@ -49,6 +49,31 @@ namespace MF.Orm.Repository
         }
 
         /// <summary>
+        /// 插入预处理
+        /// </summary>
+        /// <param name="entity">实体对象</param>
+        private void PreInsertById(T entity)
+        {
+            if (string.IsNullOrWhiteSpace(entity.Id))
+            {
+                entity.Id = Guid.NewGuid().ToString();
+            }
+            entity.InnerVersion = 0;
+            entity.State ??= "0";
+
+            entity.CreateTime = DateTime.Now;
+            entity.UpdateTime = DateTime.Now;
+            if (string.IsNullOrWhiteSpace(entity.Creator))
+            {
+                entity.Creator = globalCore.UserConcatName;
+            }
+
+            if (string.IsNullOrWhiteSpace(entity.Updator))
+            {
+                entity.Updator = globalCore.UserConcatName;
+            }
+        }
+        /// <summary>
         /// 更新预处理
         /// </summary>
         /// <param name="entity">实体对象</param>
@@ -82,6 +107,17 @@ namespace MF.Orm.Repository
         public bool Insert(T entity, bool IgnoreNullColumn = true)
         {
             PreInsert(entity);
+            return db.Insertable(entity).IgnoreColumns(IgnoreNullColumn).ExecuteCommand() > 0;
+        }
+        /// <summary>
+        /// 插入一条记录手动传入id
+        /// </summary>
+        /// <param name="entity">实体对象</param>
+        /// <param name="IgnoreNullColumn">默认true 忽略空的列， false 不忽略空的列</param>
+        /// <returns>true 成功，false 失败</returns>
+        public bool InsertById(T entity, bool IgnoreNullColumn = true)
+        {
+            PreInsertById(entity);
             return db.Insertable(entity).IgnoreColumns(IgnoreNullColumn).ExecuteCommand() > 0;
         }
 
@@ -152,6 +188,25 @@ namespace MF.Orm.Repository
         }
 
         /// <summary>
+        /// 插入多条记录 手动传入id
+        /// </summary>
+        /// <param name="entitys">实体对象列表</param>
+        /// <returns>true 成功，false 失败</returns>
+        public bool InsertById(List<T> entitys)
+        {
+            if (entitys == null || entitys.Count <= 0)
+            {
+                return false;
+            }
+
+            entitys = entitys.Select(i =>
+            {
+                PreInsertById(i);
+                return i;
+            }).ToList();
+            return db.Insertable(entitys).ExecuteCommand() > 0;
+        }
+        /// <summary>
         /// 插入多条记录 返回id集合
         /// </summary>
         /// <param name="entitys">实体对象列表</param>
@@ -176,7 +231,6 @@ namespace MF.Orm.Repository
             }
             return flag;
         }
-
         /// <summary>
         /// 插入多条记录 自动忽略空的列
         /// </summary>

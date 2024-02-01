@@ -2,6 +2,7 @@
 using MF.Core.Security;
 using MF.FluentValidation;
 using MF.MediatR;
+using MF.Modules.UserCenter.Commands.User;
 using MF.NetCoreApp;
 using MF.NetCoreApp.Attributes;
 using MF.Utils;
@@ -388,6 +389,19 @@ namespace UserCenter.Controllers.v1
                 }
              );
             } 
+            return Result(response);
+        }
+
+        /// <summary>
+        /// 校验用户密码 返回当前用户所有的角色信息
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        [HttpPost("check-user-pwd"), ActionLog("【用户验证】", "来源:{cmd.CheckFrom}")]
+        public async Task<IActionResult> CheckUserReturnRoleList(CheckUserCommand cmd)
+        {
+            var response = await _bus.SendAsync(cmd);
             return Result(response);
         }
     }

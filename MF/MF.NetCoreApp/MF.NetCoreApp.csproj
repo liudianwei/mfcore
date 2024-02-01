@@ -2,16 +2,15 @@
 
   <PropertyGroup>
 	  <TargetFramework>net5.0</TargetFramework>
-	  <Version>1.0.3-rc10.6.6</Version>
+	  <Version>1.0.3-rc10.6.7</Version>
 	  <Description>
-		  +修复 异常中间件已知问题
-		  +新增 导出EXCELsheet名参数传入指定,默认sheet
-		  +优化 ActionLog日志记录，支持自定义参数解析 2023/5/11
 	  </Description>
 	  <PackageReleaseNotes>
 		  +修复 异常中间件 -add by caladi 2022/2/23
 		  +新增 导出EXCELsheet名参数传入指定,默认sheet --add by corbin 2022/3/30
 		  +优化 创建导出任务结束时间无需插入 --add by caladi 2022/8/5
+		  +优化 ActionLog日志记录，支持自定义参数解析 2023/5/11
+		  +优化 语言模式-默认中文"zh-ch"(解决第三方调用内部接口无法正常返回提示信息) 2023/11/16
 	  </PackageReleaseNotes>
   </PropertyGroup>
   <ItemGroup>

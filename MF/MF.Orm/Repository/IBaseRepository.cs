@@ -24,6 +24,14 @@ namespace MF.Orm.Repository
         bool Insert(T entity, bool IgnoreNullColumn = true);
 
         /// <summary>
+        /// 插入一条记录手动传入id
+        /// </summary>
+        /// <param name="entity">实体对象</param>
+        /// <param name="IgnoreNullColumn">默认true 忽略空字段， false 不忽略空字段</param>
+        /// <returns>true 成功， false 失败</returns>
+        bool InsertById(T entity, bool IgnoreNullColumn = true);
+
+        /// <summary>
         /// 插入一条记录 自动忽略空字段
         /// </summary>
         /// <param name="entity">实体对象</param>
@@ -65,6 +73,13 @@ namespace MF.Orm.Repository
         /// <param name="entitys">实体对象列表</param>
         /// <returns>true 成功，false 失败</returns>
         bool Insert(List<T> entitys);
+
+        /// <summary>
+        /// 插入多条记录
+        /// </summary>
+        /// <param name="entitys">实体对象列表</param>
+        /// <returns>true 成功，false 失败</returns>
+        bool InsertById(List<T> entitys);
 
         /// <summary>
         /// 插入多条记录 自动忽略空的列

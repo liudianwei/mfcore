@@ -3,7 +3,7 @@
     <PropertyGroup>
 		<TargetFramework>net5</TargetFramework>
 		<IsPackable>true</IsPackable>
-		<Version>1.0.2-rc5.1.7</Version>
+		<Version>1.0.2-rc5.1.11</Version>
 		<Description>
 			用户中心
 		</Description>
@@ -18,6 +18,7 @@
 			+新增 登录退出日志新增来源明细(IPC/WEB);支持刷卡免密登录方式---2023/6/27
 			+新增 访问日志根据时间返回数据列表(应用场景:需向工厂MES上传上下岗记录)---2023/6/28
 			+新增 根据角色和权限组查询菜单，用来获取内置角色的IPC菜单ID ---2023/7/6
+			+新增 根据账户密码验证用户信息并返回该用户所拥有的角色列表 ---2023/12/1
 		</PackageReleaseNotes>
     </PropertyGroup>
     

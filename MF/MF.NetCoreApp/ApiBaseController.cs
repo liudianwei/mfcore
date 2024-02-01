@@ -77,6 +77,7 @@ namespace MF.NetCoreApp
         {
             var res = new HttpResult();
             var lang = GetRequestHeaders("Accept-language").Split(",")[0].ToLower();
+            lang = (lang == "") ? "zh-cn" : lang;
             if (response.HasError)
             {
                 res.Code = 100;
@@ -489,7 +490,7 @@ namespace MF.NetCoreApp
                 };
                 //创建导出任务
                 var result = MRestClient.Post(domain, "rest/productcenter/v1/exportlog", JsonConvert.SerializeObject(reqparams), $"Bearer {token}");
-                Console.WriteLine($"TaskResult==>{result}");
+                Console.WriteLine($"创建下载任务: TaskResult==>{result}");
             });
         }
 
