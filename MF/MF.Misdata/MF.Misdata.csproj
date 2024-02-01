@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFrameworks>net5.0</TargetFrameworks>
     <Platforms>AnyCPU;ARM64</Platforms>
-    <Version>1.1.2-rc6</Version>
-    <Description>httpWebApi配置,默认值禁用,启用需要配置appsettings.json</Description>
+    <Version>1.1.3-rc3</Version>
+    <Description>修改部分变量修改为公共属性;orm是否单例模式使用;</Description>
     <PackageReleaseNotes>
       1、机器码记录到日志
       2、优化日志组件
@@ -27,6 +27,9 @@
       19、优化mqttclient断开连接时,频繁写日志导致磁盘满问题
       20、支持httpWebApi发布
       21、httpWebApi配置,默认值禁用,启用需要配置appsettings.json
+      22、log加个资源锁
+      23、修复生成流水号按月重置流水号，当12月份时流水始终为1的bug
+      24、修改部分变量修改为公共属性;orm是否单例模式使用;
     </PackageReleaseNotes>
     
   </PropertyGroup>

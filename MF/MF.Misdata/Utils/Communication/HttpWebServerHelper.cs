@@ -16,22 +16,22 @@ namespace Common.Communication
         /// <summary>
         /// HttpWebServer是否启用
         /// </summary>
-        public static bool HttpWebServerIsEnable { get; set; } = Convert.ToBoolean(ConfigHelper.GetAppseting("HttpWebServer:IsEnable") ?? "False");
+        public static bool HttpWebServerIsEnable { get; set; } = false;
 
         /// <summary>
         /// HttpWebServer端口
         /// </summary>
-        public static int HttpWebServerPort { get; set; } = Convert.ToInt32(ConfigHelper.GetAppseting("HttpWebServer:Port") ?? "18666");
+        public static int HttpWebServerPort { get; set; } = 18666;
 
         /// <summary>
         /// HttpWebServer是否跨域
         /// </summary>
-        public static bool HttpWebServerIsCrossDomain { get; set; } = Convert.ToBoolean(ConfigHelper.GetAppseting("HttpWebServer:IsCrossDomain") ?? "False");
+        public static bool HttpWebServerIsCrossDomain { get; set; } = false;
 
         /// <summary>
         /// HttpWebServer返回格式 text/html,text/plain,text/xml,application/xml,application/json
         /// </summary>
-        public static string HttpWebServerResultFormat { get; set; } = ConfigHelper.GetAppseting("HttpWebServer:ResultFormat") ?? "application/json";
+        public static string HttpWebServerResultFormat { get; set; } = "application/json";
 
         /// <summary>
         /// HttpWeb服务器
@@ -45,6 +45,10 @@ namespace Common.Communication
         {
             try
             {
+                HttpWebServerIsEnable = Convert.ToBoolean(ConfigHelper.GetAppseting("HttpWebServer:IsEnable") ?? "False");
+                HttpWebServerPort = Convert.ToInt32(ConfigHelper.GetAppseting("HttpWebServer:Port") ?? "18666");
+                HttpWebServerIsCrossDomain = Convert.ToBoolean(ConfigHelper.GetAppseting("HttpWebServer:IsCrossDomain") ?? "False");
+                HttpWebServerResultFormat = ConfigHelper.GetAppseting("HttpWebServer:ResultFormat") ?? "application/json";
                 if (HttpWebServerIsEnable)
                 {
                     httpWebServer.IsCrossDomain = HttpWebServerIsCrossDomain;

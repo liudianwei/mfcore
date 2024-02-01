@@ -17,7 +17,7 @@ namespace Common.DBUtils
     /// </summary>
     public static class ServiceResolve
     {
-        private static IServiceProvider _serviceProvider = null;
+        public static IServiceProvider _serviceProvider = null;
 
         /// <summary>
         /// services.BuildServiceProvider()

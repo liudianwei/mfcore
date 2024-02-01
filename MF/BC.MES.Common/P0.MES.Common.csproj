@@ -184,7 +184,7 @@
       <Version>4.0.0.1</Version>
     </PackageReference>
     <PackageReference Include="SqlSugar">
-      <Version>5.1.4.102</Version>
+      <Version>5.1.4.126</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

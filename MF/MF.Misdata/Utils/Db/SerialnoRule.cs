@@ -135,7 +135,7 @@ namespace Common.DBUtils
                                     }
 
                                     var MinMonth = new DateTime(((DateTime)Rule.CurrentDay).Year, ((DateTime)Rule.CurrentDay).Month, 1);
-                                    var MaxMonth = new DateTime(((DateTime)Rule.CurrentDay).Year, ((DateTime)Rule.CurrentDay).AddMonths(Convert.ToInt32(rule["value"]["resetDay"].Value)).Month, 1);
+                                    var MaxMonth = new DateTime(((DateTime)Rule.CurrentDay).Year, ((DateTime)Rule.CurrentDay).Month, 1).AddMonths(Convert.ToInt32(rule["value"]["resetDay"].Value));
 
                                     if (currentMonth > MaxMonth)
                                     {

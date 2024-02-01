@@ -16,7 +16,12 @@ namespace Common.Utils
         /// <summary>
         ///
         /// </summary>
-        private static IConfiguration config = null;
+        public static IConfiguration config { get; set; } = null;
+
+        public static string LoggerDirPath = Directory.GetCurrentDirectory();
+        public static string LoggerBusinessName = "BusinessLog";
+        public static string LoggerSystemName = "SystemLog";
+        public static string ConfigJsonPath = Path.Combine(Directory.GetCurrentDirectory(), "config", "appsettings.json");
 
         /// <summary>
         ///  初始化
@@ -31,7 +36,7 @@ namespace Common.Utils
                 services.AddSingleton<IConfiguration>(serviceProvider =>
                 {
                     IConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
-                    configurationBuilder.AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), "config", "appsettings.json"));
+                    configurationBuilder.AddJsonFile(ConfigJsonPath);
                     return configurationBuilder.Build();
                 });
                 config = services.BuildServiceProvider().GetService<IConfiguration>();
@@ -45,8 +50,11 @@ namespace Common.Utils
                     config.MoreSettings = new ConnMoreSettings() { DisableNvarchar = true };//添加这一行 ,将参数全部转成varchar模式
                 });
                 IServiceProvider serviceProvider = services.BuildServiceProvider();
-                BusinessLog.Path = $"{GetAppseting("Logger:DirPath") ?? Directory.GetCurrentDirectory() + "\\"}{GetAppseting("Logger:BusinessName") ?? "BusinessLog"}";
-                SystemLog.Path = $"{GetAppseting("Logger:DirPath") ?? Directory.GetCurrentDirectory() + "\\"}{GetAppseting("Logger:SystemName") ?? "SystemLog"}";
+                LoggerDirPath = GetAppseting("Logger:DirPath") ?? Directory.GetCurrentDirectory();
+                LoggerBusinessName = GetAppseting("Logger:BusinessName") ?? "BusinessLog";
+                LoggerSystemName = GetAppseting("Logger:SystemName") ?? "SystemLog";
+                BusinessLog.Path = $"{LoggerDirPath}\\{LoggerBusinessName}";
+                SystemLog.Path = $"{LoggerDirPath}\\{LoggerSystemName}";
                 ServiceResolve.SetServiceResolve(serviceProvider);
             }
             catch (Exception e)

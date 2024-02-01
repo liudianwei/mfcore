@@ -200,10 +200,10 @@ namespace ScadaAppCore
                             {
                                 if (ChangeTagNames != null && ChangeTagNames.Contains(tag.TagName))
                                 {
-                                    ApplicationLog.BusinessLog(tag.OpName, $"【信号跳变】{tag.TagDescription}|{tag.TagValue.ToString()}");
+                                    ApplicationLog.BusinessLog(tag.OpName, $"【信号跳变】{tag.TagDescription}|{tag.TagValue}");
                                 }
                             }
-                            ApplicationLog.SystemLog(tag.OpName, "ValueChange:" + tag.TagDescription + "|" + tag.TagValue.ToString());
+                            ApplicationLog.SystemLog(tag.OpName, $"ValueChange:{tag.TagDescription}|{(tag.TagValue is byte[]? string.Join(",", (byte[])tag.TagValue) : tag.TagValue)}");
 
                             #endregion 逻辑日志
                         }
@@ -597,15 +597,31 @@ namespace ScadaAppCore
                     case "byteArray":
                         if (e.TagValue != null && e.TagValue.ToString() != "")
                         {
-                            string[] strvaule = e.TagValue.ToString().Split(',');
-                            if (strvaule.Length <= e.TagTypeLength)
+                            if (e.TagValue.ToString().Contains(","))
                             {
-                                byte[] bytevaule = Enumerable.Repeat((byte)0x00, e.TagTypeLength).ToArray();
-                                for (int i = 0; i < strvaule.Length; i++)
+                                string[] strvaule = e.TagValue.ToString().Split(',');
+                                if (strvaule.Length <= e.TagTypeLength)
                                 {
-                                    bytevaule[i] = byte.Parse(strvaule[i]);
+                                    byte[] bytevaule = Enumerable.Repeat((byte)0x00, e.TagTypeLength).ToArray();
+                                    for (int i = 0; i < strvaule.Length; i++)
+                                    {
+                                        try
+                                        {
+                                            bytevaule[i] = byte.Parse(strvaule[i]);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            ApplicationLog.WriteLog($"字符转byte失败,字符{strvaule[i]},错误描述{ex.Message}");
+                                            TagValue = e.TagValue;
+                                            return TagValue;
+                                        }
+                                    }
+                                    TagValue = bytevaule;
                                 }
-                                TagValue = bytevaule;
+                                else
+                                {
+                                    TagValue = e.TagValue;
+                                }
                             }
                             else
                             {

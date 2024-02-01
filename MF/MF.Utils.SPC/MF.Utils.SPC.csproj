@@ -2,12 +2,13 @@
 
   <PropertyGroup>
 	  <TargetFrameworks>netcoreapp3.1;net5</TargetFrameworks>
-    <Version>1.0.1-rc1</Version>
+    <Version>1.0.1-rc2</Version>
     <Description>
       +优化算法
     </Description>
     <PackageReleaseNotes>
       +优化算法-2023/8/28
+      +优化算法-2023/12/21
     </PackageReleaseNotes>
   </PropertyGroup>
 

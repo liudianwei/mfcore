@@ -21,6 +21,11 @@ namespace Common.DBUtils
         private static readonly string Tab = "\t";
 
         /// <summary>
+        /// 是否单例模式
+        /// </summary>
+        public static bool IsScope { get; set; } = true;
+
+        /// <summary>
         /// 获取数据库连接字符串
         /// </summary>
         /// <param name="configuration">IConfiguration</param>
@@ -45,59 +50,16 @@ namespace Common.DBUtils
         /// </summary>
         /// <param name="strConnectionstring"></param>
         /// <returns></returns>
-        //public static SqlSugarClient Getdb()
-        //{
-        //    var db = ServiceResolve.ResolveS<SqlSugarClient>();
-        //    //Console.WriteLine($"db-id: {db.ContextID}");
-        //    return db;
-        //    //var sqlSugarConfig = GetConnectionParam();
-        //    //var config = new ConnectionConfig()
-        //    //{
-        //    //    DbType = sqlSugarConfig.Item1,
-        //    //    ConnectionString = sqlSugarConfig.Item2,
-        //    //    IsAutoCloseConnection = true,
-        //    //    InitKeyType = InitKeyType.Attribute
-        //    //};
-
-        //    //var db = new SqlSugarClient(config);
-
-        //    //var loggerFactory = new LoggerFactory();
-
-        //    //ILogger log = null;
-        //    //bool.TryParse(ConfigHelper.GetAppseting("ConnectronStr:SqlLog"), out bool flag);
-        //    //if (flag)
-        //    //{
-        //    //    db.Ado.IsEnableLogEvent = true;
-        //    //    db.Aop.OnLogExecuted = (sql, pars) =>
-        //    //    {
-        //    //        sql = Formatt(sql, pars);
-        //    //        sql = PretySql(sql);
-        //    //        Console.WriteLine(sql);
-        //    //        SlowSql(db, log);
-        //    //    };
-        //    //    db.Aop.OnError = (exp) =>//执行SQL 错误事件
-        //    //    {
-        //    //        Console.WriteLine(exp.Sql);
-        //    //    };
-        //    //}
-        //    //else
-        //    //{
-        //    //    db.Ado.IsEnableLogEvent = false;
-        //    //}
-
-        //    //return db;
-        //}
-
-        /// <summary>
-        /// 获取数据库操作对象
-        /// </summary>
-        /// <param name="strConnectionstring"></param>
-        /// <returns></returns>
-        public static SqlSugarScope Getdb()
+        public static ISqlSugarClient Getdb()
         {
-            var db = ServiceResolve.ResolveS<SqlSugarScope>();
-            //Console.WriteLine($"db-id: {db.ContextID}");
-            return db;
+            if (IsScope)
+            {
+                return ServiceResolve.ResolveS<SqlSugarScope>();
+            }
+            else
+            {
+                return ServiceResolve.ResolveS<SqlSugarClient>().CopyNew();
+            }
         }
 
         #region 日志记录工具方法

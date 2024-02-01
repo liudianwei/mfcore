@@ -46,17 +46,20 @@ namespace Common.Utils
         /// <returns></returns>
         public static ILogNet GetLogNet(string filename = "common", HslMessageDegree degree = HslMessageDegree.DEBUG, bool consoleOutput = false)
         {
-            if (LogNets.TryGetValue(filename, out var _logger))
+            lock (LogNets)
             {
-                return _logger;
-            }
-            else
-            {
-                _logger = new LogNetDateTime(Path, GenerateMode.ByEveryDay);
-                _logger.SetMessageDegree(degree);
-                _logger.ConsoleOutput = consoleOutput;
-                LogNets.Add(filename, _logger);
-                return _logger;
+                if (LogNets.TryGetValue(filename, out var _logger))
+                {
+                    return _logger;
+                }
+                else
+                {
+                    _logger = new LogNetDateTime(Path, GenerateMode.ByEveryDay);
+                    _logger.SetMessageDegree(degree);
+                    _logger.ConsoleOutput = consoleOutput;
+                    LogNets.Add(filename, _logger);
+                    return _logger;
+                }
             }
         }
 

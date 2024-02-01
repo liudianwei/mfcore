@@ -447,8 +447,7 @@ namespace MF.Utils.SPC
             double R2;
             //子组标准差的平均值
             double S2;
-            if (LSL > USL)
-                return null;
+
             CSpc_Data_Cpk Spc_Data_Cpk = new CSpc_Data_Cpk();
             int k = X.Length / n;
             X2 = Average(X, n);
@@ -460,7 +459,7 @@ namespace MF.Utils.SPC
             Spc_Data_Cpk.Singma = (Type == "XR" ? R2 : S2) / (double)Spc_Param.Tables[Xml_Spc_Param.Table_Name].Rows[n - 2][Xml_Spc_Param.Param_L_D1];
             Spc_Data_Cpk.SingmaS = S2;
             //如果没给出测量值的上限和下限
-            if ((USL - LSL) == 0)
+            if ((USL - LSL) == 0 || LSL > USL)
             {
                 USL = X2 + 3 * S2;
                 LSL = X2 - 3 * S2;

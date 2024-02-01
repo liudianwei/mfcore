@@ -29,66 +29,74 @@ namespace ScadaAppCore
             try
             {
                 var tag = ScadaApp.TagList.Find(it => it.TagID == TagID);
-                if (tag.IsEnable)
+                if (tag != null)
                 {
-                    if (tag.IsMonitor)
+                    if (tag.IsEnable)
                     {
-                        string errorMsg = string.Empty;
-                        string MesVal = string.Empty;
-                        if (ScadaApp.mesRedisClient.Read($"{tag.OpCode}:{tag.TagID}", out MesVal, out errorMsg))
+                        if (tag.IsMonitor)
                         {
-                            tag.TagValue = MesVal;
-                            tag.TagValue = ScadaApp.ConvertStringToTagType(tag);
-                            TagValue = tag.TagValue;
-                            if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
+                            string errorMsg = string.Empty;
+                            string MesVal = string.Empty;
+                            if (ScadaApp.mesRedisClient.Read($"{tag.OpCode}:{tag.TagID}", out MesVal, out errorMsg))
                             {
-                                ApplicationLog.BusinessLog(tag.OpName, $"【读取数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{MesVal}");
+                                tag.TagValue = MesVal;
+                                tag.TagValue = ScadaApp.ConvertStringToTagType(tag);
+                                TagValue = tag.TagValue;
+                                if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
+                                {
+                                    ApplicationLog.BusinessLog(tag.OpName, $"【读取数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{MesVal}");
+                                }
+                                ApplicationLog.SystemLog(tag.OpName, $"Read:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{MesVal}");
                             }
-                            ApplicationLog.SystemLog(tag.OpName, $"Read:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{MesVal}");
+                            else
+                            {
+                                TagValue = null;
+                                ApplicationLog.BusinessLog(tag.OpName, $"【读取数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|缓存读取失败{errorMsg}");
+                                ApplicationLog.WriteLog($"Read:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|缓存读取失败{errorMsg}");
+                            }
                         }
                         else
                         {
-                            TagValue = null;
-                            ApplicationLog.BusinessLog(tag.OpName, $"【读取数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|缓存读取失败{errorMsg}");
-                            ApplicationLog.WriteLog($"Read:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|缓存读取失败{errorMsg}");
+                            var result = MesRestClient.Get(ScadaApp.HttpUri, $"/{tag.OpCode}/DeviceRead?TagId={tag.TagID}");
+                            if (result.IsSuccess)
+                            {
+                                tag.TagValue = result.Value;
+                                tag.TagValue = ScadaApp.ConvertStringToTagType(tag);
+                                TagValue = tag.TagValue;
+                                if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
+                                {
+                                    ApplicationLog.BusinessLog(tag.OpName, $"【读取数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{result.Value}");
+                                }
+                                ApplicationLog.SystemLog(tag.OpName, $"ReadApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{result.Value}");
+                            }
+                            else
+                            {
+                                TagValue = null;
+                                ApplicationLog.BusinessLog(tag.OpName, $"【读取数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|Api读取失败{result.Message}");
+                                ApplicationLog.SystemLog(tag.OpName, $"ReadApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|Api读取失败{result.Message}");
+                            }
                         }
                     }
                     else
                     {
-                        var result = MesRestClient.Get(ScadaApp.HttpUri, $"/{tag.OpCode}/DeviceRead?TagId={tag.TagID}");
-                        if (result.IsSuccess)
+                        TagValue = null;
+                        if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
                         {
-                            tag.TagValue = result.Value;
-                            tag.TagValue = ScadaApp.ConvertStringToTagType(tag);
-                            TagValue = tag.TagValue;
-                            if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
-                            {
-                                ApplicationLog.BusinessLog(tag.OpName, $"【读取数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{result.Value}");
-                            }
-                            ApplicationLog.SystemLog(tag.OpName, $"ReadApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{result.Value}");
+                            ApplicationLog.BusinessLog(tag.OpName, $"【读取数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
                         }
-                        else
-                        {
-                            TagValue = null;
-                            ApplicationLog.BusinessLog(tag.OpName, $"【读取数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|Api读取失败{result.Message}");
-                            ApplicationLog.SystemLog(tag.OpName, $"ReadApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|Api读取失败{result.Message}");
-                        }
+                        ApplicationLog.SystemLog(tag.OpName, $"Read:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
                     }
                 }
                 else
                 {
+                    ApplicationLog.SystemLog("common", $"【异常记录】ReadPLC未识别变量:{TagID}", "ERROR");
                     TagValue = null;
-                    if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
-                    {
-                        ApplicationLog.BusinessLog(tag.OpName, $"【读取数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
-                    }
-                    ApplicationLog.SystemLog(tag.OpName, $"Read:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
                 }
             }
             catch (Exception err)
             {
                 TagValue = null;
-                ApplicationLog.WriteLog(err, err.Message);
+                ApplicationLog.WriteLog(err, err.ToString());
             }
             return TagValue;
         }
@@ -160,7 +168,7 @@ namespace ScadaAppCore
             }
             catch (Exception err)
             {
-                ApplicationLog.WriteLog(err, err.Message);
+                ApplicationLog.WriteLog(err, err.ToString());
             }
             return tags;
         }
@@ -252,7 +260,7 @@ namespace ScadaAppCore
             }
             catch (Exception err)
             {
-                ApplicationLog.WriteLog(err, err.Message);
+                ApplicationLog.WriteLog(err, err.ToString());
             }
             return valueList;
         }
@@ -272,60 +280,67 @@ namespace ScadaAppCore
             try
             {
                 var tag = ScadaApp.TagList.Find(it => it.TagID == TagID);
-                if (tag.IsEnable)
+                if (tag != null)
                 {
-                    string errorMsg = string.Empty;
-                    tag.TagValue = TagValue;
-                    tag = ScadaApp.ConvertTagTypeToString(tag);
+                    if (tag.IsEnable)
+                    {
+                        string errorMsg = string.Empty;
+                        tag.TagValue = TagValue;
+                        tag = ScadaApp.ConvertTagTypeToString(tag);
 
-                    if (tag.IsMonitor)
-                    {
-                        ScadaApp.Enqueue(new ScadaApp.TagMsg()
+                        if (tag.IsMonitor)
                         {
-                            UniqueId = tag.OpCode,
-                            TagID = tag.TagID.ToString(),
-                            TagName = tag.TagName,
-                            TagQuality = "good",
-                            TagValue = tag.TagValue.ToString()
-                        });
-                        if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
-                        {
-                            ApplicationLog.BusinessLog(tag.OpName, $"【写入数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue.ToString()}");
-                        }
-                        ApplicationLog.SystemLog(tag.OpName, $"Write队列:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue.ToString()}");
-                    }
-                    else
-                    {
-                        var result = MesRestClient.Post(ScadaApp.HttpUri, $"/{tag.OpCode}/DeviceWrite", new OperateWriteValue() { TagId = tag.TagID.ToString(), Value = tag.TagValue.ToString() });
-                        if (result.IsSuccess)
-                        {
+                            ScadaApp.Enqueue(new ScadaApp.TagMsg()
+                            {
+                                UniqueId = tag.OpCode,
+                                TagID = tag.TagID.ToString(),
+                                TagName = tag.TagName,
+                                TagQuality = "good",
+                                TagValue = tag.TagValue.ToString()
+                            });
                             if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
                             {
                                 ApplicationLog.BusinessLog(tag.OpName, $"【写入数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue.ToString()}");
                             }
-                            ApplicationLog.SystemLog(tag.OpName, $"WriteApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue.ToString()}");
+                            ApplicationLog.SystemLog(tag.OpName, $"Write队列:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue.ToString()}");
                         }
                         else
                         {
-                            ApplicationLog.BusinessLog(tag.OpName, $"【写入数据】{tag.OpName}|{tag.TagID}|{tag.TagValue.ToString()}到服务端写入失败|{result.Message}");
-                            ApplicationLog.SystemLog(tag.OpName, $"WriteApi:{tag.OpName}|{tag.TagID}|{tag.TagValue.ToString()}到服务端写入失败|{result.Message}");
+                            var result = MesRestClient.Post(ScadaApp.HttpUri, $"/{tag.OpCode}/DeviceWrite", new OperateWriteValue() { TagId = tag.TagID.ToString(), Value = tag.TagValue.ToString() });
+                            if (result.IsSuccess)
+                            {
+                                if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
+                                {
+                                    ApplicationLog.BusinessLog(tag.OpName, $"【写入数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue.ToString()}");
+                                }
+                                ApplicationLog.SystemLog(tag.OpName, $"WriteApi:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue.ToString()}");
+                            }
+                            else
+                            {
+                                ApplicationLog.BusinessLog(tag.OpName, $"【写入数据】{tag.OpName}|{tag.TagID}|{tag.TagValue.ToString()}到服务端写入失败|{result.Message}");
+                                ApplicationLog.SystemLog(tag.OpName, $"WriteApi:{tag.OpName}|{tag.TagID}|{tag.TagValue.ToString()}到服务端写入失败|{result.Message}");
+                            }
                         }
+                    }
+                    else
+                    {
+                        if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
+                        {
+                            ApplicationLog.BusinessLog(tag.OpName, $"【写入数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
+                        }
+                        ApplicationLog.SystemLog(tag.OpName, $"Write:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
                     }
                 }
                 else
                 {
-                    if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
-                    {
-                        ApplicationLog.BusinessLog(tag.OpName, $"【写入数据】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
-                    }
-                    ApplicationLog.SystemLog(tag.OpName, $"Write:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
+                    ApplicationLog.SystemLog("common", $"【异常记录】WritePLC未识别变量:{TagID}|{TagValue}", "ERROR");
                 }
 
                 flag = true;
             }
             catch (Exception err)
             {
-                ApplicationLog.WriteLog(err, err.Message);
+                ApplicationLog.WriteLog(err, $"TagID:{TagID}:{err}");
             }
             return flag;
         }
@@ -345,23 +360,30 @@ namespace ScadaAppCore
                 foreach (QualityDataType item in List)
                 {
                     var tag = ScadaApp.TagList.Find(it => it.TagID == item.TagID);
-                    if (tag.IsEnable)
+                    if (tag != null)
                     {
-                        tag.TagValue = item.TagValue;
-                        tag = ScadaApp.ConvertTagTypeToString(tag);
-                        tagMsgs.Add(new ScadaApp.TagMsg()
+                        if (tag.IsEnable)
                         {
-                            UniqueId = tag.OpCode,
-                            TagID = tag.TagID.ToString(),
-                            TagName = tag.TagName,
-                            TagQuality = "good",
-                            TagValue = tag.TagValue.ToString()
-                        });
+                            tag.TagValue = item.TagValue;
+                            tag = ScadaApp.ConvertTagTypeToString(tag);
+                            tagMsgs.Add(new ScadaApp.TagMsg()
+                            {
+                                UniqueId = tag.OpCode,
+                                TagID = tag.TagID.ToString(),
+                                TagName = tag.TagName,
+                                TagQuality = "good",
+                                TagValue = tag.TagValue.ToString()
+                            });
+                        }
+                        else
+                        {
+                            ApplicationLog.BusinessLog(tag.OpName, $"【批量写入】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
+                            ApplicationLog.SystemLog(tag.OpName, $"Write:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
+                        }
                     }
                     else
                     {
-                        ApplicationLog.BusinessLog(tag.OpName, $"【批量写入】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
-                        ApplicationLog.SystemLog(tag.OpName, $"Write:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
+                        ApplicationLog.SystemLog("common", $"【异常记录】WritePLC_Sync_DataList未识别变量:{item.TagID}|{item.TagValue}", "ERROR");
                     }
                 }
                 if (!ScadaApp.mesRedisClient.Pub(ScadaApp.WriteTagNodeValue, SimpleJson.SerializeObject(tagMsgs), out errorMsg))
@@ -380,7 +402,7 @@ namespace ScadaAppCore
             }
             catch (Exception err)
             {
-                ApplicationLog.WriteLog(err, err.Message);
+                ApplicationLog.WriteLog(err, err.ToString());
             }
             return flag;
         }
@@ -397,37 +419,44 @@ namespace ScadaAppCore
             try
             {
                 var tag = ScadaApp.TagList.Find(it => it.TagID == TagID);
-                if (tag.IsEnable)
+                if (tag != null)
                 {
-                    tag.TagValue = TagValue;
-                    tag = ScadaApp.ConvertTagTypeToString(tag);
-
-                    if (ScadaApp.mesRedisClient.Write($"{tag.OpCode}:{tag.TagID}", tag.TagValue.ToString(), out var errorMsg))
+                    if (tag.IsEnable)
                     {
-                        ApplicationLog.BusinessLog(tag.OpName, $"【Redis写入】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue}");
-                        ApplicationLog.SystemLog(tag.OpName, $"RedisWrite:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue}");
+                        tag.TagValue = TagValue;
+                        tag = ScadaApp.ConvertTagTypeToString(tag);
+
+                        if (ScadaApp.mesRedisClient.Write($"{tag.OpCode}:{tag.TagID}", tag.TagValue.ToString(), out var errorMsg))
+                        {
+                            ApplicationLog.BusinessLog(tag.OpName, $"【Redis写入】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue}");
+                            ApplicationLog.SystemLog(tag.OpName, $"RedisWrite:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue}");
+                        }
+                        else
+                        {
+                            ApplicationLog.BusinessLog(tag.OpName, $"【Redis写入】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue} 到服务端写入失败|{errorMsg}");
+                            ApplicationLog.SystemLog(tag.OpName, $"RedisWrite:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue} 到服务端写入失败|{errorMsg}");
+                            return flag;
+                        }
                     }
                     else
                     {
-                        ApplicationLog.BusinessLog(tag.OpName, $"【Redis写入】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue} 到服务端写入失败|{errorMsg}");
-                        ApplicationLog.SystemLog(tag.OpName, $"RedisWrite:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|{tag.TagValue} 到服务端写入失败|{errorMsg}");
-                        return flag;
+                        if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
+                        {
+                            ApplicationLog.BusinessLog(tag.OpName, $"【Redis写入】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
+                        }
+                        ApplicationLog.SystemLog(tag.OpName, $"RedisWrite:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
                     }
                 }
                 else
                 {
-                    if (tag.TagName != "HeartBeatPLC" && tag.TagName != "HeartBeatMIS")
-                    {
-                        ApplicationLog.BusinessLog(tag.OpName, $"【Redis写入】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
-                    }
-                    ApplicationLog.SystemLog(tag.OpName, $"RedisWrite:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
+                    ApplicationLog.SystemLog("common", $"【异常记录】WritePLCDirect未识别变量:{TagID}|{TagValue}", "ERROR");
                 }
 
                 flag = true;
             }
             catch (Exception err)
             {
-                ApplicationLog.WriteLog(err, err.Message);
+                ApplicationLog.WriteLog(err, err.ToString());
             }
             return flag;
         }
@@ -448,17 +477,24 @@ namespace ScadaAppCore
                 foreach (QualityDataType item in List)
                 {
                     var tag = ScadaApp.TagList.Find(it => it.TagID == item.TagID);
-                    if (tag.IsEnable)
+                    if (tag != null)
                     {
-                        tag.TagValue = item.TagValue;
-                        tag = ScadaApp.ConvertTagTypeToString(tag);
-                        Keys.Add($"{tag.OpCode}:{tag.TagID}");
-                        Values.Add(tag.TagValue.ToString());
+                        if (tag.IsEnable)
+                        {
+                            tag.TagValue = item.TagValue;
+                            tag = ScadaApp.ConvertTagTypeToString(tag);
+                            Keys.Add($"{tag.OpCode}:{tag.TagID}");
+                            Values.Add(tag.TagValue.ToString());
+                        }
+                        else
+                        {
+                            ApplicationLog.BusinessLog(tag.OpName, $"【Redis批量写入】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
+                            ApplicationLog.SystemLog(tag.OpName, $"RedisWrite:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
+                        }
                     }
                     else
                     {
-                        ApplicationLog.BusinessLog(tag.OpName, $"【Redis批量写入】{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
-                        ApplicationLog.SystemLog(tag.OpName, $"RedisWrite:{tag.OpName}|{tag.TagID}|{tag.TagDescription}|变量未启用,请确认");
+                        ApplicationLog.SystemLog("common", $"【异常记录】WritePLC_Sync_DataList_Direct未识别变量:{item.TagID}|{item.TagValue}", "ERROR");
                     }
                 }
                 if (!ScadaApp.mesRedisClient.Write(Keys.ToArray(), Values.ToArray(), out errorMsg))
@@ -477,7 +513,7 @@ namespace ScadaAppCore
             }
             catch (Exception err)
             {
-                ApplicationLog.WriteLog(err, err.Message);
+                ApplicationLog.WriteLog(err, err.ToString());
             }
             return flag;
         }
