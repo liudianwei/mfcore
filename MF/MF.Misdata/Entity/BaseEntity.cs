@@ -1,4 +1,5 @@
-﻿using SqlSugar;
+﻿using MF.Utils;
+using SqlSugar;
 
 using System;
 
@@ -83,7 +84,7 @@ namespace Common.DBUtils
         {
             if (string.IsNullOrWhiteSpace(Id))
             {
-                Id = Guid.NewGuid().ToString();
+                Id = PubId.SnowflakeId.ToString();
                 State = "0";
                 Creator = nickName;
                 CreateTime = DateTime.Now;

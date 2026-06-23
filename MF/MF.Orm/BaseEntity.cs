@@ -1,6 +1,6 @@
-﻿using System;
-
+﻿using MF.Utils;
 using SqlSugar;
+using System;
 
 namespace MF.Orm
 {
@@ -82,7 +82,7 @@ namespace MF.Orm
         {
             if (string.IsNullOrWhiteSpace(Id))
             {
-                Id = Guid.NewGuid().ToString();
+                Id = PubId.SnowflakeId.ToString();
                 State = "0";
                 Creator = nickName;
                 CreateTime = DateTime.Now;

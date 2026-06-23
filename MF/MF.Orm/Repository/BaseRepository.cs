@@ -1,15 +1,14 @@
-﻿using System;
+﻿using MF.NetCoreApp;
+using MF.Orm.UnitOfWork;
+using MF.Utils;
+using SqlSugar;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-
-using SqlSugar;
-
-using MF.NetCoreApp;
-using MF.Orm.UnitOfWork;
 
 namespace MF.Orm.Repository
 {
@@ -31,7 +30,7 @@ namespace MF.Orm.Repository
         /// <param name="entity">实体对象</param>
         private void PreInsert(T entity)
         {
-            entity.Id = Guid.NewGuid().ToString();
+            entity.Id = PubId.SnowflakeId.ToString();
             entity.InnerVersion = 0;
             entity.State ??= "0";
 
@@ -56,7 +55,7 @@ namespace MF.Orm.Repository
         {
             if (string.IsNullOrWhiteSpace(entity.Id))
             {
-                entity.Id = Guid.NewGuid().ToString();
+                entity.Id = PubId.SnowflakeId.ToString();
             }
             entity.InnerVersion = 0;
             entity.State ??= "0";

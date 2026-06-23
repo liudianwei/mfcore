@@ -1,18 +1,17 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using MF.Orm;
+using MF.Orm.Repository;
+using MF.Orm.Service;
+using MF.Orm.SqlSugar;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
-
-
-using MF.Orm.Repository;
-using MF.Orm.Service;
-using MF.Orm.SqlSugar;
-using Microsoft.AspNetCore.Hosting;
-using System.IO;
 
 namespace MF.Extensions.DependencyInjection
 {
@@ -100,6 +99,15 @@ namespace MF.Extensions.DependencyInjection
 
                         var configuration = serviceProvider.GetRequiredService<IConfiguration>();
                         bool.TryParse(configuration["Log:SqlLog"], out bool flag);
+                        if (int.TryParse(configuration["MaxRow"], out var maxRow))
+                            db.UseAutoLimit(maxRow, log);
+                        if (int.TryParse(configuration["MaxYear"], out var years))
+                        {
+                            // 2. 🎯 读取 json 配置文件里配置的所有大表数组
+                            var bigTables = configuration.GetSection("BigTables").Get<string[]>() ?? Array.Empty<string>();
+                            db.UseAutoTimeLimit(bigTables, years, log);
+                        }
+                        db.InitPipeline();
                         //if (string.IsNullOrWhiteSpace(flag))
                         //{
                         //    flag = "false";
@@ -163,6 +171,14 @@ namespace MF.Extensions.DependencyInjection
                         var log = loggerFactory.CreateLogger<SqlSugarClient>();
                         var configuration = serviceProvider.GetRequiredService<IConfiguration>();
                         bool.TryParse(configuration["Log:SqlLog"], out bool flag);
+                        if (int.TryParse(configuration["MaxRow"], out var maxRow))
+                            db.UseAutoLimit(maxRow, log);
+                        if (int.TryParse(configuration["MaxYear"], out var years))
+                        {
+                            var bigTables = configuration.GetSection("BigTables").Get<string[]>() ?? Array.Empty<string>();
+                            db.UseAutoTimeLimit(bigTables, years, log);
+                        }
+                        db.InitPipeline();
                         //if (string.IsNullOrWhiteSpace(flag))
                         //{
                         //    flag = "false";
@@ -230,6 +246,15 @@ namespace MF.Extensions.DependencyInjection
                         var log = loggerFactory.CreateLogger<SqlSugarClient>();
                         var configuration = serviceProvider.GetRequiredService<IConfiguration>();
                         bool.TryParse(configuration["Log:SqlLog"], out bool flag);
+                        if (int.TryParse(configuration["MaxRow"], out var maxRow))
+                            db.UseAutoLimit(maxRow, log);
+                        if (int.TryParse(configuration["MaxYear"], out var years))
+                        {
+                            // 2. 🎯 读取 json 配置文件里配置的所有大表数组
+                            var bigTables = configuration.GetSection("BigTables").Get<string[]>() ?? Array.Empty<string>();
+                            db.UseAutoTimeLimit(bigTables, years, log);
+                        }
+                        db.InitPipeline();
                         //if (string.IsNullOrWhiteSpace(flag))
                         //{
                         //    flag = "false";
@@ -330,7 +355,7 @@ namespace MF.Extensions.DependencyInjection
 
                 dllnames = dllns.ToList();
             }
-            catch (Exception ee) 
+            catch (Exception ee)
             {
                 Console.WriteLine(ee.Message);
                 Console.WriteLine(ee.StackTrace);
@@ -348,7 +373,7 @@ namespace MF.Extensions.DependencyInjection
                 log.LogError("dll路径: " + path);
                 foreach (var dllpath in dllnames)
                 {
-                    var ass = Assembly.LoadFrom(Path.Combine(path, dllpath+".dll"));
+                    var ass = Assembly.LoadFrom(Path.Combine(path, dllpath + ".dll"));
                     var types = ass.GetTypes().ToList();
                     types = types.Where(i => i.GetCustomAttribute<SugarTable>() != null).ToList();
 
