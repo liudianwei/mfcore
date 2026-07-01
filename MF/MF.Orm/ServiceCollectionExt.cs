@@ -101,12 +101,12 @@ namespace MF.Extensions.DependencyInjection
                         bool.TryParse(configuration["Log:SqlLog"], out bool flag);
                         if (int.TryParse(configuration["MaxRow"], out var maxRow))
                             db.UseAutoLimit(maxRow, log);
-                        if (int.TryParse(configuration["MaxYear"], out var years))
+                        if (int.TryParse(configuration["MaxMonth"], out var months))
                         {
-                            // 2. 🎯 读取 json 配置文件里配置的所有大表数组
                             var bigTables = configuration.GetSection("BigTables").Get<string[]>() ?? Array.Empty<string>();
-                            db.UseAutoTimeLimit(bigTables, years, log);
+                            db.UseAutoTimeLimit(bigTables, months, log);
                         }
+                        db.UseAutoPartitionKeyByComponentSn(log);
                         db.InitPipeline();
                         //if (string.IsNullOrWhiteSpace(flag))
                         //{
@@ -173,11 +173,12 @@ namespace MF.Extensions.DependencyInjection
                         bool.TryParse(configuration["Log:SqlLog"], out bool flag);
                         if (int.TryParse(configuration["MaxRow"], out var maxRow))
                             db.UseAutoLimit(maxRow, log);
-                        if (int.TryParse(configuration["MaxYear"], out var years))
+                        if (int.TryParse(configuration["MaxMonth"], out var months))
                         {
                             var bigTables = configuration.GetSection("BigTables").Get<string[]>() ?? Array.Empty<string>();
-                            db.UseAutoTimeLimit(bigTables, years, log);
+                            db.UseAutoTimeLimit(bigTables, months, log);
                         }
+                        db.UseAutoPartitionKeyByComponentSn(log);
                         db.InitPipeline();
                         //if (string.IsNullOrWhiteSpace(flag))
                         //{
@@ -248,12 +249,12 @@ namespace MF.Extensions.DependencyInjection
                         bool.TryParse(configuration["Log:SqlLog"], out bool flag);
                         if (int.TryParse(configuration["MaxRow"], out var maxRow))
                             db.UseAutoLimit(maxRow, log);
-                        if (int.TryParse(configuration["MaxYear"], out var years))
+                        if (int.TryParse(configuration["MaxMonth"], out var months))
                         {
-                            // 2. 🎯 读取 json 配置文件里配置的所有大表数组
                             var bigTables = configuration.GetSection("BigTables").Get<string[]>() ?? Array.Empty<string>();
-                            db.UseAutoTimeLimit(bigTables, years, log);
+                            db.UseAutoTimeLimit(bigTables, months, log);
                         }
+                        db.UseAutoPartitionKeyByComponentSn(log);
                         db.InitPipeline();
                         //if (string.IsNullOrWhiteSpace(flag))
                         //{

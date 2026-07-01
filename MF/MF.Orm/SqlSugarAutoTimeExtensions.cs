@@ -17,8 +17,8 @@ namespace MF.Orm
         // =========================================================================
         public static void UseAutoTimeLimit(
             this ISqlSugarClient db,
-            string[] limitTables, // 👈 动态注入需要卡1年时间的大表数组
-            int years,
+            string[] limitTables, // 👈 动态注入需要卡时间的大表数组
+            int months,
             Microsoft.Extensions.Logging.ILogger log)
         {
             // 如果配置文件里没配，直接放行，不影响任何性能
@@ -48,7 +48,7 @@ namespace MF.Orm
                         string columnName = "create_time";
 
                         // 生成通用的标准 ISO 日期时间格式字符串
-                        string timeMin = DateTime.Now.AddYears(-years).ToString("yyyy-MM-dd HH:mm:ss");
+                        string timeMin = DateTime.Now.AddMonths(-months).ToString("yyyy-MM-dd HH:mm:ss");
                         string timeMax = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
                         // 构造标准的 ANSI SQL 过滤语句
@@ -66,7 +66,7 @@ namespace MF.Orm
 
                         // 4. 打印安全性拦截审计日志
                         var dbType = db.CurrentConnectionConfig.DbType;
-                        log.LogInformation($"SQL时间兜底拦截【当前库: {dbType}】：检测到配置的大表盲查，已自动追加1年时间限制。{Environment.NewLine}【原 SQL】: {sql} {Environment.NewLine}【新 SQL】: {trimSql}");
+                        log.LogInformation($"SQL时间兜底拦截【当前库: {dbType}】：检测到配置的大表盲查，已自动追加{months}月时间限制。{Environment.NewLine}【原 SQL】: {sql} {Environment.NewLine}【新 SQL】: {trimSql}");
 
                         // 5. 吐回替换后带有时间限制的新 SQL
                         return KeyValuePair.Create(trimSql, pars);
@@ -77,5 +77,6 @@ namespace MF.Orm
                 return KeyValuePair.Create(sql, pars);
             });
         }
+
     }
 }

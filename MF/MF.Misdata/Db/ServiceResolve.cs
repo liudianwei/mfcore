@@ -182,12 +182,12 @@ namespace Common.DBUtils
                              if (flag)
                              {
                                  dB.Ado.IsEnableLogEvent = true;
-                                 if (int.TryParse(configuration["MaxYear"], out var years))
+                                 if (int.TryParse(configuration["MaxMonth"], out var months))
                                  {
-                                     // 2. 🎯 读取 json 配置文件里配置的所有大表数组
                                      var bigTables = configuration.GetSection("BigTables").Get<string[]>() ?? Array.Empty<string>();
-                                     dB.UseAutoTimeLimit(bigTables, years, log);
+                                     dB.UseAutoTimeLimit(bigTables, months, log);
                                  }
+                                 dB.UseAutoPartitionKeyByComponentSn(log);
                                  dB.InitPipeline();
                                  //SQL执行前事件
                                  //db.Aop.OnLogExecuting = (sql, pars) =>
