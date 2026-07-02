@@ -136,24 +136,24 @@ namespace MF.Orm
             {
                 if (likePattern.StartsWith("%") && likePattern.EndsWith("%") && likePattern.Length > 2)
                     return db.Queryable<ComponentSnTimeRangeEntity>()
-                        .Where(r => r.Sn.Contains(likePattern.Trim('%')))
+                        .Where(r => r.ComponentSn.Contains(likePattern.Trim('%')))
                         .ToList();
 
                 if (likePattern.StartsWith("%"))
                     return db.Queryable<ComponentSnTimeRangeEntity>()
-                        .Where(r => r.Sn.EndsWith(likePattern.TrimStart('%')))
+                        .Where(r => r.ComponentSn.EndsWith(likePattern.TrimStart('%')))
                         .ToList();
 
                 if (likePattern.EndsWith("%"))
                     return db.Queryable<ComponentSnTimeRangeEntity>()
-                        .Where(r => r.Sn.StartsWith(likePattern.TrimEnd('%')))
+                        .Where(r => r.ComponentSn.StartsWith(likePattern.TrimEnd('%')))
                         .ToList();
 
                 return new List<ComponentSnTimeRangeEntity>();
             }
 
             return db.Queryable<ComponentSnTimeRangeEntity>()
-                .Where(r => snValues.Contains(r.Sn))
+                .Where(r => snValues.Contains(r.ComponentSn))
                 .ToList();
         }
 

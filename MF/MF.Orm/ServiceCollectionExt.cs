@@ -107,6 +107,7 @@ namespace MF.Extensions.DependencyInjection
                             db.UseAutoTimeLimit(bigTables, months, log);
                         }
                         db.UseAutoPartitionKeyByComponentSn(log);
+                        db.UseAutoSnTimeRangeTracker(log);
                         db.InitPipeline();
                         //if (string.IsNullOrWhiteSpace(flag))
                         //{
@@ -179,6 +180,7 @@ namespace MF.Extensions.DependencyInjection
                             db.UseAutoTimeLimit(bigTables, months, log);
                         }
                         db.UseAutoPartitionKeyByComponentSn(log);
+                        db.UseAutoSnTimeRangeTracker(log);
                         db.InitPipeline();
                         //if (string.IsNullOrWhiteSpace(flag))
                         //{
@@ -255,6 +257,7 @@ namespace MF.Extensions.DependencyInjection
                             db.UseAutoTimeLimit(bigTables, months, log);
                         }
                         db.UseAutoPartitionKeyByComponentSn(log);
+                        db.UseAutoSnTimeRangeTracker(log);
                         db.InitPipeline();
                         //if (string.IsNullOrWhiteSpace(flag))
                         //{

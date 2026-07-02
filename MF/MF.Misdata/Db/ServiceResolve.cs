@@ -188,6 +188,7 @@ namespace Common.DBUtils
                                      dB.UseAutoTimeLimit(bigTables, months, log);
                                  }
                                  dB.UseAutoPartitionKeyByComponentSn(log);
+                                 dB.UseAutoSnTimeRangeTracker(log);
                                  dB.InitPipeline();
                                  //SQL执行前事件
                                  //db.Aop.OnLogExecuting = (sql, pars) =>
