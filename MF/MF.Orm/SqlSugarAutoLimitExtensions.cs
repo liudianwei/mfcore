@@ -11,6 +11,8 @@ namespace MF.Orm
 {
     public static class SqlSugarAutoLimitExtensions
     {
+        private const string InterceptorRegistrationKey = nameof(SqlSugarAutoLimitExtensions);
+
         private static bool IsPagedSql(string sql)
         {
             sql = sql.ToUpperInvariant();
@@ -129,7 +131,7 @@ namespace MF.Orm
                 var newSql = AddLimitByDbType(sql, dbType, maxRow);
                 log.LogInformation($"sql查询没有最大行数限制 替换sql {Environment.NewLine}{sql}  {Environment.NewLine}{newSql}");
                 return KeyValuePair.Create(newSql, pars);
-            });
+            }, InterceptorRegistrationKey);
         }
     }
 }

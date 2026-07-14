@@ -12,6 +12,8 @@ namespace MF.Orm
 {
     public static class SqlSugarAutoTimeExtensions
     {
+        private const string InterceptorRegistrationKey = nameof(SqlSugarAutoTimeExtensions);
+
         // =========================================================================
         // 🎯 配置化进阶版：支持从配置文件动态传入大表名单
         // =========================================================================
@@ -75,7 +77,7 @@ namespace MF.Orm
 
                 // 没触发拦截或已带时间的，原封不动放行
                 return KeyValuePair.Create(sql, pars);
-            });
+            }, InterceptorRegistrationKey);
         }
 
     }

@@ -12,6 +12,8 @@ namespace MF.Orm
         // 💡 核心黑科技：用一个全局静态的委托列表，把所有需要修改 SQL 的逻辑存起来
         private static readonly List<Func<string, SugarParameter[], KeyValuePair<string, SugarParameter[]>>> _interceptors =
             new List<Func<string, SugarParameter[], KeyValuePair<string, SugarParameter[]>>>();
+        private static readonly HashSet<string> _registrationKeys =
+            new HashSet<string>(StringComparer.Ordinal);
 
         private static readonly object _lock = new object();
         private static bool _isInitialized = false;
@@ -19,10 +21,18 @@ namespace MF.Orm
         /// <summary>
         /// 注册自定义 SQL 改写逻辑
         /// </summary>
-        public static void RegisterInterceptor(Func<string, SugarParameter[], KeyValuePair<string, SugarParameter[]>> interceptor)
+        public static void RegisterInterceptor(
+            Func<string, SugarParameter[], KeyValuePair<string, SugarParameter[]>> interceptor,
+            string registrationKey)
         {
+            if (string.IsNullOrWhiteSpace(registrationKey))
+                throw new ArgumentException("拦截器注册键不能为空", nameof(registrationKey));
+
             lock (_lock)
             {
+                if (!_registrationKeys.Add(registrationKey))
+                    return;
+
                 _interceptors.Add(interceptor);
             }
         }

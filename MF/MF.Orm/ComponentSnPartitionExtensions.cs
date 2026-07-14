@@ -11,6 +11,7 @@ namespace MF.Orm
     {
         // 配置表名，用于跳过自身查询避免递归
         private const string ConfigTable = "component_sn_time_range";
+        private const string InterceptorRegistrationKey = nameof(ComponentSnPartitionExtensions);
 
         /// <summary>
         /// 注册拦截器：检测到 component_sn 条件时，从配置表查询对应时间范围，
@@ -37,9 +38,15 @@ namespace MF.Orm
                     return KeyValuePair.Create(sql, pars);
 
                 // 尝试匹配 = / IN / LIKE 三种条件
-                var eqMatch = Regex.Match(trimSql, @"component_sn\s*=\s*(@\w+)", RegexOptions.IgnoreCase);
-                var inMatch = Regex.Match(trimSql, @"component_sn\s+IN\s*\(([^)]+)\)", RegexOptions.IgnoreCase);
-                var likeMatch = Regex.Match(trimSql, @"component_sn\s+LIKE\s*(@\w+)", RegexOptions.IgnoreCase);
+                var eqMatch = Regex.Match(trimSql,
+                    "\\bcomponent_sn\\b(?:\\]|`|\")?\\s*=\\s*([@:]\\w+)", RegexOptions.IgnoreCase);
+                var inMatch = Regex.Match(trimSql,
+                    "\\bcomponent_sn\\b(?:\\]|`|\")?\\s+IN\\s*\\(([^)]+)\\)", RegexOptions.IgnoreCase);
+                var likeMatch = Regex.Match(trimSql,
+                    "\\bcomponent_sn\\b(?:\\]|`|\")?\\s+LIKE\\s*" +
+                    "(CONCAT\\s*\\([^)]*\\)|(?:N?'%'\\s*(?:\\+|\\|\\|)\\s*)?[@:]\\w+" +
+                    "(?:\\s*(?:\\+|\\|\\|)\\s*N?'%')?)",
+                    RegexOptions.IgnoreCase);
 
                 if (!eqMatch.Success && !inMatch.Success && !likeMatch.Success)
                     return KeyValuePair.Create(sql, pars);
@@ -68,7 +75,7 @@ namespace MF.Orm
                 log.LogInformation($"分区键时间兜底拦截【{dbType}】：{string.Join(",", snValues)} => 追加create_time分区键");
 
                 return KeyValuePair.Create(trimSql, pars);
-            });
+            }, InterceptorRegistrationKey);
         }
 
         /// <summary>根据匹配到的条件类型分发到对应的解析函数</summary>
@@ -98,7 +105,7 @@ namespace MF.Orm
         private static (List<string> snValues, string likePrefix) ResolveIn(SugarParameter[] pars, Match inMatch)
         {
             var snValues = new List<string>();
-            var paramMatches = Regex.Matches(inMatch.Groups[1].Value, @"@\w+");
+            var paramMatches = Regex.Matches(inMatch.Groups[1].Value, @"[@:]\w+");
             foreach (Match m in paramMatches)
             {
                 var param = ResolveParam(pars, m.Value);
@@ -117,11 +124,27 @@ namespace MF.Orm
         /// </summary>
         private static (List<string> snValues, string likePattern) ResolveLike(SugarParameter[] pars, Match likeMatch)
         {
-            var param = ResolveParam(pars, likeMatch.Groups[1].Value);
+            var expression = likeMatch.Groups[1].Value;
+            var paramMatch = Regex.Match(expression, @"[@:]\w+");
+            if (!paramMatch.Success)
+                return (new List<string>(), null);
+
+            var param = ResolveParam(pars, paramMatch.Value);
             if (param?.Value == null)
                 return (new List<string>(), null);
 
             var val = param.Value.ToString();
+            var expressionBeforeParam = expression.Substring(0, paramMatch.Index);
+            var expressionAfterParam = expression.Substring(paramMatch.Index + paramMatch.Length);
+
+            if (Regex.IsMatch(expressionBeforeParam, @"N?'%'", RegexOptions.IgnoreCase) &&
+                !val.StartsWith("%"))
+                val = "%" + val;
+
+            if (Regex.IsMatch(expressionAfterParam, @"N?'%'", RegexOptions.IgnoreCase) &&
+                !val.EndsWith("%"))
+                val += "%";
+
             if (!val.Contains('%'))
                 return (new List<string> { val }, null);
 
@@ -165,8 +188,10 @@ namespace MF.Orm
         /// </summary>
         private static string AppendTimeBounds(string sql, DateTime minStart, DateTime maxEnd)
         {
-            var hasLower = Regex.IsMatch(sql, @"create_time\s*(>=|>)", RegexOptions.IgnoreCase);
-            var hasUpper = Regex.IsMatch(sql, @"create_time\s*(<=|<)", RegexOptions.IgnoreCase);
+            var hasLower = Regex.IsMatch(sql,
+                "\\bcreate_time\\b(?:\\]|`|\")?\\s*(>=|>)", RegexOptions.IgnoreCase);
+            var hasUpper = Regex.IsMatch(sql,
+                "\\bcreate_time\\b(?:\\]|`|\")?\\s*(<=|<)", RegexOptions.IgnoreCase);
 
             var lower = $" create_time >= '{minStart:yyyy-MM-dd HH:mm:ss}' ";
             var upper = $" create_time <= '{maxEnd:yyyy-MM-dd HH:mm:ss}' ";
