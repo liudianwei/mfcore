@@ -1,22 +1,19 @@
 ﻿using SqlSugar;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace MF.Orm
 {
     public static class SqlSugarInterceptorManager
     {
-        // 💡 核心黑科技：用一个全局静态的委托列表，把所有需要修改 SQL 的逻辑存起来
-        private static readonly List<Func<string, SugarParameter[], KeyValuePair<string, SugarParameter[]>>> _interceptors =
-            new List<Func<string, SugarParameter[], KeyValuePair<string, SugarParameter[]>>>();
+        // 注册时在锁内发布新的不可变快照，使 SQL 执行热路径无需加锁。
+        private static Func<string, SugarParameter[], KeyValuePair<string, SugarParameter[]>>[] _interceptors =
+            Array.Empty<Func<string, SugarParameter[], KeyValuePair<string, SugarParameter[]>>>();
         private static readonly HashSet<string> _registrationKeys =
             new HashSet<string>(StringComparer.Ordinal);
 
         private static readonly object _lock = new object();
-        private static bool _isInitialized = false;
 
         /// <summary>
         /// 注册自定义 SQL 改写逻辑
@@ -33,7 +30,10 @@ namespace MF.Orm
                 if (!_registrationKeys.Add(registrationKey))
                     return;
 
-                _interceptors.Add(interceptor);
+                var interceptors = new Func<string, SugarParameter[], KeyValuePair<string, SugarParameter[]>>[_interceptors.Length + 1];
+                Array.Copy(_interceptors, interceptors, _interceptors.Length);
+                interceptors[interceptors.Length - 1] = interceptor;
+                Volatile.Write(ref _interceptors, interceptors);
             }
         }
 
@@ -46,7 +46,8 @@ namespace MF.Orm
             db.Aop.OnExecutingChangeSql = (sql, pars) =>
             {
                 // 顺着注册的顺序，像流水线一样依次加工 SQL
-                foreach (var interceptor in _interceptors)
+                var interceptors = Volatile.Read(ref _interceptors);
+                foreach (var interceptor in interceptors)
                 {
                     var result = interceptor(sql, pars);
                     sql = result.Key;
