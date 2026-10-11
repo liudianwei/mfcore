@@ -261,10 +261,10 @@ namespace MF.Orm
 
             var bounds = new List<string>();
             if (!hasLower && minStart.HasValue)
-                bounds.Add($"create_time >= '{minStart.Value:yyyy-MM-dd HH:mm:ss}'");
+                bounds.Add($"create_time >= '{minStart.Value.AddMinutes(-1):yyyy-MM-dd HH:mm:ss}'");
 
             if (!hasUpper && maxEnd.HasValue)
-                bounds.Add($"create_time <= '{maxEnd.Value:yyyy-MM-dd HH:mm:ss}'");
+                bounds.Add($"create_time <= '{maxEnd.Value.AddMinutes(1):yyyy-MM-dd HH:mm:ss}'");
 
             if (bounds.Count == 0)
                 return sql;
