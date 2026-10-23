@@ -116,7 +116,7 @@ namespace MF.Orm
 
         public static void UseAutoLimit(this SqlSugarClient db, int maxRow, Microsoft.Extensions.Logging.ILogger<SqlSugarClient> log)
         {
-            SqlSugarInterceptorManager.RegisterInterceptor((sql, pars) =>
+            SqlSugarInterceptorManager.RegisterInterceptor(db, (sql, pars) =>
             {
                 var trimSql = sql.TrimStart();
                 // 只处理 SELECT

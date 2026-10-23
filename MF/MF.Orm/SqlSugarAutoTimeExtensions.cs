@@ -28,7 +28,7 @@ namespace MF.Orm
 
             // 💡 极其硬核的性能优化：高并发下用 HashSet 的 Contains 速度比 Array.Any 快几十倍
             var hashTables = new HashSet<string>(limitTables, StringComparer.OrdinalIgnoreCase);
-            SqlSugarInterceptorManager.RegisterInterceptor((sql, pars) =>
+            SqlSugarInterceptorManager.RegisterInterceptor(db, (sql, pars) =>
             {
                 var trimSql = sql.TrimStart();
 

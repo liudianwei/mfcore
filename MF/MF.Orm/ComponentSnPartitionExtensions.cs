@@ -22,7 +22,7 @@ namespace MF.Orm
             this ISqlSugarClient db,
             ILogger log)
         {
-            SqlSugarInterceptorManager.RegisterInterceptor((sql, pars) =>
+            SqlSugarInterceptorManager.RegisterInterceptor(db, (sql, pars) =>
             {
                 var trimSql = sql.TrimStart();
 
@@ -67,7 +67,18 @@ namespace MF.Orm
                     return KeyValuePair.Create(sql, pars);
 
                 // 根据 SN 查询配置表获取时间范围
-                var ranges = QueryTimeRanges(db, snValues, likePrefix, log);
+                List<ComponentSnTimeRangeEntity> ranges;
+                try
+                {
+                    ranges = QueryTimeRanges(db, snValues, likePrefix, log);
+                }
+                catch (Exception ex)
+                {
+                    log.LogWarning(ex,
+                        "component_sn 分区时间查询失败，已放行原 SQL：{ComponentSn}",
+                        string.Join(",", snValues));
+                    return KeyValuePair.Create(sql, pars);
+                }
                 if (ranges.Count == 0)
                     return KeyValuePair.Create(sql, pars);
 
@@ -176,6 +187,8 @@ namespace MF.Orm
         private static List<ComponentSnTimeRangeEntity> QueryTimeRanges(
             ISqlSugarClient db, List<string> snValues, string likePattern, ILogger log)
         {
+            using var auxiliaryDb = SqlSugarAuxiliaryClientFactory.Create(db);
+
             if (likePattern != null)
             {
                 var keyword = likePattern.Trim('%');
@@ -186,7 +199,7 @@ namespace MF.Orm
                     return new List<ComponentSnTimeRangeEntity>();
                 }
 
-                var query = CreateLikeQuery(db, likePattern, keyword);
+                var query = CreateLikeQuery(auxiliaryDb, likePattern, keyword);
                 if (query == null)
                     return new List<ComponentSnTimeRangeEntity>();
 
@@ -202,7 +215,7 @@ namespace MF.Orm
                         "component_sn LIKE 条件匹配超过 {MaxCount} 条，改为在数据库端汇总时间范围：{LikePattern}",
                         MaxLikeMatchCount, likePattern);
 
-                    var range = CreateLikeQuery(db, likePattern, keyword)
+                    var range = CreateLikeQuery(auxiliaryDb, likePattern, keyword)
                         .Select(r => new ComponentSnTimeRangeEntity
                         {
                             StartTime = SqlFunc.AggregateMin(r.StartTime),
@@ -218,7 +231,7 @@ namespace MF.Orm
                 return ranges;
             }
 
-            return db.Queryable<ComponentSnTimeRangeEntity>()
+            return auxiliaryDb.Queryable<ComponentSnTimeRangeEntity>()
                 .Where(r => snValues.Contains(r.ComponentSn))
                 .OrderByDescending(r => r.EndTime)
                 .OrderByDescending(r => r.StartTime)

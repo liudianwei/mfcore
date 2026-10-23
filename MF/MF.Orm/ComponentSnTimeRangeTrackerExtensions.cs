@@ -21,7 +21,7 @@ namespace MF.Orm
             this ISqlSugarClient db,
             ILogger log)
         {
-            SqlSugarInterceptorManager.RegisterInterceptor((sql, pars) =>
+            SqlSugarInterceptorManager.RegisterInterceptor(db, (sql, pars) =>
             {
                 var trimSql = sql.TrimStart();
 
@@ -110,7 +110,8 @@ namespace MF.Orm
 
         private static DateTime? ExtractCreateTime(string sql, SugarParameter[] pars)
         {
-            var updateMatch = Regex.Match(sql, @"\bcreate_time\b\s*=\s*(@\w+)", RegexOptions.IgnoreCase);
+            var updateMatch = Regex.Match(sql,
+                @"\bcreate_time\b(?:\]|`|"")?\s*=\s*([@:]\w+)", RegexOptions.IgnoreCase);
             if (updateMatch.Success)
             {
                 var p = ResolveParam(pars, updateMatch.Groups[1].Value);
@@ -120,7 +121,7 @@ namespace MF.Orm
             }
 
             var insertMatch = Regex.Match(sql,
-                @"INSERT\s+INTO\s+\w+[\s\S]*?\(([^)]+)\)\s*VALUES\s*\(([^)]+)\)",
+                @"INSERT\s+INTO\s+[\w`\[\]""]+\s*\(([^)]+)\)\s*VALUES\s*\(([^)]+)\)",
                 RegexOptions.IgnoreCase);
             if (insertMatch.Success)
             {
@@ -128,10 +129,12 @@ namespace MF.Orm
                 var values = SplitList(insertMatch.Groups[2].Value);
                 for (int i = 0; i < columns.Count && i < values.Count; i++)
                 {
-                    if (columns[i].Equals("create_time", StringComparison.OrdinalIgnoreCase) &&
-                        values[i].StartsWith("@"))
+                    var columnName = columns[i].Trim().Trim('[', ']', '`', '"');
+                    var value = values[i].Trim();
+                    if (columnName.Equals("create_time", StringComparison.OrdinalIgnoreCase) &&
+                        (value.StartsWith("@") || value.StartsWith(":")))
                     {
-                        var p = ResolveParam(pars, values[i]);
+                        var p = ResolveParam(pars, value);
                         if (p?.Value is DateTime dt) return dt;
                         if (p?.Value != null && DateTime.TryParse(p.Value.ToString(), out var parsed))
                             return parsed;
@@ -186,24 +189,25 @@ namespace MF.Orm
         {
             try
             {
+                using var auxiliaryDb = SqlSugarAuxiliaryClientFactory.Create(db);
                 var now = DateTime.Now;
                 var id = PubId.SnowflakeId.ToString();
                 var snParam = new SugarParameter("@component_sn", componentSnValue);
                 var updateTimeParam = new SugarParameter("@update_time", updateTime);
 
-                var exists = db.Ado.GetInt(
+                var exists = auxiliaryDb.Ado.GetInt(
                     $"SELECT CASE WHEN EXISTS (SELECT 1 FROM {ConfigTable} WHERE component_sn = @component_sn) THEN 1 ELSE 0 END", snParam);
 
                 if (exists == 1)
                 {
-                    db.Ado.ExecuteCommand(
+                    auxiliaryDb.Ado.ExecuteCommand(
                         $"UPDATE {ConfigTable} SET end_time = @update_time, update_time = @now " +
                         $"WHERE component_sn = @component_sn AND end_time < @update_time",
                         snParam, updateTimeParam, new SugarParameter("@now", now));
                 }
                 else
                 {
-                    db.Ado.ExecuteCommand(
+                    auxiliaryDb.Ado.ExecuteCommand(
                         $"INSERT INTO {ConfigTable} (id, component_sn, start_time, end_time, creator, create_time, update_time, state, inner_version) " +
                         $"VALUES (@id, @component_sn, @create_time, @update_time, 'system', @now, @now, '0', 0)",
                         new SugarParameter("@id", id),
@@ -218,7 +222,7 @@ namespace MF.Orm
             }
             catch (Exception ex)
             {
-                log.LogWarning($"SN时间范围跟踪失败：{componentSnValue}，{ex.Message}");
+                log.LogWarning(ex, "SN时间范围跟踪失败：{ComponentSn}", componentSnValue);
             }
         }
 
