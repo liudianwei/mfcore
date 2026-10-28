@@ -1,5 +1,6 @@
 ﻿using MF.Core.Extensions;
 using MF.FluentValidation;
+using MF.Core.Exceptions;
 using MF.Orm.Repository;
 using MF.Utils;
 using System;
@@ -42,7 +43,7 @@ namespace MF.Orm
 
         protected void ThrowError(string errmsg)
         {
-            throw new Exception(errmsg);
+            throw new BusinessException(errmsg);
         }
 
         /// <summary>
