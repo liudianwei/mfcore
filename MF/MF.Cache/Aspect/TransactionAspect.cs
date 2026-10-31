@@ -80,7 +80,7 @@ namespace MF.NetCore
             catch (Exception ex)
             {
                 _db.Ado.RollbackTran();
-                throw new Exception(ex.Message);
+                throw;
             }
         }
 
@@ -98,7 +98,7 @@ namespace MF.NetCore
             catch (Exception ex)
             {
                 _db.Ado.RollbackTran();
-                throw new Exception(ex.Message);
+                throw;
             }
         }
 
@@ -111,7 +111,7 @@ namespace MF.NetCore
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw;
             }
         }
     }
