@@ -766,6 +766,7 @@ namespace UserCenter.CommandHandles
         {
             //根据用户id 查询所有权限带分组信息
             var db = _unitOfWork.GetDbClient();
+            var ownedIds = PermissionAssignmentScope.GetOwnedPermissionIds(db, uid);
             var list1 = db.Queryable<Permission, RolePermission, Role, RoleUser, User, PermissionPermissiongroup, Permissiongroup>
             ((p, rp, r, ru, u, pgp, gp) => new JoinQueryInfos(
                 JoinType.Left, rp.PermissionId == p.Id,
@@ -775,7 +776,7 @@ namespace UserCenter.CommandHandles
                 JoinType.Left, pgp.PermissionId == p.Id,
                 JoinType.Left, gp.Id == pgp.PermissiongroupId
             ))
-            .Where((p, rp, r, ru, u, pgp, gp) => u.Id == uid && p.State == BaseStateConstants.ACTIVATE)
+            .Where((p, rp, r, ru, u, pgp, gp) => u.Id == uid && ownedIds.Contains(p.Id))
             .Select((p, rp, r, ru, u, pgp, gp) => new PermissionDto
             {
                 Id = p.Id,
@@ -795,32 +796,7 @@ namespace UserCenter.CommandHandles
             })
             .Distinct();
 
-            var list2 = db.Queryable<Permission, PermissionPermissiongroup, Permissiongroup>
-            ((p, pgp, gp) => new JoinQueryInfos(
-                    JoinType.Left, pgp.PermissionId == p.Id,
-                    JoinType.Left, gp.Id == pgp.PermissiongroupId
-            ))
-            .Where((p, pgp, gp) => p.Creator == _globalCore.UserConcatName && p.State == BaseStateConstants.ACTIVATE)
-            .Select((p, pgp, gp) => new PermissionDto
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Code = p.Code,
-                ParentId = p.ParentId,
-                ApiUrl = p.ApiUrl,
-                OrderNum = p.OrderNum,
-                Url = p.Url,
-                IframeUrl = p.IframeUrl,
-                Type = p.Type,
-                Icon = p.Icon,
-                PermissionGroupId = gp.Id,
-                PermissionGroupName = gp.Name,
-                Perms = p.Perms,
-                CreateTime = p.CreateTime
-            })
-            .Distinct();
-            var list = db.UnionAll(list1, list2).OrderBy(it => it.CreateTime, OrderByType.Desc).Distinct().ToList();
-            return list;
+            return list1.ToList();
         }
 
         private List<PermissionDto> GetAllPermissionDtos()

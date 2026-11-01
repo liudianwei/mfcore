@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -201,11 +201,11 @@ namespace UserCenter.CommandHandles
             {
                 return Failed(BaseSystemError.ID_CANNOT_BE_EMPTY);
             }
-            if (cmd.List.IsNullT())
+            if (_globalCore.UserId.IsNull())
             {
-                _rolePermissionRepository.Delete(rp => rp.RoleId == cmd.Id, false);
-                return Succeed();
+                return Failed(UserCenterError.USER_NOT_FOUND);
             }
+            cmd.List = cmd.List?.Distinct().ToList() ?? new List<string>();
             var roleObj = _roleRepository.Queryable().InSingle(cmd.Id);
             if (roleObj.IsNull())
             {
@@ -220,9 +220,15 @@ namespace UserCenter.CommandHandles
                 }
             }
             var db = _unitOfWork.GetDbClient();
+            var uid = _globalCore.UserId;
+            var isSuper = uid.Equals(SystemConstants.superId);
+            var ownedIds = isSuper ? null : PermissionAssignmentScope.GetOwnedPermissionIds(db, uid);
+            if (!isSuper && cmd.List.Except(ownedIds).Any())
+            {
+                return Failed(BaseSystemError.DO_NOT_HAVE_PERMISSION);
+            }
             var flag = db.UseTran(() =>
             {
-                var uid = _globalCore.UserId;
                 if (uid.Equals(SystemConstants.superId))//注意：system 先删除所有，再重新创建 
                 {
                     db.Deleteable<RolePermission>().Where(rp => rp.RoleId == cmd.Id).ExecuteCommand();
@@ -238,13 +244,16 @@ namespace UserCenter.CommandHandles
                         rp.ChangeBaseInfo(_globalCore.UserName);
                         addItemList.Add(rp);
                     }
-                    db.Insertable(addItemList).ExecuteCommand();
+                    if (addItemList.Count > 0)
+                    {
+                        db.Insertable(addItemList).ExecuteCommand();
+                    }
                 }
-                //除system分配权限之外的其它角色 都是禁用、启用操作 而非删除再插入  防止去掉勾选项后 就看不到之前system分配的权限了
+                // 普通管理员只能修改自身有效权限范围内的关系，保留范围外的原有授权。
                 else
                 {
                     //针对已分配给权限操作
-                    var list = db.Queryable<RolePermission>().Where(i => i.RoleId == cmd.Id).ToList();
+                    var list = db.Queryable<RolePermission>().Where(i => i.RoleId == cmd.Id && ownedIds.Contains(i.PermissionId)).ToList();
                     //禁用
                     var disList = list.Where(i => !cmd.List.Contains(i.PermissionId)).Select(i => i.Id).ToArray();
                     //更新
@@ -260,7 +269,7 @@ namespace UserCenter.CommandHandles
                     .Where(it => updateList.Contains(it.Id))
                     .ExecuteCommand();
 
-                    //未分配 但属于自己创建的按钮、菜单
+                    // 新增已验证属于当前用户权限范围的关系。
                     var allPermList = list.Select(i => i.PermissionId).ToArray();
                     var selfList = cmd.List.Except(allPermList).ToList();
 
