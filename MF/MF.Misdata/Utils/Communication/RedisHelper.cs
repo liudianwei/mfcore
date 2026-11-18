@@ -422,6 +422,7 @@ namespace Common.Communication
                         }
 
                         #endregion 非监控数据
+                        flag = true;
                     }
                     else
                     {
